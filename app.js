@@ -258,8 +258,90 @@ const App = {
         }
       });
 
+      // 拖拽排序交互与“咻”声音效
+      item.setAttribute('draggable', 'true');
+      item.dataset.index = idx;
+
+      item.addEventListener('dragstart', (e) => {
+        item.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', idx);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        document.querySelectorAll('.project-item').forEach(el => el.classList.remove('drag-over'));
+      });
+
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        item.classList.add('drag-over');
+      });
+
+      item.addEventListener('dragleave', () => {
+        item.classList.remove('drag-over');
+      });
+
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        item.classList.remove('drag-over');
+        const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+        const toIdx = idx;
+
+        if (!isNaN(fromIdx) && fromIdx !== toIdx) {
+          const [movedProject] = this.projects.splice(fromIdx, 1);
+          this.projects.splice(toIdx, 0, movedProject);
+          this.saveProjects();
+          
+          this.playSwooshSound();
+          this.renderProjectList();
+          this.showToast('已成功调整图解顺序 咻~');
+        }
+      });
+
       container.appendChild(item);
     });
+  },
+
+  // 播放“咻~” (Swoosh/Whoosh) 拖拽置换音效 (Web Audio API 极速合成)
+  playSwooshSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+
+      const bufferSize = Math.floor(ctx.sampleRate * 0.24);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(400, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(2200, ctx.currentTime + 0.1);
+      filter.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.24);
+      filter.Q.setValueAtTime(4, ctx.currentTime);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.01, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.24);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      noise.start();
+      noise.stop(ctx.currentTime + 0.24);
+    } catch (e) {
+      console.log('Swoosh sound error:', e);
+    }
   },
 
   deleteProject(id) {

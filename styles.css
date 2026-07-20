@@ -638,6 +638,21 @@ body.dark-mode .project-item {
   color: var(--hover-text, var(--text-main)) !important;
 }
 
+/* 拖拽排序视觉反馈样式 */
+.project-item.dragging {
+  opacity: 0.35 !important;
+  transform: scale(0.92) !important;
+  border: 2px dashed var(--primary) !important;
+  box-shadow: 0 0 15px rgba(209, 142, 151, 0.4) !important;
+}
+
+.project-item.drag-over {
+  transform: translateY(-6px) scale(1.05) !important;
+  border: 2px solid var(--primary) !important;
+  box-shadow: 0 10px 25px rgba(209, 142, 151, 0.5) !important;
+  background-color: var(--primary-light) !important;
+}
+
 .project-item:hover .badge {
   background-color: rgba(255, 255, 255, 0.2) !important;
   color: var(--hover-text, var(--text-main)) !important;
