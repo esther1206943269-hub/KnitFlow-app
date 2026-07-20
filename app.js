@@ -483,7 +483,7 @@ const App = {
       breakdownArea.style.padding = '0.55rem 0.85rem';
       breakdownArea.innerHTML = `
         <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-style: italic;">
-          <span>💡 <strong>独立花样提示：</strong>【这行没有花样，请继续编织】</span>
+          <span>💡 <strong>独立花样提示：</strong>【这行没有花样哦，请继续编织吧】</span>
         </div>
       `;
     }
