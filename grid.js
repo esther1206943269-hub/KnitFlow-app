@@ -266,6 +266,7 @@ const Grid = {
     svg.setAttribute('width', svgWidth);
     svg.setAttribute('height', svgHeight);
     svg.setAttribute('class', 'knitting-grid-svg');
+    svg.addEventListener('dragstart', (e) => e.preventDefault());
     
     // 1. 绘制外部坐标轴与数字
     // 行号 (左右两侧均绘制: 单数行粉红 / 双数行草绿)
@@ -363,11 +364,18 @@ const Grid = {
         };
 
         rect.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return; // 仅左键响应
+          e.preventDefault(); // 防止 Edge 等浏览器触发默认原生拖拽导致 mouseup 事件丢失
           this.isDrawing = true;
           handleInteraction(e);
         });
 
         rect.addEventListener('mouseenter', (e) => {
+          // 双重保险：检查当前按键状态，如果鼠标左键已被松开，强制结束绘图
+          if (e.buttons === 0) {
+            this.isDrawing = false;
+            return;
+          }
           if (this.isDrawing) {
             handleInteraction(e);
           }
