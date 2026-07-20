@@ -410,7 +410,11 @@ const Grid = {
       this.isDrawing = false;
     };
     window.addEventListener('mouseup', handleMouseUp);
-    // 并在 svg 销毁或重绘时可考虑移除，不过此处可直接注册在 window 级别
+    window.addEventListener('touchend', handleMouseUp);
+    window.addEventListener('touchcancel', handleMouseUp);
+    window.addEventListener('pointerup', handleMouseUp);
+    window.addEventListener('pointercancel', handleMouseUp);
+    window.addEventListener('blur', handleMouseUp);
 
     // 3. 绘制活跃行高亮框及阅读方向指示箭头
     const activeRowIndex = activeRow - 1;
