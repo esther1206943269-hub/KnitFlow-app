@@ -583,7 +583,17 @@ const App = {
     if (!activeRowData) return;
 
     const text = activeRowData.text || ''; // 当前主图解行的文本说明
-    const activeRowNum = activeRowData.rowNum || (activeIndex + 1); // 主图解行号，如 5
+
+    // 辅助函数：精确单词/边界匹配，防止 F1 误匹配 F18
+    const isExactCodeMatch = (code, fullText) => {
+      if (!code || !fullText) return false;
+      const cleanCode = code.replace(/[\[\]]/g, '').trim();
+      if (!cleanCode) return false;
+      const escaped = cleanCode.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      // 匹配 [F1] 或 独立的 F1（后面不能紧跟数字，如 F18）
+      const regex = new RegExp(`(\\[${escaped}\\]|\\b${escaped}\\b)(?!\\d)`, 'i');
+      return regex.test(fullText);
+    };
 
     // 1. 重置所有独立子行卡片及外层组卡片的样式
     document.querySelectorAll('#text-motifs-list .motif-sub-row').forEach(row => {
@@ -600,29 +610,15 @@ const App = {
 
     let firstMatchedEl = null;
 
-    // 2. 智能精准匹配：同时支持文本显式匹配（如 [F5]）与 行号联动匹配（如 ROW 5 对应 F5 / 第5行）
+    // 2. 检索当前行文本，精确匹配对应的独立花样子行（如 F18 或 [F18]）
     document.querySelectorAll('#text-motifs-list .motif-sub-row').forEach(row => {
-      const code = row.dataset.code; // 如 "F5"
-      const bracketCode = row.dataset.bracketCode; // 如 "[F5]"
-      const subRowNum = parseInt(row.dataset.subRowNum); // 独立子行序号（如 5）
+      const code = row.dataset.code; // 如 "F18"
+      const bracketCode = row.dataset.bracketCode; // 如 "[F18]"
 
       let isMatch = false;
 
-      // 方式 A：主图解文本中显式包含了代号（如 "[F5]" 或 "F5"）
-      if ((code && text.includes(code)) || (bracketCode && text.includes(bracketCode))) {
-        isMatch = true;
-      }
-
-      // 方式 B：如果代号中的数字与当前主图解行号一致（例如 ROW 5 自动对应 F5 / R5 / 第5行）
-      if (code) {
-        const numMatch = code.match(/\d+/);
-        if (numMatch && parseInt(numMatch[0]) === activeRowNum) {
-          isMatch = true;
-        }
-      }
-
-      // 方式 C：如果独立子行号与当前行号完全匹配
-      if (subRowNum === activeRowNum) {
+      // 精确边界匹配（F1 不会匹配到 F18）
+      if (isExactCodeMatch(code, text) || isExactCodeMatch(bracketCode, text)) {
         isMatch = true;
       }
 
@@ -644,21 +640,29 @@ const App = {
       }
     });
 
-    // 3. 同时也匹配花样大组名称（如 [小野花]）
+    // 3. 匹配花样大组名称（如 [小野花]）
     document.querySelectorAll('#text-motifs-list .motif-group-card').forEach(card => {
       const groupCodeBadge = card.querySelector('.motif-code-badge');
       if (groupCodeBadge) {
         const groupCode = groupCodeBadge.textContent.trim();
-        if (groupCode && text.includes(groupCode)) {
+        if (isExactCodeMatch(groupCode, text)) {
           card.style.borderColor = 'var(--primary)';
           if (!firstMatchedEl) firstMatchedEl = card;
         }
       }
     });
 
-    // 4. 自动平滑滚动，使匹配的独立花样行实时居中显示在视口中
-    if (firstMatchedEl) {
-      firstMatchedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // 4. 精确置顶滚动：将高亮匹配的花样行（如 F17/F18）直接滚动定位至清单框最顶部！
+    const listContainer = document.getElementById('text-motifs-list');
+    if (listContainer && firstMatchedEl) {
+      const containerRect = listContainer.getBoundingClientRect();
+      const elementRect = firstMatchedEl.getBoundingClientRect();
+      const targetScrollTop = listContainer.scrollTop + (elementRect.top - containerRect.top) - 8;
+
+      listContainer.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+      });
     }
   },
 
