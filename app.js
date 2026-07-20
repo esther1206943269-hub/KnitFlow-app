@@ -470,17 +470,15 @@ const App = {
       });
 
       const defaultExpl = {
-        '[F1]': '行1: 1下, 1扭上, 1下\n行2: 1上, 1扭下, 1上',
-        '[F2]': '行1: 1扭下, 1上, 1扭下\n行2: 1扭上, 1下, 1扭上',
-        '[F3]': '行1: 2下, 1扭上, 2下\n行2: 2上, 1扭下, 2上',
-        '[F4]': '行1: 2下, 2扭上, 2下\n行2: 2上, 2扭下, 2上',
-        '[F5]': '行1: 3下, 1扭上, 3下\n行2: 3上, 1扭下, 3上'
+        '[F1]': 'F1 [1下, 1扭上, 1下]\nF2 [1上, 1扭下, 1上]',
+        '[F2]': 'F1 [1扭下, 1上, 1扭下]\nF2 [1扭上, 1下, 1扭上]',
+        '[F3]': 'F1 [2下, 1扭上, 2下]\nF2 [2上, 1扭下, 2上]'
       };
 
       detected.forEach(code => {
         p.motifs.push({
           code: code,
-          desc: defaultExpl[code] || '行1: 自定义独立花样 / 针法对照解说'
+          desc: defaultExpl[code] || 'F1 [自定义独立花样 / 针法对照解说]'
         });
       });
       this.saveProjects();
@@ -491,79 +489,85 @@ const App = {
     if (p.motifs.length === 0) {
       container.innerHTML = `
         <div style="color: var(--text-muted); font-size: 0.8rem; font-style: italic; text-align: center; padding: 0.75rem 0;">
-          暂无子花样对照，点击上方 "+ Add Motif" 批量输入或添加自定义花样解（如 [F16], [麻花A]）。
+          暂无子花样对照，点击上方 "+ Add Motif" 批量输入或添加自定义花样解（如 [小野花] 或 [F16]）。
         </div>
       `;
       return;
     }
 
     p.motifs.forEach((motif, idx) => {
-      const item = document.createElement('div');
-      item.className = 'motif-row-item';
-      item.dataset.code = motif.code;
-      item.style.cssText = `
+      const groupItem = document.createElement('div');
+      groupItem.className = 'motif-group-card';
+      groupItem.style.cssText = `
         display: flex;
         flex-direction: column;
         gap: 6px;
-        padding: 0.65rem 0.85rem;
+        padding: 0.75rem 0.85rem;
         background-color: var(--bg-color);
         border-radius: var(--radius-sm);
         border: 1px solid var(--card-border);
+        margin-bottom: 0.6rem;
         transition: var(--transition);
       `;
 
-      // 渲染多行行数解说明细
-      const rawLines = (motif.desc || '').split('\n').map(l => l.trim()).filter(Boolean);
-      let descHTML = '';
-      if (rawLines.length > 0) {
-        descHTML = rawLines.map(line => {
-          // 匹配 行1:, R1:, Row 1:, [R1] 等格式
-          const rowMatch = line.match(/^(R\d+|Row\s*\d+|行\s*\d+|第\s*\d+\s*行)[:：\s]\s*(.*)$/i);
-          if (rowMatch) {
-            return `
-              <div class="motif-desc-line" style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; line-height: 1.4;">
-                <span style="font-size: 0.75rem; font-weight: 700; background: var(--primary-light); color: var(--primary); padding: 1px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">${rowMatch[1]}</span>
-                <span style="color: var(--text-main); flex: 1; word-break: break-word;">${rowMatch[2]}</span>
-              </div>
-            `;
-          } else {
-            return `<div class="motif-desc-line" style="font-size: 0.85rem; color: var(--text-main); line-height: 1.4; word-break: break-word;">${line}</div>`;
-          }
-        }).join('');
-      } else {
-        descHTML = `<div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">(未填写说明)</div>`;
-      }
-
-      item.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--card-border); padding-bottom: 4px; margin-bottom: 2px;">
-          <span class="motif-code-badge" style="font-family: monospace; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 4px; font-size: 0.85rem;">${motif.code}</span>
+      // 组卡片顶部标头
+      const headerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--card-border); padding-bottom: 6px;">
+          <span class="motif-code-badge" style="font-family: monospace; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 4px; font-size: 0.88rem;">${motif.code}</span>
           <div style="display: flex; gap: 4px;">
             <button class="btn text-btn btn-edit-motif" data-index="${idx}" style="padding: 1px 6px; font-size: 0.75rem;">修改</button>
             <button class="btn text-btn danger-text btn-delete-motif" data-index="${idx}" style="padding: 1px 6px; font-size: 0.75rem;">删除</button>
           </div>
         </div>
-        <div class="motif-desc-container" style="display: flex; flex-direction: column; gap: 4px;">
-          ${descHTML}
-        </div>
       `;
 
-      // 编辑
-      item.querySelector('.btn-edit-motif').addEventListener('click', (e) => {
+      // 智能解析子行（如 F1 [...], F2 [...], R1: ..., 行1: ...）
+      const lines = (motif.desc || '').split('\n').map(l => l.trim()).filter(Boolean);
+      let subItemsHTML = '';
+
+      if (lines.length > 0) {
+        subItemsHTML = lines.map((line) => {
+          // 正则解析：支持 F1 [...], F1: ..., [F1] ..., R1: ..., 行1: ...
+          const subMatch = line.match(/^([A-Za-z0-9_]+|\[[A-Za-z0-9_]+\]|R\d+|Row\s*\d+|行\s*\d+)[:：\s]*\[?(.*?)\]?$/i);
+
+          let subCode = '';
+          let subText = line;
+
+          if (subMatch && subMatch[2] !== undefined) {
+            subCode = subMatch[1].replace(/[\[\]]/g, '').trim(); // 提取纯代码如 "F1"
+            subText = subMatch[2].trim(); // 提取纯针法说明
+          }
+
+          const fullSubCode = subCode ? subCode : '';
+
+          return `
+            <div class="motif-sub-row" data-code="${fullSubCode}" data-bracket-code="[${fullSubCode}]" style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; background: rgba(0,0,0,0.02); transition: all 0.25s ease;">
+              ${subCode ? `<span class="sub-code-chip" style="font-family: monospace; font-size: 0.78rem; font-weight: 700; background: var(--primary-light); color: var(--primary); padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">${subCode}</span>` : ''}
+              <span style="color: var(--text-main); flex: 1; word-break: break-word; line-height: 1.4;">${subText}</span>
+            </div>
+          `;
+        }).join('');
+      } else {
+        subItemsHTML = `<div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">(未填写说明)</div>`;
+      }
+
+      groupItem.innerHTML = headerHTML + `<div class="motif-sub-rows-container" style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">${subItemsHTML}</div>`;
+
+      // 绑定编辑与删除
+      groupItem.querySelector('.btn-edit-motif').onclick = (e) => {
         e.stopPropagation();
         this.openMotifModal(idx);
-      });
-
-      // 删除
-      item.querySelector('.btn-delete-motif').addEventListener('click', (e) => {
+      };
+      groupItem.querySelector('.btn-delete-motif').onclick = (e) => {
         e.stopPropagation();
         if (confirm(`确定要删除子图解花样 “${motif.code}” 吗？`)) {
           p.motifs.splice(idx, 1);
           this.saveProjects();
           this.renderMotifs();
         }
-      });
+      };
 
-      container.appendChild(item);
+      container.appendChild(groupItem);
     });
 
     this.highlightActiveMotifs();
@@ -577,20 +581,61 @@ const App = {
     const activeRowData = p.data[activeIndex];
     if (!activeRowData) return;
 
-    const text = activeRowData.text;
+    const text = activeRowData.text; // 当前主图解行的文本说明
 
-    document.querySelectorAll('#text-motifs-list .motif-row-item').forEach(item => {
-      const code = item.dataset.code;
-      if (code && text.includes(code)) {
-        item.style.borderColor = 'var(--primary)';
-        item.style.backgroundColor = 'var(--primary-light)';
-        item.style.boxShadow = '0 0 0 2px var(--primary-light)';
-      } else {
-        item.style.borderColor = 'var(--card-border)';
-        item.style.backgroundColor = 'var(--bg-color)';
-        item.style.boxShadow = 'none';
+    // 1. 重置所有独立子行卡片及外层组卡片的样式
+    document.querySelectorAll('#text-motifs-list .motif-sub-row').forEach(row => {
+      row.style.borderColor = 'transparent';
+      row.style.backgroundColor = 'rgba(0,0,0,0.02)';
+      row.style.boxShadow = 'none';
+    });
+
+    document.querySelectorAll('#text-motifs-list .motif-group-card').forEach(card => {
+      card.style.borderColor = 'var(--card-border)';
+      card.style.boxShadow = 'none';
+    });
+
+    let firstMatchedEl = null;
+
+    // 2. 检索当前行文本，自动高亮对应的独立花样子行（如 F6 或 [F6]）
+    document.querySelectorAll('#text-motifs-list .motif-sub-row').forEach(row => {
+      const code = row.dataset.code;
+      const bracketCode = row.dataset.bracketCode;
+
+      if ((code && text.includes(code)) || (bracketCode && text.includes(bracketCode))) {
+        row.style.borderColor = 'var(--primary)';
+        row.style.backgroundColor = 'var(--primary-light)';
+        row.style.boxShadow = '0 0 8px rgba(209, 142, 151, 0.4)';
+
+        // 同时高亮其所属的大组卡片外框
+        const parentCard = row.closest('.motif-group-card');
+        if (parentCard) {
+          parentCard.style.borderColor = 'var(--primary)';
+        }
+
+        if (!firstMatchedEl) {
+          firstMatchedEl = row;
+        }
       }
     });
+
+    // 3. 同时也匹配花样大组名称（如 [小野花]）
+    document.querySelectorAll('#text-motifs-list .motif-group-card').forEach(card => {
+      const groupCodeBadge = card.querySelector('.motif-code-badge');
+      if (groupCodeBadge) {
+        const groupCode = groupCodeBadge.textContent.trim();
+        if (groupCode && text.includes(groupCode)) {
+          card.style.borderColor = 'var(--primary)';
+          card.style.boxShadow = '0 0 8px rgba(209, 142, 151, 0.3)';
+          if (!firstMatchedEl) firstMatchedEl = card;
+        }
+      }
+    });
+
+    // 4. 自动平滑滚动，使匹配的独立花样行实时居中显示在视口中
+    if (firstMatchedEl) {
+      firstMatchedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   },
 
   addMotif() {
