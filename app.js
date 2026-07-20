@@ -526,7 +526,7 @@ const App = {
       let subItemsHTML = '';
 
       if (lines.length > 0) {
-        subItemsHTML = lines.map((line) => {
+        subItemsHTML = lines.map((line, lineIdx) => {
           // 正则解析：支持 F1 [...], F1: ..., [F1] ..., R1: ..., 行1: ...
           const subMatch = line.match(/^([A-Za-z0-9_]+|\[[A-Za-z0-9_]+\]|R\d+|Row\s*\d+|行\s*\d+)[:：\s]*\[?(.*?)\]?$/i);
 
@@ -539,9 +539,10 @@ const App = {
           }
 
           const fullSubCode = subCode ? subCode : '';
+          const subRowNum = lineIdx + 1; // 1-indexed
 
           return `
-            <div class="motif-sub-row" data-code="${fullSubCode}" data-bracket-code="[${fullSubCode}]" style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; background: rgba(0,0,0,0.02); transition: all 0.25s ease;">
+            <div class="motif-sub-row" data-code="${fullSubCode}" data-bracket-code="[${fullSubCode}]" data-sub-row-num="${subRowNum}" style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; background: rgba(0,0,0,0.02); transition: all 0.25s ease;">
               ${subCode ? `<span class="sub-code-chip" style="font-family: monospace; font-size: 0.78rem; font-weight: 700; background: var(--primary-light); color: var(--primary); padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">${subCode}</span>` : ''}
               <span style="color: var(--text-main); flex: 1; word-break: break-word; line-height: 1.4;">${subText}</span>
             </div>
@@ -581,10 +582,12 @@ const App = {
     const activeRowData = p.data[activeIndex];
     if (!activeRowData) return;
 
-    const text = activeRowData.text; // 当前主图解行的文本说明
+    const text = activeRowData.text || ''; // 当前主图解行的文本说明
+    const activeRowNum = activeRowData.rowNum || (activeIndex + 1); // 主图解行号，如 5
 
     // 1. 重置所有独立子行卡片及外层组卡片的样式
     document.querySelectorAll('#text-motifs-list .motif-sub-row').forEach(row => {
+      row.classList.remove('active-motif-pulse');
       row.style.borderColor = 'transparent';
       row.style.backgroundColor = 'rgba(0,0,0,0.02)';
       row.style.boxShadow = 'none';
@@ -597,17 +600,39 @@ const App = {
 
     let firstMatchedEl = null;
 
-    // 2. 检索当前行文本，自动高亮对应的独立花样子行（如 F6 或 [F6]）
+    // 2. 智能精准匹配：同时支持文本显式匹配（如 [F5]）与 行号联动匹配（如 ROW 5 对应 F5 / 第5行）
     document.querySelectorAll('#text-motifs-list .motif-sub-row').forEach(row => {
-      const code = row.dataset.code;
-      const bracketCode = row.dataset.bracketCode;
+      const code = row.dataset.code; // 如 "F5"
+      const bracketCode = row.dataset.bracketCode; // 如 "[F5]"
+      const subRowNum = parseInt(row.dataset.subRowNum); // 独立子行序号（如 5）
 
+      let isMatch = false;
+
+      // 方式 A：主图解文本中显式包含了代号（如 "[F5]" 或 "F5"）
       if ((code && text.includes(code)) || (bracketCode && text.includes(bracketCode))) {
+        isMatch = true;
+      }
+
+      // 方式 B：如果代号中的数字与当前主图解行号一致（例如 ROW 5 自动对应 F5 / R5 / 第5行）
+      if (code) {
+        const numMatch = code.match(/\d+/);
+        if (numMatch && parseInt(numMatch[0]) === activeRowNum) {
+          isMatch = true;
+        }
+      }
+
+      // 方式 C：如果独立子行号与当前行号完全匹配
+      if (subRowNum === activeRowNum) {
+        isMatch = true;
+      }
+
+      if (isMatch) {
+        // 触发高亮呼吸闪烁动画！
+        row.classList.add('active-motif-pulse');
         row.style.borderColor = 'var(--primary)';
         row.style.backgroundColor = 'var(--primary-light)';
-        row.style.boxShadow = '0 0 8px rgba(209, 142, 151, 0.4)';
 
-        // 同时高亮其所属的大组卡片外框
+        // 同时高亮所属的大组卡片
         const parentCard = row.closest('.motif-group-card');
         if (parentCard) {
           parentCard.style.borderColor = 'var(--primary)';
@@ -626,7 +651,6 @@ const App = {
         const groupCode = groupCodeBadge.textContent.trim();
         if (groupCode && text.includes(groupCode)) {
           card.style.borderColor = 'var(--primary)';
-          card.style.boxShadow = '0 0 8px rgba(209, 142, 151, 0.3)';
           if (!firstMatchedEl) firstMatchedEl = card;
         }
       }

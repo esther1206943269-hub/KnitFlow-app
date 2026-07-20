@@ -1970,3 +1970,24 @@ input:checked + .switch-slider:before {
     transform: translateY(0) scale(1);
   }
 }
+
+/* 匹配当前行独立花样高亮闪烁呼吸动画 */
+@keyframes motifPulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(209, 142, 151, 0.7);
+    border-color: #D18E97;
+  }
+  50% {
+    box-shadow: 0 0 14px 4px rgba(209, 142, 151, 0.85);
+    border-color: #D18E97;
+    background-color: var(--primary-light);
+  }
+  100% {
+    box-shadow: 0 0 5px 1px rgba(209, 142, 151, 0.5);
+    border-color: #D18E97;
+  }
+}
+
+.active-motif-pulse {
+  animation: motifPulseGlow 1.8s infinite ease-in-out !important;
+}
