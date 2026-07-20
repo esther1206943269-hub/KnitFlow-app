@@ -447,6 +447,64 @@
 
   </div>
 
+  <!-- 独立花样/针法对照批量与多行编辑器弹窗 -->
+  <div id="motif-modal" class="modal-overlay hidden">
+    <div class="modal-card card" style="max-width: 580px; width: 92%; background: var(--bg-color); border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: var(--radius-lg); padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem;">
+        <h3 style="margin: 0; font-size: 1.1rem; font-family: var(--font-serif);">独立花样/针法对照编辑器 (Sub-Patterns)</h3>
+        <button id="btn-close-motif-modal" class="btn text-btn" style="font-size: 1.2rem; line-height: 1; padding: 2px 6px;">✕</button>
+      </div>
+
+      <!-- 模式切换标签卡 -->
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">
+        <button id="tab-btn-motif-batch" class="btn text-btn" style="font-weight: 600; border-bottom: 2px solid var(--primary); border-radius: 0; color: var(--primary);">⚡ 批量一次全写 (Batch Input)</button>
+        <button id="tab-btn-motif-single" class="btn text-btn" style="font-weight: 500; opacity: 0.7;">📝 单个花样多行编辑 (Single Item)</button>
+      </div>
+
+      <!-- Tab 1: 批量写输入 -->
+      <div id="motif-tab-batch">
+        <div class="helper-text" style="margin-bottom: 0.5rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+          💡 <strong>支持直接复制粘贴所有的花样与分行说明！</strong>格式如 <code>[F16]</code>（或 <code>[花样A]</code>），紧接着写各行的编织针法。
+        </div>
+        <textarea id="motif-batch-input" rows="11" style="width: 100%; font-size: 0.85rem; font-family: var(--font-sans); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-main); line-height: 1.4;" placeholder="示例格式：
+
+[F16]
+R1: 1下, 空加针, 1扭上, 30下
+R2: 1上, 1扭下, 30上
+
+[F17]
+R1: 1下, 空加针, 1扭上, 31下
+R2: 1上, 1扭下, 31上
+
+[F18]
+1下, 2扭上, 1下"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button id="btn-cancel-motif-batch" class="btn text-btn">取消</button>
+          <button id="btn-save-motif-batch" class="btn primary">一键导入所有独立花样</button>
+        </div>
+      </div>
+
+      <!-- Tab 2: 单个写编辑 -->
+      <div id="motif-tab-single" class="hidden">
+        <input type="hidden" id="motif-single-index" value="-1">
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+          <label style="font-size: 0.85rem; font-weight: 500;">花样/图解代号 (Code/Tag)</label>
+          <input type="text" id="motif-single-code" placeholder="例如 [F16] 或 [Cable A]" style="font-size: 0.85rem; padding: 0.4rem 0.6rem;">
+        </div>
+        <div class="form-group">
+          <label style="font-size: 0.85rem; font-weight: 500;">分行针法解说 (Multi-line Pattern Text)</label>
+          <textarea id="motif-single-desc" rows="7" placeholder="支持多行书写，示例：
+R1: 1下, 1扭上, 1下
+R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height: 1.4;"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button id="btn-cancel-motif-single" class="btn text-btn">取消</button>
+          <button id="btn-save-motif-single" class="btn primary">保存花样</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 提示弹窗 (Toast) -->
   <div id="toast" class="toast hidden"></div>
 

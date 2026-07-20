@@ -470,18 +470,17 @@ const App = {
       });
 
       const defaultExpl = {
-        '[F1]': '1下, 1扭上, 1下 (小花芯花样组)',
-        '[F2]': '1扭下, 1上, 1扭下 (侧花边针法组)',
-        '[F3]': '2下, 1扭上, 2下 (5针主体绞花/花样)',
-        '[F4]': '2下, 2扭上, 2下 (6针扩展花样组)',
-        '[F5]': '3下, 1扭上, 3下 (7针宽幅大花样组)',
-        '[C6F]': 'Front Cable 6 (前交叉 6 针麻花麻针)'
+        '[F1]': '行1: 1下, 1扭上, 1下\n行2: 1上, 1扭下, 1上',
+        '[F2]': '行1: 1扭下, 1上, 1扭下\n行2: 1扭上, 1下, 1扭上',
+        '[F3]': '行1: 2下, 1扭上, 2下\n行2: 2上, 1扭下, 2上',
+        '[F4]': '行1: 2下, 2扭上, 2下\n行2: 2上, 2扭下, 2上',
+        '[F5]': '行1: 3下, 1扭上, 3下\n行2: 3上, 1扭下, 3上'
       };
 
       detected.forEach(code => {
         p.motifs.push({
           code: code,
-          desc: defaultExpl[code] || '自定义独立花样 / 针法对照说明'
+          desc: defaultExpl[code] || '行1: 自定义独立花样 / 针法对照解说'
         });
       });
       this.saveProjects();
@@ -492,7 +491,7 @@ const App = {
     if (p.motifs.length === 0) {
       container.innerHTML = `
         <div style="color: var(--text-muted); font-size: 0.8rem; font-style: italic; text-align: center; padding: 0.75rem 0;">
-          暂无子花样对照，点击上方 "+ Add Motif" 添加自定义花样解（如 [F1], [麻花A]）。
+          暂无子花样对照，点击上方 "+ Add Motif" 批量输入或添加自定义花样解（如 [F16], [麻花A]）。
         </div>
       `;
       return;
@@ -505,29 +504,53 @@ const App = {
       item.style.cssText = `
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        padding: 0.6rem 0.8rem;
+        gap: 6px;
+        padding: 0.65rem 0.85rem;
         background-color: var(--bg-color);
         border-radius: var(--radius-sm);
         border: 1px solid var(--card-border);
         transition: var(--transition);
       `;
 
+      // 渲染多行行数解说明细
+      const rawLines = (motif.desc || '').split('\n').map(l => l.trim()).filter(Boolean);
+      let descHTML = '';
+      if (rawLines.length > 0) {
+        descHTML = rawLines.map(line => {
+          // 匹配 行1:, R1:, Row 1:, [R1] 等格式
+          const rowMatch = line.match(/^(R\d+|Row\s*\d+|行\s*\d+|第\s*\d+\s*行)[:：\s]\s*(.*)$/i);
+          if (rowMatch) {
+            return `
+              <div class="motif-desc-line" style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; line-height: 1.4;">
+                <span style="font-size: 0.75rem; font-weight: 700; background: var(--primary-light); color: var(--primary); padding: 1px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">${rowMatch[1]}</span>
+                <span style="color: var(--text-main); flex: 1; word-break: break-word;">${rowMatch[2]}</span>
+              </div>
+            `;
+          } else {
+            return `<div class="motif-desc-line" style="font-size: 0.85rem; color: var(--text-main); line-height: 1.4; word-break: break-word;">${line}</div>`;
+          }
+        }).join('');
+      } else {
+        descHTML = `<div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">(未填写说明)</div>`;
+      }
+
       item.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--card-border); padding-bottom: 4px; margin-bottom: 2px;">
           <span class="motif-code-badge" style="font-family: monospace; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 4px; font-size: 0.85rem;">${motif.code}</span>
           <div style="display: flex; gap: 4px;">
             <button class="btn text-btn btn-edit-motif" data-index="${idx}" style="padding: 1px 6px; font-size: 0.75rem;">修改</button>
             <button class="btn text-btn danger-text btn-delete-motif" data-index="${idx}" style="padding: 1px 6px; font-size: 0.75rem;">删除</button>
           </div>
         </div>
-        <div class="motif-desc-text" style="font-size: 0.85rem; color: var(--text-main); line-height: 1.35;">${motif.desc}</div>
+        <div class="motif-desc-container" style="display: flex; flex-direction: column; gap: 4px;">
+          ${descHTML}
+        </div>
       `;
 
       // 编辑
       item.querySelector('.btn-edit-motif').addEventListener('click', (e) => {
         e.stopPropagation();
-        this.editMotif(idx);
+        this.openMotifModal(idx);
       });
 
       // 删除
@@ -571,47 +594,176 @@ const App = {
   },
 
   addMotif() {
+    this.openMotifModal(-1);
+  },
+
+  openMotifModal(editIdx = -1) {
+    const p = this.currentProject;
+    if (!p) return;
+    if (!p.motifs) p.motifs = [];
+
+    const modal = document.getElementById('motif-modal');
+    if (!modal) return;
+
+    const batchTab = document.getElementById('motif-tab-batch');
+    const singleTab = document.getElementById('motif-tab-single');
+    const tabBtnBatch = document.getElementById('tab-btn-motif-batch');
+    const tabBtnSingle = document.getElementById('tab-btn-motif-single');
+
+    if (editIdx >= 0) {
+      // 切换至单个编辑模式
+      batchTab.classList.add('hidden');
+      singleTab.classList.remove('hidden');
+      tabBtnBatch.style.opacity = '0.7';
+      tabBtnBatch.style.borderBottom = 'none';
+      tabBtnSingle.style.opacity = '1';
+      tabBtnSingle.style.borderBottom = '2px solid var(--primary)';
+
+      const current = p.motifs[editIdx];
+      document.getElementById('motif-single-index').value = editIdx;
+      document.getElementById('motif-single-code').value = current.code;
+      document.getElementById('motif-single-desc').value = current.desc;
+    } else {
+      // 切换至批量写模式
+      singleTab.classList.add('hidden');
+      batchTab.classList.remove('hidden');
+      tabBtnSingle.style.opacity = '0.7';
+      tabBtnSingle.style.borderBottom = 'none';
+      tabBtnBatch.style.opacity = '1';
+      tabBtnBatch.style.borderBottom = '2px solid var(--primary)';
+
+      // 预填充当前所有花样格式化文本
+      let batchText = '';
+      if (p.motifs.length > 0) {
+        batchText = p.motifs.map(m => `${m.code}\n${m.desc}`).join('\n\n');
+      }
+      document.getElementById('motif-batch-input').value = batchText;
+    }
+
+    modal.classList.remove('hidden');
+  },
+
+  closeMotifModal() {
+    const modal = document.getElementById('motif-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  saveBatchMotifs() {
     const p = this.currentProject;
     if (!p) return;
 
-    if (!p.motifs) p.motifs = [];
+    const text = document.getElementById('motif-batch-input').value;
+    if (!text || !text.trim()) {
+      p.motifs = [];
+    } else {
+      const lines = text.split('\n');
+      const parsed = [];
+      let curCode = null;
+      let curLines = [];
 
-    const code = prompt('输入花样/子图解代号 (例如 [F1] 或 [Cable A]):', '[F1]');
-    if (!code || !code.trim()) return;
-    const cleanCode = code.trim().startsWith('[') ? code.trim() : `[${code.trim()}]`;
+      const flush = () => {
+        if (curCode) {
+          parsed.push({
+            code: curCode,
+            desc: curLines.join('\n').trim()
+          });
+        }
+      };
 
-    const desc = prompt(`输入代号 "${cleanCode}" 的详细解说/针法组合:`, '1下, 1扭上, 1下');
-    if (!desc || !desc.trim()) return;
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
 
-    p.motifs.push({
-      code: cleanCode,
-      desc: desc.trim()
-    });
+        // 匹配 [F16] 或 [麻花A] 或 F16: 等开头的代号
+        const tagMatch = trimmed.match(/^(\[[^\]]+\]|[A-Za-z0-9_]+:)$/);
+        if (tagMatch) {
+          flush();
+          let tag = tagMatch[1];
+          if (tag.endsWith(':')) tag = tag.slice(0, -1).trim();
+          if (!tag.startsWith('[')) tag = `[${tag}]`;
+          curCode = tag;
+          curLines = [];
+        } else {
+          if (!curCode) {
+            curCode = '[F1]';
+          }
+          curLines.push(trimmed);
+        }
+      });
+      flush();
+
+      p.motifs = parsed;
+    }
 
     this.saveProjects();
     this.renderMotifs();
-    this.showToast(`已添加子图解花样: ${cleanCode}`);
+    this.closeMotifModal();
+    this.showToast('已批量导入并更新子图解花样说明！');
   },
 
-  editMotif(idx) {
+  saveSingleMotif() {
     const p = this.currentProject;
-    if (!p || !p.motifs || !p.motifs[idx]) return;
+    if (!p) return;
+    if (!p.motifs) p.motifs = [];
 
-    const current = p.motifs[idx];
-    const newCode = prompt('修改花样代号:', current.code);
-    if (!newCode || !newCode.trim()) return;
+    const idx = parseInt(document.getElementById('motif-single-index').value);
+    let code = document.getElementById('motif-single-code').value.trim();
+    const desc = document.getElementById('motif-single-desc').value.trim();
 
-    const newDesc = prompt(`修改代号 "${newCode.trim()}" 的详细针法解说:`, current.desc);
-    if (!newDesc || !newDesc.trim()) return;
+    if (!code) {
+      alert('请填写花样代号！');
+      return;
+    }
 
-    p.motifs[idx] = {
-      code: newCode.trim(),
-      desc: newDesc.trim()
-    };
+    if (!code.startsWith('[')) code = `[${code}]`;
+
+    if (idx >= 0 && idx < p.motifs.length) {
+      p.motifs[idx] = { code, desc };
+    } else {
+      p.motifs.push({ code, desc });
+    }
 
     this.saveProjects();
     this.renderMotifs();
-    this.showToast(`已更新子图解花样: ${newCode.trim()}`);
+    this.closeMotifModal();
+    this.showToast(`已保存独立花样: ${code}`);
+  },
+
+  bindMotifModalEvents() {
+    const closeBtn = document.getElementById('btn-close-motif-modal');
+    const cancelBatch = document.getElementById('btn-cancel-motif-batch');
+    const cancelSingle = document.getElementById('btn-cancel-motif-single');
+    const saveBatch = document.getElementById('btn-save-motif-batch');
+    const saveSingle = document.getElementById('btn-save-motif-single');
+    const tabBatch = document.getElementById('tab-btn-motif-batch');
+    const tabSingle = document.getElementById('tab-btn-motif-single');
+
+    if (closeBtn) closeBtn.onclick = () => this.closeMotifModal();
+    if (cancelBatch) cancelBatch.onclick = () => this.closeMotifModal();
+    if (cancelSingle) cancelSingle.onclick = () => this.closeMotifModal();
+
+    if (saveBatch) saveBatch.onclick = () => this.saveBatchMotifs();
+    if (saveSingle) saveSingle.onclick = () => this.saveSingleMotif();
+
+    if (tabBatch && tabSingle) {
+      tabBatch.onclick = () => {
+        document.getElementById('motif-tab-single').classList.add('hidden');
+        document.getElementById('motif-tab-batch').classList.remove('hidden');
+        tabBatch.style.opacity = '1';
+        tabBatch.style.borderBottom = '2px solid var(--primary)';
+        tabSingle.style.opacity = '0.7';
+        tabSingle.style.borderBottom = 'none';
+      };
+
+      tabSingle.onclick = () => {
+        document.getElementById('motif-tab-batch').classList.add('hidden');
+        document.getElementById('motif-tab-single').classList.remove('hidden');
+        tabSingle.style.opacity = '1';
+        tabSingle.style.borderBottom = '2px solid var(--primary)';
+        tabBatch.style.opacity = '0.7';
+        tabBatch.style.borderBottom = 'none';
+      };
+    }
   },
 
   // 顶栏快速教程徽章显示
@@ -1249,6 +1401,7 @@ const App = {
   // 事件交互绑定
   // ==========================================================================
   bindEvents() {
+    this.bindMotifModalEvents();
     // 仪表盘大厅跳转
     document.getElementById('btn-home').addEventListener('click', () => {
       this.switchView('view-dashboard');
