@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnitFlow - 智能棒针编织行数记录与图解助手</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- 引入 Google Fonts 提升排版质感 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 头部导航 -->
+    <header class="main-header">
+      <div class="logo-area" id="btn-home">
+        <h1>KnitFlow <span class="subtitle">编织行行好</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="btn-toggle-theme" class="icon-button" title="切换深浅主题">
+          <svg class="theme-icon" viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9zm0 16a7 7 0 1 1 7-7 7.008 7.008 0 0 1-7 7z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 视图：主页 Dashboard -->
+    <main id="view-dashboard" class="app-view active">
+      <!-- 1:1 原图矢量线条猫咪（固定左上方位置，微晃呼吸动效） -->
+      <div class="fixed-cat-container">
+        <img src="cat_line_art.svg" alt="Line Art Cat">
+      </div>
+
+      <section class="welcome-hero" style="margin-bottom: 1.5rem;">
+        <h2>Start Your Creation</h2>
+      </section>
+
+      <div class="dashboard-grid">
+        <!-- 创建新项目卡片 -->
+        <div class="card create-card" style="border: none; background: transparent; padding: 0; box-shadow: none;">
+          <h3 style="border-left: 2px solid var(--primary); padding-left: 0.6rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Create</h3>
+          <div class="creation-links">
+            <button id="btn-new-text" class="creation-link-item" style="--hover-bg: #D18E97; --hover-text: #5B3B1E; --title-color: #D18E97; --dark-title-color: #D18E97;">
+              <span class="creation-title">Written Pattern</span>
+              <span class="creation-desc">Generate a row counter from written knitting instructions</span>
+            </button>
+            <button id="btn-new-grid" class="creation-link-item" style="--hover-bg: #D2A432; --hover-text: #EAE1CB; --title-color: #D2A432; --dark-title-color: #D2A432;">
+              <span class="creation-title">Pixel Grid</span>
+              <span class="creation-desc">Design multi-color grids with interactive drawing and tracking</span>
+            </button>
+            <button id="btn-import-csv" class="creation-link-item" style="--hover-bg: #979E6C; --hover-text: #BC5727; --title-color: #838e55; --dark-title-color: #979E6C;">
+              <span class="creation-title">Excel / CSV</span>
+              <span class="creation-desc">Upload local spreadsheets and convert them into grids</span>
+            </button>
+          </div>
+
+          <!-- 预设与自定义图解模板库 -->
+          <div class="preset-templates-section" style="margin-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+              <h3 style="border-left: 2px solid var(--accent); padding-left: 0.6rem; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.95rem; opacity: 0.9;">Template Library / 图解库</h3>
+              <button id="btn-create-template-direct" class="btn text-btn" style="padding: 3px 8px; font-size: 0.78rem; border: 1px dashed var(--primary); color: var(--primary); font-weight: 600;" title="制作新图解模板保存至此处">➕ New Template</button>
+            </div>
+            <div id="preset-chips-list" class="preset-chips" style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <!-- 动态渲染预设与自定义模板 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 项目列表 -->
+        <div class="card projects-card" style="border: none; background: transparent; padding: 0; box-shadow: none;">
+          <h3 style="border-left: 2px solid var(--primary); padding-left: 0.6rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Projects</h3>
+          <div id="project-list" class="project-list">
+            <!-- 动态生成 -->
+            <div class="empty-state">
+              <p>No saved projects yet. Create one to start!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：文字图解创建 -->
+    <main id="view-create-text" class="app-view">
+      <div class="card form-card">
+        <button class="back-link" id="btn-back-text-create">← Back to Dashboard</button>
+        <h2>New Written Pattern</h2>
+        <div class="form-group">
+          <label for="text-project-name">Project Name</label>
+          <input type="text" id="text-project-name" placeholder="e.g. Winter Cable Scarf" required>
+        </div>
+        <div class="form-group">
+          <label for="text-tutorial-url">Reference Tutorial Link (Optional)</label>
+          <input type="text" id="text-tutorial-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="form-group">
+          <label for="text-pattern-input">Written Pattern Instructions</label>
+          <div class="helper-text">Format example:<br>Row 1: K3, P3, K3<br>Row 2: P3, K3, P3... or R1-5: Knit</div>
+          <textarea id="text-pattern-input" rows="12" placeholder="Paste or type your written pattern instructions here..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button id="btn-save-text-project" class="btn primary">Parse & Start Knitting</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：像素图解创建 -->
+    <main id="view-create-grid" class="app-view">
+      <div class="card form-card">
+        <button class="back-link" id="btn-back-grid-create">← Back to Dashboard</button>
+        <h2>New Pixel Grid Project</h2>
+        <div class="form-group">
+          <label for="grid-project-name">Project Name</label>
+          <input type="text" id="grid-project-name" placeholder="e.g. Fair Isle Nordic Mittens" required>
+        </div>
+        <div class="form-group">
+          <label for="grid-tutorial-url">Reference Tutorial Link (Optional)</label>
+          <input type="text" id="grid-tutorial-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="grid-width">Total Stitches (Width)</label>
+            <input type="number" id="grid-width" value="20" min="5" max="100">
+          </div>
+          <div class="form-group half">
+            <label for="grid-height">Total Rows (Height)</label>
+            <input type="number" id="grid-height" value="20" min="5" max="200">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Knitting Technique</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="grid-knit-type" value="flat" checked> Flat (Odd rows R-to-L, Even rows L-to-R)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="grid-knit-type" value="circular"> Circular (All rows R-to-L)
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="btn-save-grid-project" class="btn primary">Create Blank Grid</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：导入 Excel/CSV 网格 -->
+    <main id="view-import-csv" class="app-view">
+      <div class="card form-card">
+        <button class="back-link" id="btn-back-csv-create">← Back to Dashboard</button>
+        <h2>Import Excel / CSV Grid</h2>
+        <div class="form-group">
+          <label for="csv-project-name">Project Name</label>
+          <input type="text" id="csv-project-name" placeholder="e.g. Jacquard Sweater Vest" required>
+        </div>
+        <div class="form-group">
+          <label for="csv-tutorial-url">Reference Tutorial Link (Optional)</label>
+          <input type="text" id="csv-tutorial-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="form-group">
+          <label for="csv-file-input">Select CSV File (exported from Excel)</label>
+          <input type="file" id="csv-file-input" accept=".csv,.txt">
+          <div class="helper-text">Tip: In Excel, mark each cell with symbols (e.g. X, O, K, P). Save as CSV (comma delimited) and upload here.</div>
+        </div>
+        <div class="form-group">
+          <label for="csv-raw-input">Or paste CSV text directly below (comma / tab / space separated)</label>
+          <textarea id="csv-raw-input" rows="8" placeholder="X,X,O,O,X,X&#10;X,X,O,O,X,X&#10;O,O,X,X,O,O"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label>Knitting Technique</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="csv-knit-type" value="flat" checked> Flat (Flat)
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="csv-knit-type" value="circular"> Circular (In the round)
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button id="btn-save-csv-project" class="btn primary">Parse & Generate Chart</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：文字编织模式 Player -->
+    <main id="view-text-player" class="app-view">
+      <div class="player-layout">
+        <!-- 左侧核心控制面板 -->
+        <div class="player-left">
+          <button class="back-link" id="btn-back-text-player">← Back to Dashboard</button>
+          
+          <div class="card project-header-card">
+            <h2 id="text-player-title">Knitting Project</h2>
+            <div class="project-meta" style="flex-wrap: wrap; gap: 0.5rem 0.75rem;">
+              <span id="text-meta-type" class="badge">Written Pattern</span>
+              <span class="badge time" style="display: inline-flex; align-items: center; gap: 4px; padding: 0.35rem 0.75rem;">
+                ⏱️ <span id="text-meta-time">00:00:00</span>
+                <button id="btn-text-timer-toggle" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0 2px; font-size: 0.8rem; line-height: 1; display: inline-flex; align-items: center;" title="Pause / Resume Timer">⏸️</button>
+              </span>
+              <span id="text-meta-cumulative-time" class="badge secondary" style="padding: 0.35rem 0.75rem;">Total Time: 0m</span>
+              <button id="btn-save-as-template-text" class="badge highlight-btn" style="border: 1px solid var(--accent); color: var(--accent); cursor: pointer; padding: 0.35rem 0.75rem; background: transparent; font-weight: 600;" title="保存当前图解为复用模板">⭐ 存为模板</button>
+              <div id="text-tutorial-link-area" class="tutorial-link-area"></div>
+            </div>
+            
+          </div>
+
+          <!-- 当前行核心展示卡片 -->
+          <div class="card active-row-card">
+            <div class="row-info-header">
+              <span class="row-label">Active Row</span>
+              
+              <!-- 移动后的 Knitting Progress 进度条 -->
+              <div class="header-progress-inline">
+                <div class="progress-info-row">
+                  <span class="progress-title">Knitting Progress</span>
+                  <span id="text-progress-percent" class="progress-pct">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="text-progress-fill" class="progress-fill"></div>
+                </div>
+              </div>
+
+              <span class="row-total" id="text-row-progress">1 / 40 Rows</span>
+            </div>
+            
+            <div class="huge-row-num" id="text-huge-row-num">ROW 1</div>
+            
+            <div class="stitch-instructions" id="text-stitch-instructions">
+              Loading instructions...
+            </div>
+            
+            <div class="player-controls">
+              <button id="btn-text-prev" class="btn round-btn secondary" title="Previous Row (Backspace)">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+              </button>
+              
+              <button id="btn-text-next" class="btn round-btn primary huge-btn" title="Next Row (Spacebar)">
+                <span class="btn-text">Next Row</span>
+                <span class="btn-subtext">Spacebar</span>
+              </button>
+            </div>
+
+            <div class="mini-controls">
+              <button id="btn-text-reset" class="btn text-btn">Reset Progress</button>
+              <button id="btn-text-edit" class="btn text-btn">Edit Pattern</button>
+              <button id="btn-text-copy" class="btn text-btn">Copy Text</button>
+              <button id="btn-text-print" class="btn text-btn">Print Sheet</button>
+            </div>
+          </div>
+
+          <!-- 教程与针法卡片 -->
+          <div class="card tutorials-card" id="text-tutorials-card" style="margin-top: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Reference Tutorials & Links</h3>
+            <div class="tutorials-list" id="text-tutorials-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- 动态填充 -->
+            </div>
+            <div class="tutorials-actions" style="margin-top: 0.5rem; display: flex; justify-content: flex-end;">
+              <button id="btn-text-add-tutorial" class="btn text-btn" style="padding: 4px 8px; font-size: 0.85rem;">➕ Add Tutorial / Link</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧行数滚动预览与花样对照表 -->
+        <div class="player-right">
+          <div class="card list-card">
+            <h3>Rows Overview</h3>
+            <div class="list-container" id="text-rows-list">
+              <!-- 动态填充 -->
+            </div>
+          </div>
+
+          <!-- 子图解 / 花样对照表 -->
+          <div class="card motifs-card" id="text-motifs-card" style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0;">Sub-Patterns Glossary</h3>
+              <button id="btn-add-motif" class="btn text-btn" style="font-size: 0.78rem; padding: 2px 8px; border: 1px solid var(--primary); color: var(--primary); font-weight: 500;">+ Add Motif</button>
+            </div>
+            <div class="helper-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+              Sub-pattern codes & motif keys used in instructions (e.g. [F1], [F2], [Cable A])
+            </div>
+            <div class="motifs-list" id="text-motifs-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 260px; overflow-y: auto;">
+              <!-- 动态渲染子图解对照列表 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：像素网格编织模式 Player -->
+    <main id="view-grid-player" class="app-view">
+      <div class="player-layout grid-layout-override">
+        <!-- 左侧核心控制面板 -->
+        <div class="player-left grid-side-panel">
+          <button class="back-link" id="btn-back-grid-player">← Back to Dashboard</button>
+          
+          <div class="card project-header-card">
+            <h2 id="grid-player-title">Grid Knitting Project</h2>
+            <div class="project-meta" style="flex-wrap: wrap; gap: 0.5rem 0.75rem;">
+              <span id="grid-meta-type" class="badge">Pixel Chart</span>
+              <span id="grid-meta-knit" class="badge">Flat</span>
+              <span class="badge time" style="display: inline-flex; align-items: center; gap: 4px; padding: 0.35rem 0.75rem;">
+                ⏱️ <span id="grid-meta-time">00:00:00</span>
+                <button id="btn-grid-timer-toggle" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0 2px; font-size: 0.8rem; line-height: 1; display: inline-flex; align-items: center;" title="Pause / Resume Timer">⏸️</button>
+              </span>
+              <span id="grid-meta-cumulative-time" class="badge secondary" style="padding: 0.35rem 0.75rem;">Total Time: 0m</span>
+              <div id="grid-tutorial-link-area" class="tutorial-link-area"></div>
+            </div>
+            
+          </div>
+
+          <!-- 当前行指示卡片 -->
+          <div class="card active-row-card" id="grid-active-row-card">
+            <div class="row-info-header">
+              <span class="row-label">Active Row</span>
+
+              <!-- 移动后的 Knitting Progress 进度条 -->
+              <div class="header-progress-inline">
+                <div class="progress-info-row">
+                  <span class="progress-title">Knitting Progress</span>
+                  <span id="grid-progress-percent" class="progress-pct">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="grid-progress-fill" class="progress-fill"></div>
+                </div>
+              </div>
+
+              <span class="row-total" id="grid-row-progress">1 / 20 Rows</span>
+            </div>
+            
+            <div class="huge-row-num" id="grid-huge-row-num">ROW 1</div>
+            
+            <div class="direction-indicator" id="grid-direction-indicator">
+              Reading Direction: Right to Left →
+            </div>
+
+            <div class="active-row-stitch-preview" id="grid-row-stitch-preview">
+              <!-- 动态解析出当前行的针目序列简写 -->
+            </div>
+            
+            <div class="player-controls">
+              <button id="btn-grid-prev" class="btn round-btn secondary" title="Previous Row (Backspace)">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+              </button>
+              
+              <button id="btn-grid-next" class="btn round-btn primary huge-btn" title="Next Row (Spacebar)">
+                <span class="btn-text">Next Row</span>
+                <span class="btn-subtext">Spacebar</span>
+              </button>
+            </div>
+
+            <div class="mini-controls">
+              <button id="btn-grid-reset" class="btn text-btn">Reset Progress</button>
+              <button id="btn-save-as-template-grid" class="btn text-btn" style="border: 1px solid var(--accent); color: var(--accent);" title="保存当前网格图解为复用模板">⭐ 存为模板</button>
+              <button id="btn-grid-export-png" class="btn text-btn" style="border: 1px solid var(--primary); color: var(--primary);">Export PNG</button>
+              <button id="btn-grid-print" class="btn text-btn">Print Sheet</button>
+            </div>
+          </div>
+
+          <!-- 针目符号与色彩画笔选择区 -->
+          <div class="card paint-palette-card" id="paint-palette">
+            <h3 style="margin-bottom: 0.75rem; font-size: 1.05rem; font-weight: 600;">Stitch Symbol & Color Palette / 针法符号与色彩画笔</h3>
+            <div class="palette-grid" id="palette-colors" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem;">
+              <!-- 动态渲染针法与颜色 -->
+            </div>
+            
+            <div class="custom-yarn-builder" style="margin-top: 1rem; border-top: 1px solid var(--card-border); padding-top: 0.75rem;">
+              <div style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem;">Add Custom Yarn Color / 自定义颜料</div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <select id="input-custom-yarn-symbol" style="flex: 1; font-size: 0.85rem; padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main);">
+                  <option value="plain">Color Block (No Symbol) / 纯色无符号</option>
+                  <option value="k">Knit / 下针</option>
+                  <option value="p">Purl / 上针</option>
+                  <option value="yo">Yarn Over / 空加针</option>
+                  <option value="k2tog">K2tog / 左上2并1</option>
+                  <option value="ssk">SSK / 右上2并1</option>
+                  <option value="c2f">C2F Cable / 2针左上交叉</option>
+                  <option value="c2b">C2B Cable / 2针右上交叉</option>
+                  <option value="sl">Slip / 滑针</option>
+                  <option value="m1">Make 1 / 扭加针</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <input type="color" id="input-custom-yarn-color" value="#D18E97" style="width: 38px; height: 32px; border: 1px solid var(--card-border); border-radius: 4px; cursor: pointer; padding: 2px; background: transparent;">
+                <input type="text" id="input-custom-yarn-name" placeholder="Yarn Name" style="flex: 1; min-width: 100px; font-size: 0.85rem; padding: 0.35rem 0.6rem; border-radius: 4px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main);">
+                <button id="btn-add-custom-yarn" class="btn text-btn" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; border: 1px solid var(--primary); color: var(--primary);">+ Add</button>
+              </div>
+            </div>
+
+            <div class="helper-text margin-top-sm" style="margin-top: 0.75rem; font-size: 0.8rem; opacity: 0.8;">💡 Tip: Click any symbol/color swatch above, then click or drag on grid cells to paint!</div>
+          </div>
+
+          <!-- 图例展示 -->
+          <div class="card legend-card" id="legend-display">
+            <h3>Stitch Symbol Legend / 针法图例表</h3>
+            <div class="legend-list" id="stitch-legend-list">
+              <!-- 动态渲染 -->
+            </div>
+          </div>
+
+          <!-- 教程与针法卡片 -->
+          <div class="card tutorials-card" id="grid-tutorials-card" style="margin-top: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Reference Tutorials & Links</h3>
+            <div class="tutorials-list" id="grid-tutorials-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- 动态填充 -->
+            </div>
+            <div class="tutorials-actions" style="margin-top: 0.5rem; display: flex; justify-content: flex-end;">
+              <button id="btn-grid-add-tutorial" class="btn text-btn" style="padding: 4px 8px; font-size: 0.85rem;">➕ Add Tutorial / Link</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧像素网格画布 -->
+        <div class="player-right grid-canvas-panel">
+          <div class="card grid-container-card">
+            <div class="grid-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div class="toolbar-left" style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="tool-title" style="font-weight: 600;">Chart Canvas</span>
+                <button id="btn-grid-toggle-mode" class="btn" style="background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 4px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Done Editing & Track Rows</button>
+              </div>
+              <div class="toolbar-right" style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                <!-- 动态扩展网格尺寸按钮 -->
+                <div class="grid-dim-actions" style="display: flex; gap: 2px; border: 1px solid var(--card-border); border-radius: 4px; padding: 2px; background: var(--bg-color);">
+                  <button id="btn-grid-add-row" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="底部增加一行">＋Row</button>
+                  <button id="btn-grid-remove-row" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="减少一行">－Row</button>
+                  <button id="btn-grid-add-col" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="右侧增加一列">＋Col</button>
+                  <button id="btn-grid-remove-col" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="减少一列">－Col</button>
+                </div>
+                <button id="btn-grid-zoom-in" class="btn icon-only-btn" title="Zoom In">＋</button>
+                <button id="btn-grid-zoom-out" class="btn icon-only-btn" title="Zoom Out">－</button>
+                <button id="btn-edit-clear" class="btn text-btn danger-text">Clear Canvas</button>
+              </div>
+            </div>
+            
+            <div class="grid-scroll-wrapper">
+              <div class="grid-canvas-container" id="grid-canvas-container">
+                <!-- SVG 或 HTML 动态渲染的网格 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- 提示弹窗 (Toast) -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- 引入逻辑脚本 -->
+  <script src="speech.js"></script>
+  <script src="parser.js"></script>
+  <script src="grid.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

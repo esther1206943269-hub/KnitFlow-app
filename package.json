@@ -1,0 +1,19 @@
+{
+  "name": "knitflow",
+  "version": "1.0.0",
+  "description": "智能棒针编织行数记录与图解助手",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server ./ -p 5173 -o"
+  },
+  "keywords": [
+    "knitting",
+    "assistant",
+    "helper"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
