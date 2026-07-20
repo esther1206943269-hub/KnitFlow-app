@@ -395,9 +395,9 @@ body.dark-mode .fixed-cat-container img {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 3.5rem; /* 增大列与列的水平间距 */
-  align-items: start;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
 }
 
 .create-card {
@@ -449,7 +449,7 @@ body.dark-mode .fixed-cat-container img {
 }
 
 .creation-title {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--title-color, var(--text-main));
   transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.25s ease, visibility 0.25s;
@@ -459,6 +459,7 @@ body.dark-mode .fixed-cat-container img {
   text-overflow: ellipsis;
   white-space: nowrap;
   transform: translateY(0); /* 默认正中心 */
+  letter-spacing: 0.01em;
   opacity: 1;
   visibility: visible;
   font-family: var(--font-sans);
