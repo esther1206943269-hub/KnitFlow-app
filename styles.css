@@ -826,19 +826,31 @@ body.dark-mode .project-name {
 }
 
 .back-link {
-  background: none;
-  border: none;
-  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-  transition: var(--transition);
-  display: inline-block;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-align: center;
 }
 
 .back-link:hover {
+  background-color: var(--card-bg);
+  border-color: var(--primary);
   color: var(--primary);
-  transform: translateX(-4px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .form-card h2 {
