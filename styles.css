@@ -3,9 +3,9 @@
 /* KnitFlow Nordic Minimalist Design System & Styling */
 
 :root {
-  /* 北欧极简高对比度配色 - 70% 半透明无边框玻璃质感 */
+  /* 北欧极简高对比度配色 - 30% 半透明玻璃质感 */
   --bg-color: #ffffff;
-  --card-bg: rgba(255, 255, 255, 0.70); /* 70% 不透明度卡片底色 */
+  --card-bg: rgba(255, 255, 255, 0.30); /* 30% 不透明度卡片底色 */
   --card-border: transparent;
   --text-main: #111111;
   --text-muted: #666666;
@@ -34,13 +34,13 @@
   --radius-md: 12px;  /* 列表中框倒圆角 */
   --radius-lg: 16px;  /* 卡片主框倒圆角 */
   --transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --blur: blur(14px); /* 70% 不透明度无边框毛玻璃 */
+  --blur: blur(14px);
 }
 
-/* 深色模式变量 (70% 半透明深色无边框卡片) */
+/* 深色模式变量 (30% 半透明深色卡片) */
 body.dark-mode {
   --bg-color: #111111;
-  --card-bg: rgba(26, 26, 26, 0.70);
+  --card-bg: rgba(26, 26, 26, 0.30);
   --card-border: transparent;
   --text-main: #f5f5f5;
   --text-muted: #888888;
@@ -429,7 +429,7 @@ body.dark-mode .fixed-cat-container img {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 95px; /* 减少高度，由 120px 缩为 95px */
+  height: 95px;
   position: relative;
   text-align: center;
   padding: 1rem;
@@ -517,13 +517,18 @@ body.dark-mode .creation-title {
   gap: 0.6rem;
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-sm);
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   color: var(--text-main);
   cursor: pointer;
   text-align: left;
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   font-family: var(--font-sans);
+}
+
+body.dark-mode .btn-preset-chip {
+  background-color: rgba(45, 45, 45, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .btn-preset-chip:hover {
@@ -600,15 +605,16 @@ body.dark-mode .creation-title {
   text-align: center;
   padding: 1.25rem;
   border-radius: var(--radius-sm);
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   overflow: hidden;
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 body.dark-mode .project-item {
-  background-color: var(--card-bg);
+  background-color: rgba(45, 45, 45, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 
