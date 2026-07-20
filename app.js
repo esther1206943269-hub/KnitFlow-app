@@ -410,7 +410,83 @@ const App = {
     });
 
     this.highlightActiveMotifs();
+    this.renderMotifBreakdown(activeRowData ? activeRowData.text : '');
     this.updateTimerDisplay();
+  },
+
+  renderMotifBreakdown(text) {
+    const breakdownArea = document.getElementById('text-motif-breakdown-area');
+    if (!breakdownArea) return;
+
+    const p = this.currentProject;
+    if (!p || !p.motifs || p.motifs.length === 0 || !text) {
+      breakdownArea.style.display = 'none';
+      return;
+    }
+
+    const isExactCodeMatch = (code, fullText) => {
+      if (!code || !fullText) return false;
+      const cleanCode = code.replace(/[\[\]]/g, '').trim();
+      if (!cleanCode) return false;
+      const escaped = cleanCode.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const regex = new RegExp(`(\\[${escaped}\\]|\\b${escaped}\\b)(?!\\d)`, 'i');
+      return regex.test(fullText);
+    };
+
+    const matchedItems = [];
+
+    p.motifs.forEach(motif => {
+      const lines = (motif.desc || '').split('\n').map(l => l.trim()).filter(Boolean);
+      lines.forEach(line => {
+        const subMatch = line.match(/^([A-Za-z0-9_]+|\[[A-Za-z0-9_]+\]|R\d+|Row\s*\d+|行\s*\d+)[:：\s]*\[?(.*?)\]?$/i);
+        let subCode = '';
+        let subText = line;
+        if (subMatch && subMatch[2] !== undefined) {
+          subCode = subMatch[1].replace(/[\[\]]/g, '').trim();
+          subText = subMatch[2].trim();
+        }
+
+        if (subCode && isExactCodeMatch(subCode, text)) {
+          matchedItems.push({ code: subCode, text: subText, group: motif.code });
+        } else if (!subCode && isExactCodeMatch(motif.code, text)) {
+          matchedItems.push({ code: motif.code, text: line, group: motif.code });
+        }
+      });
+    });
+
+    breakdownArea.style.display = 'block';
+
+    if (matchedItems.length > 0) {
+      breakdownArea.style.background = 'rgba(209, 142, 151, 0.12)';
+      breakdownArea.style.borderLeft = '4px solid var(--primary)';
+      breakdownArea.style.padding = '0.75rem 1rem';
+
+      const itemsHTML = matchedItems.map(item => `
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem; color: var(--text-main); font-weight: 600; background: rgba(255,255,255,0.7); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--card-border);">
+          <span style="font-family: monospace; font-size: 0.85rem; background: var(--primary); color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 700;">${item.code}</span>
+          <span style="flex: 1; word-break: break-word;">${item.text}</span>
+        </div>
+      `).join('');
+
+      breakdownArea.innerHTML = `
+        <div style="font-size: 0.82rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+          <span>🌸 子图解针法展开 (Sub-Pattern Breakdown)</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          ${itemsHTML}
+        </div>
+      `;
+    } else {
+      // 当前行没有花样
+      breakdownArea.style.background = 'rgba(0, 0, 0, 0.03)';
+      breakdownArea.style.borderLeft = '4px solid var(--text-muted)';
+      breakdownArea.style.padding = '0.55rem 0.85rem';
+      breakdownArea.innerHTML = `
+        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-style: italic;">
+          <span>💡 <strong>独立花样提示：</strong>【这行没有花样，请继续编织】</span>
+        </div>
+      `;
+    }
   },
 
   renderTextRowsList() {
