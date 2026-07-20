@@ -38,8 +38,8 @@
       </section>
 
       <div class="dashboard-grid">
-        <!-- 创建新项目卡片 -->
-        <div class="card create-card" style="border: none; background: transparent; padding: 0; box-shadow: none;">
+        <!-- 功能区 1: 添加新项目 -->
+        <div class="card create-card">
           <h3 style="border-left: 2px solid var(--primary); padding-left: 0.6rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">添加新项目 / NEW PROJECTS</h3>
           <div class="creation-links">
             <button id="btn-new-text" class="creation-link-item" style="--hover-bg: #D18E97; --hover-text: #5B3B1E; --title-color: #D18E97; --dark-title-color: #D18E97;">
@@ -55,21 +55,10 @@
               <span class="creation-desc">上传本地 CSV/Excel 表格生成网格图解 / Upload local spreadsheets and convert them into grids</span>
             </button>
           </div>
-
-          <!-- 预设与自定义图解模板库 -->
-          <div class="preset-templates-section" style="margin-top: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: nowrap;">
-              <h3 style="border-left: 2px solid var(--accent); padding-left: 0.6rem; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.9rem; opacity: 0.9; white-space: nowrap;">图解库 / TEMPLATE LIBRARY</h3>
-              <button id="btn-create-template-direct" class="btn text-btn" style="padding: 2px 6px; font-size: 0.72rem; border: 1px dashed var(--primary); color: var(--primary); font-weight: 600; white-space: nowrap;" title="制作新图解模板保存至此处">新建模板 / NEW TEMPLATE</button>
-            </div>
-            <div id="preset-chips-list" class="preset-chips" style="display: flex; flex-direction: column; gap: 0.6rem;">
-              <!-- 动态渲染预设与自定义模板 -->
-            </div>
-          </div>
         </div>
 
-        <!-- 项目列表 -->
-        <div class="card projects-card" style="border: none; background: transparent; padding: 0; box-shadow: none;">
+        <!-- 功能区 2: 我的项目 -->
+        <div class="card projects-card" style="min-height: 100%;">
           <h3 style="border-left: 2px solid var(--primary); padding-left: 0.6rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">我的项目 / PROJECTS</h3>
           <div id="project-list" class="project-list">
             <!-- 动态生成 -->
@@ -77,6 +66,17 @@
               <p>No saved projects yet. Create one to start!</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- 功能区 3: 预设与自定义图解模板库 -->
+      <div class="card preset-templates-section" style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: nowrap;">
+          <h3 style="border-left: 2px solid var(--accent); padding-left: 0.6rem; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.95rem; opacity: 0.9; white-space: nowrap;">图解库 / TEMPLATE LIBRARY</h3>
+          <button id="btn-create-template-direct" class="btn text-btn" style="padding: 3px 8px; font-size: 0.72rem; border: 1px dashed var(--primary); color: var(--primary); font-weight: 600; white-space: nowrap;" title="制作新图解模板保存至此处">新建模板 / NEW TEMPLATE</button>
+        </div>
+        <div id="preset-chips-list" class="preset-chips" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem;">
+          <!-- 动态渲染预设与自定义模板 -->
         </div>
       </div>
     </main>
