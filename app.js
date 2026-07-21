@@ -1320,8 +1320,21 @@ const App = {
         item.classList.add('active');
       }
       
+      let textColor = '#3c3530';
+      if (st.color) {
+        let hex = st.color.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length === 6) {
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+          const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+          if (yiq < 128) textColor = 'rgba(255, 255, 255, 0.95)';
+        }
+      }
+
       item.innerHTML = `
-        <div class="stitch-icon-box" style="background-color: ${st.color}">${st.symbol}</div>
+        <div class="stitch-icon-box" style="background-color: ${st.color}">${Grid.getStitchSVGIcon(key, textColor, 18)}</div>
         <span>${st.text}</span>
       `;
       
@@ -1365,8 +1378,22 @@ const App = {
     Object.entries(Grid.stitches).forEach(([key, st]) => {
       const item = document.createElement('div');
       item.className = 'legend-item';
+
+      let textColor = '#3c3530';
+      if (st.color) {
+        let hex = st.color.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length === 6) {
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+          const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+          if (yiq < 128) textColor = 'rgba(255, 255, 255, 0.95)';
+        }
+      }
+
       item.innerHTML = `
-        <div class="legend-color-box" style="background-color: ${st.color}">${st.symbol}</div>
+        <div class="legend-color-box" style="background-color: ${st.color}">${Grid.getStitchSVGIcon(key, textColor, 15)}</div>
         <span>${st.name}</span>
       `;
       container.appendChild(item);
