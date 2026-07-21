@@ -32,7 +32,8 @@ const App = {
   loadProjects() {
     try {
       const stored = localStorage.getItem('knitflow_projects');
-      this.projects = stored ? JSON.parse(stored) : this.getSampleProjects();
+      const parsed = stored ? JSON.parse(stored) : null;
+      this.projects = (parsed && Array.isArray(parsed) && parsed.length > 0) ? parsed : this.getSampleProjects();
       
       // 自动迁移旧项目，确保都有 referenceLinks 数组
       this.projects.forEach(p => {
@@ -1651,72 +1652,79 @@ const App = {
     });
   },
 
+  openCreateText(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const nameEl = document.getElementById('text-project-name');
+    const inputEl = document.getElementById('text-pattern-input');
+    if (nameEl) nameEl.value = '';
+    if (inputEl) inputEl.value = '';
+    this.switchView('view-create-text');
+  },
+
+  openCreateGrid(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const nameEl = document.getElementById('grid-project-name');
+    if (nameEl) nameEl.value = '';
+    this.switchView('view-create-grid');
+  },
+
+  openImportCSV(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const nameEl = document.getElementById('csv-project-name');
+    const fileEl = document.getElementById('csv-file-input');
+    const rawEl = document.getElementById('csv-raw-input');
+    if (nameEl) nameEl.value = '';
+    if (fileEl) fileEl.value = null;
+    if (rawEl) rawEl.value = '';
+    this.switchView('view-import-csv');
+  },
+
   // ==========================================================================
-  // 事件交互绑定
+  // 事件交互绑定 (全防御性包装，避免任一元素缺失影响页面功能)
   // ==========================================================================
   bindEvents() {
     this.bindMotifModalEvents();
+
+    const addClick = (id, fn) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', fn);
+      }
+    };
+
     // 仪表盘大厅跳转
-    document.getElementById('btn-home').addEventListener('click', () => {
+    addClick('btn-home', () => {
       this.switchView('view-dashboard');
       this.renderProjectList();
     });
 
-
-
-    document.getElementById('btn-new-text').addEventListener('click', () => {
-      document.getElementById('text-project-name').value = '';
-      document.getElementById('text-pattern-input').value = '';
-      this.switchView('view-create-text');
-    });
-
-    document.getElementById('btn-new-grid').addEventListener('click', () => {
-      document.getElementById('grid-project-name').value = '';
-      this.switchView('view-create-grid');
-    });
-
-    document.getElementById('btn-import-csv').addEventListener('click', () => {
-      document.getElementById('csv-project-name').value = '';
-      document.getElementById('csv-file-input').value = null;
-      document.getElementById('csv-raw-input').value = '';
-      this.switchView('view-import-csv');
-    });
+    // 页面跳转
+    addClick('btn-new-text', (e) => this.openCreateText(e));
+    addClick('btn-new-grid', (e) => this.openCreateGrid(e));
+    addClick('btn-import-csv', (e) => this.openImportCSV(e));
 
     // 返回按钮
-    document.getElementById('btn-back-text-create').addEventListener('click', () => this.switchView('view-dashboard'));
-    document.getElementById('btn-back-grid-create').addEventListener('click', () => this.switchView('view-dashboard'));
-    document.getElementById('btn-back-csv-create').addEventListener('click', () => this.switchView('view-dashboard'));
-    document.getElementById('btn-back-text-player').addEventListener('click', () => {
+    addClick('btn-back-text-create', () => this.switchView('view-dashboard'));
+    addClick('btn-back-grid-create', () => this.switchView('view-dashboard'));
+    addClick('btn-back-csv-create', () => this.switchView('view-dashboard'));
+    addClick('btn-back-text-player', () => {
       this.switchView('view-dashboard');
       this.renderProjectList();
     });
-    document.getElementById('btn-back-grid-player').addEventListener('click', () => {
+    addClick('btn-back-grid-player', () => {
       this.switchView('view-dashboard');
       this.renderProjectList();
     });
 
     // 主题切换
-    document.getElementById('btn-toggle-theme').addEventListener('click', () => {
+    addClick('btn-toggle-theme', () => {
       document.body.classList.toggle('dark-mode');
     });
 
-    // 像素图解空网格创建
-    const btnSaveGrid = document.getElementById('btn-save-grid-project');
-    if (btnSaveGrid) {
-      btnSaveGrid.addEventListener('click', (e) => this.createGridProject(e));
-    }
-
-    // 文字图解保存与解析
-    const btnSaveText = document.getElementById('btn-save-text-project');
-    if (btnSaveText) {
-      btnSaveText.addEventListener('click', (e) => this.createTextProject(e));
-    }
-
-    // CSV 文件/文本解析创建
-    const btnSaveCSV = document.getElementById('btn-save-csv-project');
-    if (btnSaveCSV) {
-      btnSaveCSV.addEventListener('click', (e) => this.createCSVProject(e));
-    }
+    // 表单提交事件
+    addClick('btn-save-grid-project', (e) => this.createGridProject(e));
+    addClick('btn-save-text-project', (e) => this.createTextProject(e));
+    addClick('btn-save-csv-project', (e) => this.createCSVProject(e));
   },
 
   createGridProject(e) {
