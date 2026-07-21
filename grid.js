@@ -58,10 +58,10 @@ const Grid = {
         return '<line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'yo': // 挂针: 空心圆
         return '<circle cx="12" cy="12" r="5.5" stroke="currentColor" stroke-width="2" fill="none"/>';
-      case 'ktbl': // 扭针: 弧形人/山字顶 (100% 精确匹配图一 ∧ 样式)
-        return '<path d="M 6 18 C 8 13 10 5 12 5 C 14 5 16 13 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'p1tbl': // 扭上针: 弧形人/山字顶 + 底部横线
-        return '<path d="M 6 15 C 8 11 10 4 12 4 C 14 4 16 11 18 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="19" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'ktbl': // 扭针: 100% 用户原版 SVG 代码 (M 15 90 C 35 85 65 55 65 30...)
+        return '<path d="M 3.6 21.6 C 8.4 20.4 15.6 13.2 15.6 7.2 C 15.6 2.4 8.4 2.4 8.4 7.2 C 8.4 13.2 15.6 20.4 20.4 21.6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'p1tbl': // 扭上针: 用户原版扭针 SVG + 底部横线
+        return '<path d="M 3.6 18.5 C 8.4 17.5 15.6 11.2 15.6 6 C 15.6 1.8 8.4 1.8 8.4 6 C 8.4 11.2 15.6 17.5 20.4 18.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4" y1="21" x2="20" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'ssp': // 上针的右上二针并一针: 折角折线 + 底部横线
         return '<path d="M 18 6 L 6 12 L 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'ssk': // 右上二针并一针: 入字形 (斜线 + 左接线)
