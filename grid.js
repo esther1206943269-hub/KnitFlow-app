@@ -14,17 +14,7 @@ const Grid = {
       'c2f':   { symbol: '╏', name: 'C2F 前交叉麻花', color: '#e0e7ff', text: 'C2F Cable' },
       'c2b':   { symbol: '╎', name: 'C2B 后交叉麻花', color: '#ddd6fe', text: 'C2B Cable' },
       'sl':    { symbol: 'V', name: 'Slip 挑针/滑针', color: '#f3e8ff', text: 'Slip' },
-      'm1':    { symbol: '+', name: 'Make 1 扭加针', color: '#dcfce7', text: 'Make 1' },
-      'c1':    { symbol: '', name: 'Rosy Pink 玫瑰粉 (A)', color: '#D18E97', text: 'Rosy Pink' },
-      'c2':    { symbol: '', name: 'Mustard 芥末黄 (B)', color: '#D2A432', text: 'Mustard' },
-      'c3':    { symbol: '', name: 'Sage Green 鼠尾草绿 (C)', color: '#979E6C', text: 'Sage Green' },
-      'c4':    { symbol: '', name: 'Cocoa Brown 可可棕 (D)', color: '#7c5436', text: 'Cocoa Brown' },
-      'c5':    { symbol: '', name: 'Slate Blue 靛蓝 (E)', color: '#5b8296', text: 'Slate Blue' },
-      'c6':    { symbol: '', name: 'Cream White 米白 (F)', color: '#F7F4D5', text: 'Cream White' },
-      'c7':    { symbol: '', name: 'Charcoal 深灰 (G)', color: '#332A2B', text: 'Charcoal' },
-      'c8':    { symbol: '', name: 'Coral Orange 珊瑚橙 (H)', color: '#E87A5D', text: 'Coral' },
-      'c9':    { symbol: '', name: 'Lavender 薰衣草紫 (I)', color: '#9B89B3', text: 'Lavender' },
-      'c10':   { symbol: '', name: 'Sky Blue 天空蓝 (J)', color: '#76A5AF', text: 'Sky Blue' }
+      'm1':    { symbol: '+', name: 'Make 1 扭加针', color: '#dcfce7', text: 'Make 1' }
     };
   },
 
@@ -37,17 +27,7 @@ const Grid = {
     'c2f':   { symbol: '╏', name: 'C2F 前交叉麻花', color: '#e0e7ff', text: 'C2F Cable' },
     'c2b':   { symbol: '╎', name: 'C2B 后交叉麻花', color: '#ddd6fe', text: 'C2B Cable' },
     'sl':    { symbol: 'V', name: 'Slip 挑针/滑针', color: '#f3e8ff', text: 'Slip' },
-    'm1':    { symbol: '+', name: 'Make 1 扭加针', color: '#dcfce7', text: 'Make 1' },
-    'c1':    { symbol: '', name: 'Rosy Pink 玫瑰粉 (A)', color: '#D18E97', text: 'Rosy Pink' },
-    'c2':    { symbol: '', name: 'Mustard 芥末黄 (B)', color: '#D2A432', text: 'Mustard' },
-    'c3':    { symbol: '', name: 'Sage Green 鼠尾草绿 (C)', color: '#979E6C', text: 'Sage Green' },
-    'c4':    { symbol: '', name: 'Cocoa Brown 可可棕 (D)', color: '#7c5436', text: 'Cocoa Brown' },
-    'c5':    { symbol: '', name: 'Slate Blue 靛蓝 (E)', color: '#5b8296', text: 'Slate Blue' },
-    'c6':    { symbol: '', name: 'Cream White 米白 (F)', color: '#F7F4D5', text: 'Cream White' },
-    'c7':    { symbol: '', name: 'Charcoal 深灰 (G)', color: '#332A2B', text: 'Charcoal' },
-    'c8':    { symbol: '', name: 'Coral Orange 珊瑚橙 (H)', color: '#E87A5D', text: 'Coral' },
-    'c9':    { symbol: '', name: 'Lavender 薰衣草紫 (I)', color: '#9B89B3', text: 'Lavender' },
-    'c10':   { symbol: '', name: 'Sky Blue 天空蓝 (J)', color: '#76A5AF', text: 'Sky Blue' }
+    'm1':    { symbol: '+', name: 'Make 1 扭加针', color: '#dcfce7', text: 'Make 1' }
   },
 
   loadProjectStitches(customStitches) {

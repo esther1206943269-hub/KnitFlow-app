@@ -84,23 +84,23 @@
     <!-- 视图：文字图解创建 -->
     <main id="view-create-text" class="app-view">
       <div class="card form-card">
-        <button class="back-link" id="btn-back-text-create">← Back to Dashboard</button>
-        <h2>New Written Pattern</h2>
+        <button class="back-link" id="btn-back-text-create">← 返回主控制台 / Back to Dashboard</button>
+        <h2>新建文字图解 / NEW WRITTEN PATTERN</h2>
         <div class="form-group">
-          <label for="text-project-name">Project Name</label>
-          <input type="text" id="text-project-name" placeholder="e.g. Winter Cable Scarf" required>
+          <label for="text-project-name">项目名称 / Project Name</label>
+          <input type="text" id="text-project-name" placeholder="例如：冬季麻花围巾 / e.g. Winter Cable Scarf" required>
         </div>
         <div class="form-group">
-          <label for="text-tutorial-url">Reference Tutorial Link (Optional)</label>
-          <input type="text" id="text-tutorial-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+          <label for="text-tutorial-url">参考教程链接（可选） / Reference Tutorial Link (Optional)</label>
+          <input type="text" id="text-tutorial-url" placeholder="例如：https://www.youtube.com/watch?v=... / e.g. https://...">
         </div>
         <div class="form-group">
-          <label for="text-pattern-input">Written Pattern Instructions</label>
-          <div class="helper-text">Format example:<br>Row 1: K3, P3, K3<br>Row 2: P3, K3, P3... or R1-5: Knit</div>
-          <textarea id="text-pattern-input" rows="12" placeholder="Paste or type your written pattern instructions here..."></textarea>
+          <label for="text-pattern-input">文字图解针法说明 / Written Pattern Instructions</label>
+          <div class="helper-text">格式示例 / Format Example:<br>第1行: 3下, 3上, 3下 / Row 1: K3, P3, K3<br>第2行: 3上, 3下, 3上... 或 R1-5: 下针 / Row 2: P3, K3, P3... or R1-5: Knit</div>
+          <textarea id="text-pattern-input" rows="12" placeholder="在此粘贴或输入你的文字图解说明... / Paste or type your written pattern instructions here..."></textarea>
         </div>
         <div class="form-actions">
-          <button id="btn-save-text-project" class="btn primary">Parse & Start Knitting</button>
+          <button id="btn-save-text-project" class="btn primary">解析并开始编织 / Parse & Start Knitting</button>
         </div>
       </div>
     </main>
@@ -108,39 +108,39 @@
     <!-- 视图：像素图解创建 -->
     <main id="view-create-grid" class="app-view">
       <div class="card form-card">
-        <button class="back-link" id="btn-back-grid-create">← Back to Dashboard</button>
-        <h2>New Pixel Grid Project</h2>
+        <button class="back-link" id="btn-back-grid-create">← 返回主控制台 / Back to Dashboard</button>
+        <h2>新建网格图解 / NEW PIXEL GRID PROJECT</h2>
         <div class="form-group">
-          <label for="grid-project-name">Project Name</label>
-          <input type="text" id="grid-project-name" placeholder="e.g. Fair Isle Nordic Mittens" required>
+          <label for="grid-project-name">项目名称 / Project Name</label>
+          <input type="text" id="grid-project-name" placeholder="例如：北欧雪花手套 / e.g. Fair Isle Nordic Mittens" required>
         </div>
         <div class="form-group">
-          <label for="grid-tutorial-url">Reference Tutorial Link (Optional)</label>
-          <input type="text" id="grid-tutorial-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+          <label for="grid-tutorial-url">参考教程链接（可选） / Reference Tutorial Link (Optional)</label>
+          <input type="text" id="grid-tutorial-url" placeholder="例如：https://www.youtube.com/watch?v=... / e.g. https://...">
         </div>
         <div class="form-row">
           <div class="form-group half">
-            <label for="grid-width">Total Stitches (Width)</label>
+            <label for="grid-width">总针数（宽度） / Total Stitches (Width)</label>
             <input type="number" id="grid-width" value="20" min="5" max="100">
           </div>
           <div class="form-group half">
-            <label for="grid-height">Total Rows (Height)</label>
+            <label for="grid-height">总行数（高度） / Total Rows (Height)</label>
             <input type="number" id="grid-height" value="20" min="5" max="200">
           </div>
         </div>
         <div class="form-group">
-          <label>Knitting Technique</label>
+          <label>编织方式 / Knitting Technique</label>
           <div class="radio-group">
             <label class="radio-label">
-              <input type="radio" name="grid-knit-type" value="flat" checked> Flat (Odd rows R-to-L, Even rows L-to-R)
+              <input type="radio" name="grid-knit-type" value="flat" checked> 片织 Flat (单数行右至左，双数行左至右)
             </label>
             <label class="radio-label">
-              <input type="radio" name="grid-knit-type" value="circular"> Circular (All rows R-to-L)
+              <input type="radio" name="grid-knit-type" value="circular"> 圈织 Circular (所有行均为右至左)
             </label>
           </div>
         </div>
         <div class="form-actions">
-          <button id="btn-save-grid-project" class="btn primary">Create Blank Grid</button>
+          <button id="btn-save-grid-project" class="btn primary">创建空白网格 / Create Blank Grid</button>
         </div>
       </div>
     </main>
@@ -148,20 +148,20 @@
     <!-- 视图：导入 Excel/CSV 网格 -->
     <main id="view-import-csv" class="app-view">
       <div class="card form-card">
-        <button class="back-link" id="btn-back-csv-create">← Back to Dashboard</button>
-        <h2>Import Excel / CSV Grid</h2>
+        <button class="back-link" id="btn-back-csv-create">← 返回主控制台 / Back to Dashboard</button>
+        <h2>导入表格 / IMPORT EXCEL / CSV GRID</h2>
         <div class="form-group">
-          <label for="csv-project-name">Project Name</label>
-          <input type="text" id="csv-project-name" placeholder="e.g. Jacquard Sweater Vest" required>
+          <label for="csv-project-name">项目名称 / Project Name</label>
+          <input type="text" id="csv-project-name" placeholder="例如：提花背心图解 / e.g. Jacquard Sweater Vest" required>
         </div>
         <div class="form-group">
-          <label for="csv-tutorial-url">Reference Tutorial Link (Optional)</label>
-          <input type="text" id="csv-tutorial-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+          <label for="csv-tutorial-url">参考教程链接（可选） / Reference Tutorial Link (Optional)</label>
+          <input type="text" id="csv-tutorial-url" placeholder="例如：https://www.youtube.com/watch?v=... / e.g. https://...">
         </div>
         <div class="form-group">
-          <label for="csv-file-input">Select CSV File (exported from Excel)</label>
+          <label for="csv-file-input">选择表格文件（从 Excel 导出的 .csv） / Select CSV File</label>
           <input type="file" id="csv-file-input" accept=".csv,.txt">
-          <div class="helper-text">Tip: In Excel, mark each cell with symbols (e.g. X, O, K, P). Save as CSV (comma delimited) and upload here.</div>
+          <div class="helper-text">提示：在 Excel 中用符号标注每个格子（如 X, O, K, P），另存为 CSV (逗号分隔) 格式后上传即可。</div>
         </div>
         <div class="form-group">
           <label for="csv-raw-input">Or paste CSV text directly below (comma / tab / space separated)</label>
