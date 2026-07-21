@@ -282,6 +282,7 @@ input[type="submit"],
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   box-shadow: none !important;
+  flex-shrink: 0;
   transition: var(--transition);
 }
 
@@ -1047,6 +1048,9 @@ input:focus, textarea:focus, select:focus {
   border-left: 6px solid #D18E97 !important; /* 左侧柔粉色/鼠尾草绿饰条 */
   border-radius: var(--radius-lg) !important;
   box-shadow: none !important;
+  flex-shrink: 0 !important;
+  height: auto !important;
+  min-height: fit-content !important;
   transition: border-left-color 0.3s ease, var(--transition);
 }
 
