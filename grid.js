@@ -6,28 +6,38 @@
 const Grid = {
   getDefaultStitches() {
     return {
-      'k':     { symbol: ' ', name: 'Knit 下针 (K)', color: '#ffffff', text: 'Knit' },
-      'p':     { symbol: '—', name: 'Purl 上针 (P)', color: '#e8e4db', text: 'Purl' },
-      'yo':    { symbol: '○', name: 'Yarn Over 挂针 (YO)', color: '#fef3c7', text: 'Yarn Over' },
-      'k2tog': { symbol: '╱', name: 'K2tog 右上二并一', color: '#fecaca', text: 'K2tog' },
-      'ssk':   { symbol: '╲', name: 'SSK 左上二并一', color: '#fed7aa', text: 'SSK' },
-      'c2f':   { symbol: '╏', name: 'C2F 前交叉麻花', color: '#e0e7ff', text: 'C2F Cable' },
-      'c2b':   { symbol: '╎', name: 'C2B 后交叉麻花', color: '#ddd6fe', text: 'C2B Cable' },
-      'sl':    { symbol: 'V', name: 'Slip 挑针/滑针', color: '#f3e8ff', text: 'Slip' },
-      'm1':    { symbol: '+', name: 'Make 1 扭加针', color: '#dcfce7', text: 'Make 1' }
+      'k':     { symbol: '|',   name: '下针 (K)',                    color: '#FFFFFF', text: '下针' },
+      'p':     { symbol: '—',   name: '上针 (P)',                    color: '#EFEBE4', text: '上针' },
+      'yo':    { symbol: '○',   name: '挂针 (YO)',                   color: '#FDE8B3', text: '挂针' },
+      'ktbl':  { symbol: 'ℓ',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
+      'p1tbl': { symbol: 'ℓ_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
+      'ssp':   { symbol: '⋋',   name: '上针的右上二针并一针 (ssp)',   color: '#F7C5BA', text: 'ssp' },
+      'ssk':   { symbol: 'λ',   name: '右上二针并一针 (ssk)',         color: '#F4B8A5', text: 'ssk' },
+      'p2tog': { symbol: '⋌',   name: '上针的左上二针并一针 (p2tog)', color: '#D4E0C8', text: 'p2tog' },
+      'k2tog': { symbol: '人',  name: '左上二针并一针 (k2tog)',       color: '#C3D5B5', text: 'k2tog' },
+      'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                 color: '#D1E3E2', text: 'krl' },
+      'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',          color: '#BACECF', text: 'prl' },
+      'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                 color: '#E3D8ED', text: 'kll' },
+      'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',          color: '#CDBEDC', text: 'pll' },
+      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',         color: '#F3DBBD', text: '交叉针' }
     };
   },
 
   stitches: {
-    'k':     { symbol: ' ', name: 'Knit 下针 (K)', color: '#ffffff', text: 'Knit' },
-    'p':     { symbol: '—', name: 'Purl 上针 (P)', color: '#e8e4db', text: 'Purl' },
-    'yo':    { symbol: '○', name: 'Yarn Over 挂针 (YO)', color: '#fef3c7', text: 'Yarn Over' },
-    'k2tog': { symbol: '╱', name: 'K2tog 右上二并一', color: '#fecaca', text: 'K2tog' },
-    'ssk':   { symbol: '╲', name: 'SSK 左上二并一', color: '#fed7aa', text: 'SSK' },
-    'c2f':   { symbol: '╏', name: 'C2F 前交叉麻花', color: '#e0e7ff', text: 'C2F Cable' },
-    'c2b':   { symbol: '╎', name: 'C2B 后交叉麻花', color: '#ddd6fe', text: 'C2B Cable' },
-    'sl':    { symbol: 'V', name: 'Slip 挑针/滑针', color: '#f3e8ff', text: 'Slip' },
-    'm1':    { symbol: '+', name: 'Make 1 扭加针', color: '#dcfce7', text: 'Make 1' }
+    'k':     { symbol: '|',   name: '下针 (K)',                    color: '#FFFFFF', text: '下针' },
+    'p':     { symbol: '—',   name: '上针 (P)',                    color: '#EFEBE4', text: '上针' },
+    'yo':    { symbol: '○',   name: '挂针 (YO)',                   color: '#FDE8B3', text: '挂针' },
+    'ktbl':  { symbol: 'ℓ',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
+    'p1tbl': { symbol: 'ℓ_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
+    'ssp':   { symbol: '⋋',   name: '上针的右上二针并一针 (ssp)',   color: '#F7C5BA', text: 'ssp' },
+    'ssk':   { symbol: 'λ',   name: '右上二针并一针 (ssk)',         color: '#F4B8A5', text: 'ssk' },
+    'p2tog': { symbol: '⋌',   name: '上针的左上二针并一针 (p2tog)', color: '#D4E0C8', text: 'p2tog' },
+    'k2tog': { symbol: '人',  name: '左上二针并一针 (k2tog)',       color: '#C3D5B5', text: 'k2tog' },
+    'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                 color: '#D1E3E2', text: 'krl' },
+    'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',          color: '#BACECF', text: 'prl' },
+    'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                 color: '#E3D8ED', text: 'kll' },
+    'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',          color: '#CDBEDC', text: 'pll' },
+    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',         color: '#F3DBBD', text: '交叉针' }
   },
 
   loadProjectStitches(customStitches) {
@@ -165,11 +175,17 @@ const Grid = {
     if (clean === '' || clean === 'k' || clean === '下' || clean === '下针' || clean === '1' || clean === '|') return 'k';
     if (clean === '-' || clean === 'p' || clean === '上' || clean === '上针' || clean === '—') return 'p';
     if (clean === 'o' || clean === 'yo' || clean === '挂' || clean === '挂针' || clean === '0' || clean === '○') return 'yo';
-    if (clean === '/' || clean === 'k2tog' || clean === '并' || clean === '右上二并一' || clean === '╱') return 'k2tog';
-    if (clean === '\\' || clean === 'ssk' || clean === '左上二并一' || clean === '╲') return 'ssk';
-    if (clean === 'a' || clean === '配色a' || clean === 'c1' || clean === '2') return 'c1';
-    if (clean === 'b' || clean === '配色b' || clean === 'c2' || clean === '3') return 'c2';
-    if (clean === 'c' || clean === '配色c' || clean === 'c3' || clean === '4') return 'c3';
+    if (clean === 'ktbl' || clean === '扭针' || clean === 'ℓ') return 'ktbl';
+    if (clean === 'p1tbl' || clean === 'p1 tbl' || clean === '扭上针' || clean === 'ℓ_') return 'p1tbl';
+    if (clean === 'ssp' || clean === '上针的右上二针并一针' || clean === '⋋') return 'ssp';
+    if (clean === 'ssk' || clean === '右上二针并一针' || clean === 'λ') return 'ssk';
+    if (clean === 'p2tog' || clean === '上针的左上二针并一针' || clean === '⋌') return 'p2tog';
+    if (clean === 'k2tog' || clean === '左上二针并一针' || clean === '人' || clean === '╱') return 'k2tog';
+    if (clean === 'krl' || clean === '右加针' || clean === 'ᵀ/') return 'krl';
+    if (clean === 'prl' || clean === '上针的右加针' || clean === 'ᵀ/_') return 'prl';
+    if (clean === 'kll' || clean === '左加针' || clean === '\\ᵀ') return 'kll';
+    if (clean === 'pll' || clean === '上针的左加针' || clean === '\\ᵀ_') return 'pll';
+    if (clean === 'c21' || clean === '右上2针与1针的交叉针' || clean === '交叉针' || clean === '╳') return 'c21';
     
     // 默认兜底为下针
     return 'k';
