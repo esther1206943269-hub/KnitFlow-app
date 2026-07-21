@@ -62,10 +62,10 @@ const Grid = {
         return '<path d="M 3.6 21.6 C 8.4 20.4 15.6 13.2 15.6 7.2 C 15.6 2.4 8.4 2.4 8.4 7.2 C 8.4 13.2 15.6 20.4 20.4 21.6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
       case 'p1tbl': // 扭上针: 用户原版扭针 SVG + 底部横线
         return '<path d="M 3.6 18.5 C 8.4 17.5 15.6 11.2 15.6 6 C 15.6 1.8 8.4 1.8 8.4 6 C 8.4 11.2 15.6 17.5 20.4 18.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4" y1="21" x2="20" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'ssp': // 上针的右上二针并一针: 折角折线 + 底部横线
-        return '<path d="M 18 6 L 6 12 L 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'ssk': // 右上二针并一针: 100% 用户原版 SVG 代码 (M 20 15 L 83 79 M 17 79 L 48 44 M 27 80 L 71 80)
+      case 'ssp': // 上针的右上二针并一针 (ssp): 100% 用户原版 SVG 代码 (含底部横线)
         return '<path d="M 4.8 3.6 L 19.92 18.96 M 4.08 18.96 L 11.52 10.56 M 6.48 19.2 L 17.04 19.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'ssk': // 右上二针并一针 (ssk): 用户原版代码 (无底部横线)
+        return '<path d="M 4.8 3.6 L 19.92 18.96 M 4.08 18.96 L 11.52 10.56" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'p2tog': // 上针的左上二针并一针: 反向折角折线 + 底部横线
         return '<path d="M 6 6 L 18 12 L 6 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'k2tog': // 左上二针并一针: 人字形 (反斜线 + 右接线)
