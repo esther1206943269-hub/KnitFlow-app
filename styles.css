@@ -1249,25 +1249,52 @@ body.dark-mode .active-row-card {
 }
 
 .mini-controls {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px solid var(--card-border);
+  margin-top: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  border-top: 1px dashed var(--card-border);
   padding-top: 1rem;
 }
 
+.mini-controls .btn,
 .mini-controls .btn.text-btn {
-  color: var(--text-muted, #888888) !important;
-  font-weight: 400;
-  font-size: 0.85rem;
-  opacity: 0.85;
-  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.6rem 0.25rem;
+  min-height: 52px;
+  background: rgba(255, 255, 255, 0.65) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-main) !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease !important;
+  word-break: break-all;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+body.dark-mode .mini-controls .btn,
+body.dark-mode .mini-controls .btn.text-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: var(--text-main) !important;
+}
+
+.mini-controls .btn:hover,
 .mini-controls .btn.text-btn:hover {
-  color: var(--text-main, #222222) !important;
-  opacity: 1;
-  transform: translateY(-1px);
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(209, 142, 151, 0.2);
 }
 
 /* 语音设置部分 */
