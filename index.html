@@ -100,7 +100,7 @@
           <textarea id="text-pattern-input" rows="12" placeholder="在此粘贴或输入你的文字图解说明... / Paste or type your written pattern instructions here..."></textarea>
         </div>
         <div class="form-actions">
-          <button id="btn-save-text-project" class="btn primary">解析并开始编织 / Parse & Start Knitting</button>
+          <button type="button" id="btn-save-text-project" class="btn primary" onclick="App.createTextProject(event)">解析并开始编织 / Parse & Start Knitting</button>
         </div>
       </div>
     </main>
@@ -140,7 +140,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <button id="btn-save-grid-project" class="btn primary">创建空白网格 / Create Blank Grid</button>
+          <button type="button" id="btn-save-grid-project" class="btn primary" onclick="App.createGridProject(event)">创建空白网格 / Create Blank Grid</button>
         </div>
       </div>
     </main>
@@ -181,7 +181,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <button id="btn-save-csv-project" class="btn primary">Parse & Generate Chart</button>
+          <button type="button" id="btn-save-csv-project" class="btn primary" onclick="App.createCSVProject(event)">Parse & Generate Chart</button>
         </div>
       </div>
     </main>

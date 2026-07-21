@@ -1700,18 +1700,97 @@ const App = {
       document.body.classList.toggle('dark-mode');
     });
 
+    // 像素图解空网格创建
+    const btnSaveGrid = document.getElementById('btn-save-grid-project');
+    if (btnSaveGrid) {
+      btnSaveGrid.addEventListener('click', (e) => this.createGridProject(e));
+    }
+
     // 文字图解保存与解析
-    document.getElementById('btn-save-text-project').addEventListener('click', () => {
-      const name = document.getElementById('text-project-name').value.trim();
-      const rawText = document.getElementById('text-pattern-input').value;
-      const tutorialUrl = document.getElementById('text-tutorial-url').value.trim();
+    const btnSaveText = document.getElementById('btn-save-text-project');
+    if (btnSaveText) {
+      btnSaveText.addEventListener('click', (e) => this.createTextProject(e));
+    }
+
+    // CSV 文件/文本解析创建
+    const btnSaveCSV = document.getElementById('btn-save-csv-project');
+    if (btnSaveCSV) {
+      btnSaveCSV.addEventListener('click', (e) => this.createCSVProject(e));
+    }
+  },
+
+  createGridProject(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    try {
+      const nameInput = document.getElementById('grid-project-name');
+      const name = nameInput ? nameInput.value.trim() : '';
+
+      const widthInput = document.getElementById('grid-width');
+      let w = widthInput ? parseInt(widthInput.value, 10) : 20;
+      if (isNaN(w) || w < 1) w = 20;
+
+      const heightInput = document.getElementById('grid-height');
+      let h = heightInput ? parseInt(heightInput.value, 10) : 20;
+      if (isNaN(h) || h < 1) h = 20;
+
+      const checkedRadio = document.querySelector('input[name="grid-knit-type"]:checked');
+      const type = checkedRadio ? checkedRadio.value : 'flat';
+
+      const tutorialUrlInput = document.getElementById('grid-tutorial-url');
+      const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
 
       if (!name) {
         alert('请输入项目名称');
+        if (nameInput) nameInput.focus();
+        return;
+      }
+
+      // 初始化空白网格
+      Grid.initBlank(w, h, type);
+
+      const newProj = {
+        id: 'proj-' + Date.now(),
+        name: name,
+        type: 'grid',
+        currentLoc: 1,
+        knitType: type,
+        totalTime: 0,
+        referenceLinks: tutorialUrl ? [{ title: '项目主教程', url: tutorialUrl }] : [],
+        updatedAt: new Date().toISOString(),
+        data: JSON.parse(JSON.stringify(Grid.data))
+      };
+
+      this.projects.unshift(newProj);
+      this.saveProjects();
+      this.renderProjectList();
+      this.openProject(newProj.id);
+      this.showToast('空白像素网格创建成功！');
+    } catch (err) {
+      console.error('Create Grid Project Error:', err);
+      alert('创建空白网格失败: ' + err.message);
+    }
+  },
+
+  createTextProject(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    try {
+      const nameInput = document.getElementById('text-project-name');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const rawTextInput = document.getElementById('text-pattern-input');
+      const rawText = rawTextInput ? rawTextInput.value : '';
+      const tutorialUrlInput = document.getElementById('text-tutorial-url');
+      const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
+
+      if (!name) {
+        alert('请输入项目名称');
+        if (nameInput) nameInput.focus();
         return;
       }
       if (!rawText.trim()) {
         alert('请粘贴您的文字图解内容');
+        if (rawTextInput) rawTextInput.focus();
         return;
       }
 
@@ -1734,72 +1813,32 @@ const App = {
 
       this.projects.unshift(newProj);
       this.saveProjects();
+      this.renderProjectList();
       this.openProject(newProj.id);
       this.showToast('项目创建并解析成功！');
-    });
-
-    // 像素图解空网格创建
-    const btnSaveGrid = document.getElementById('btn-save-grid-project');
-    if (btnSaveGrid) {
-      btnSaveGrid.addEventListener('click', (e) => {
-        if (e && e.preventDefault) e.preventDefault();
-
-        const nameInput = document.getElementById('grid-project-name');
-        const name = nameInput ? nameInput.value.trim() : '';
-
-        const widthInput = document.getElementById('grid-width');
-        let w = widthInput ? parseInt(widthInput.value, 10) : 20;
-        if (isNaN(w) || w < 1) w = 20;
-
-        const heightInput = document.getElementById('grid-height');
-        let h = heightInput ? parseInt(heightInput.value, 10) : 20;
-        if (isNaN(h) || h < 1) h = 20;
-
-        const checkedRadio = document.querySelector('input[name="grid-knit-type"]:checked');
-        const type = checkedRadio ? checkedRadio.value : 'flat';
-
-        const tutorialUrlInput = document.getElementById('grid-tutorial-url');
-        const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
-
-        if (!name) {
-          alert('请输入项目名称');
-          if (nameInput) nameInput.focus();
-          return;
-        }
-
-        // 初始化空白网格
-        Grid.initBlank(w, h, type);
-
-        const newProj = {
-          id: 'proj-' + Date.now(),
-          name: name,
-          type: 'grid',
-          currentLoc: 1,
-          knitType: type,
-          totalTime: 0,
-          referenceLinks: tutorialUrl ? [{ title: '项目主教程', url: tutorialUrl }] : [],
-          updatedAt: new Date().toISOString(),
-          data: JSON.parse(JSON.stringify(Grid.data))
-        };
-
-        this.projects.unshift(newProj);
-        this.saveProjects();
-        this.renderProjectList();
-        this.openProject(newProj.id);
-        this.showToast('空白像素网格创建成功！');
-      });
+    } catch (err) {
+      console.error('Create Text Project Error:', err);
+      alert('创建文字图解失败: ' + err.message);
     }
+  },
 
-    // CSV 文件/文本解析创建
-    document.getElementById('btn-save-csv-project').addEventListener('click', () => {
-      const name = document.getElementById('csv-project-name').value.trim();
+  createCSVProject(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    try {
+      const nameInput = document.getElementById('csv-project-name');
+      const name = nameInput ? nameInput.value.trim() : '';
       const fileInput = document.getElementById('csv-file-input');
-      const rawCSV = document.getElementById('csv-raw-input').value;
-      const type = document.querySelector('input[name="csv-knit-type"]:checked').value;
-      const tutorialUrl = document.getElementById('csv-tutorial-url').value.trim();
+      const rawCSVInput = document.getElementById('csv-raw-input');
+      const rawCSV = rawCSVInput ? rawCSVInput.value : '';
+      const checkedRadio = document.querySelector('input[name="csv-knit-type"]:checked');
+      const type = checkedRadio ? checkedRadio.value : 'flat';
+      const tutorialUrlInput = document.getElementById('csv-tutorial-url');
+      const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
 
       if (!name) {
         alert('请输入项目名称');
+        if (nameInput) nameInput.focus();
         return;
       }
 
@@ -1819,20 +1858,21 @@ const App = {
           totalTime: 0,
           referenceLinks: tutorialUrl ? [{ title: 'Main Tutorial Link', url: tutorialUrl }] : [],
           updatedAt: new Date().toISOString(),
-          data: Grid.data
+          data: JSON.parse(JSON.stringify(Grid.data))
         };
 
         this.projects.unshift(newProj);
         this.saveProjects();
+        this.renderProjectList();
         this.openProject(newProj.id);
         this.showToast('CSV chart created successfully!');
       };
 
       // 优先读取文件
-      if (fileInput.files && fileInput.files[0]) {
+      if (fileInput && fileInput.files && fileInput.files[0]) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          proceedWithText(e.target.result);
+        reader.onload = (ev) => {
+          proceedWithText(ev.target.result);
         };
         reader.readAsText(fileInput.files[0], 'UTF-8');
       } else if (rawCSV.trim()) {
@@ -1840,7 +1880,11 @@ const App = {
       } else {
         alert('Please select a CSV file or paste CSV text');
       }
-    });
+    } catch (err) {
+      console.error('Create CSV Project Error:', err);
+      alert('导入表格失败: ' + err.message);
+    }
+  },
 
     // 绑定左侧模板库新建按钮与保存项目为模板按钮
     const btnDirectTpl = document.getElementById('btn-create-template-direct');
