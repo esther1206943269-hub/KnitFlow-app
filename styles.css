@@ -1576,6 +1576,15 @@ input:checked + .switch-slider:before {
   font-weight: 700;
 }
 
+#btn-grid-toggle-mode {
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+#btn-grid-toggle-mode:hover {
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 0 6px 18px rgba(209, 142, 151, 0.55) !important;
+}
+
 .toolbar-right {
   display: flex;
   align-items: center;

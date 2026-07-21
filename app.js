@@ -1183,9 +1183,7 @@ const App = {
       if (toggleBtn) {
         toggleBtn.textContent = '✅ 完成编辑 & 返回逐行编织 / Done Editing';
         toggleBtn.classList.add('editing-active');
-        toggleBtn.style.background = 'var(--primary)';
-        toggleBtn.style.color = 'white';
-        toggleBtn.style.border = 'none';
+        toggleBtn.style.cssText = 'background: linear-gradient(135deg, #839958, #6d8244) !important; color: #ffffff !important; border: none !important; padding: 0.5rem 1rem !important; border-radius: 20px !important; font-weight: 700 !important; font-size: 0.88rem !important; box-shadow: 0 4px 12px rgba(131, 153, 88, 0.4) !important; cursor: pointer; transition: all 0.2s ease;';
       }
       if (palette) palette.classList.remove('hidden');
       if (legend) legend.classList.remove('hidden');
@@ -1200,9 +1198,7 @@ const App = {
       if (toggleBtn) {
         toggleBtn.textContent = '🎨 编辑网格图解与颜料 / Edit Grid';
         toggleBtn.classList.remove('editing-active');
-        toggleBtn.style.background = 'var(--card-bg)';
-        toggleBtn.style.color = 'var(--text-main)';
-        toggleBtn.style.border = '1px solid var(--card-border)';
+        toggleBtn.style.cssText = 'background: linear-gradient(135deg, #D18E97, #C06C76) !important; color: #ffffff !important; border: none !important; padding: 0.5rem 1rem !important; border-radius: 20px !important; font-weight: 700 !important; font-size: 0.88rem !important; box-shadow: 0 4px 14px rgba(209, 142, 151, 0.45) !important; cursor: pointer; transition: all 0.2s ease;';
       }
       if (palette) palette.classList.add('hidden');
       if (legend) legend.classList.add('hidden');
