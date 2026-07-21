@@ -1160,8 +1160,8 @@ const App = {
     this.renderStitchPalette();
     this.renderStitchLegend();
     
-    // 开启网格交互绘制与编辑状态    // 开启网格交互绘制与编辑状态
-    Grid.isEditMode = true;
+    // 默认进入【逐行点击编织模式】(Row Tracker & Knitting Mode)
+    Grid.isEditMode = false;
     this.updateGridPlayerUIState();
     
     // 渲染网格
@@ -1181,7 +1181,7 @@ const App = {
 
     if (Grid.isEditMode) {
       if (toggleBtn) {
-        toggleBtn.textContent = '✅ Done Editing & Track Rows';
+        toggleBtn.textContent = '✅ 完成编辑 & 返回逐行编织 / Done Editing';
         toggleBtn.classList.add('editing-active');
         toggleBtn.style.background = 'var(--primary)';
         toggleBtn.style.color = 'white';
@@ -1198,7 +1198,7 @@ const App = {
       }
     } else {
       if (toggleBtn) {
-        toggleBtn.textContent = '🎨 Edit Grid Colors & Symbols';
+        toggleBtn.textContent = '🎨 编辑网格图解与颜料 / Edit Grid';
         toggleBtn.classList.remove('editing-active');
         toggleBtn.style.background = 'var(--card-bg)';
         toggleBtn.style.color = 'var(--text-main)';
