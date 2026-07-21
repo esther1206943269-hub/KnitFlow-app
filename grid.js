@@ -9,8 +9,8 @@ const Grid = {
       'k':     { symbol: '|',   name: '下针 (K)',                    color: '#FFFFFF', text: '下针' },
       'p':     { symbol: '—',   name: '上针 (P)',                    color: '#EFEBE4', text: '上针' },
       'yo':    { symbol: '○',   name: '挂针 (YO)',                   color: '#FDE8B3', text: '挂针' },
-      'ktbl':  { symbol: 'ℓ',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
-      'p1tbl': { symbol: 'ℓ_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
+      'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
+      'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
       'ssp':   { symbol: '⋋',   name: '上针的右上二针并一针 (ssp)',   color: '#F7C5BA', text: 'ssp' },
       'ssk':   { symbol: 'λ',   name: '右上二针并一针 (ssk)',         color: '#F4B8A5', text: 'ssk' },
       'p2tog': { symbol: '⋌',   name: '上针的左上二针并一针 (p2tog)', color: '#D4E0C8', text: 'p2tog' },
@@ -27,8 +27,8 @@ const Grid = {
     'k':     { symbol: '|',   name: '下针 (K)',                    color: '#FFFFFF', text: '下针' },
     'p':     { symbol: '—',   name: '上针 (P)',                    color: '#EFEBE4', text: '上针' },
     'yo':    { symbol: '○',   name: '挂针 (YO)',                   color: '#FDE8B3', text: '挂针' },
-    'ktbl':  { symbol: 'ℓ',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
-    'p1tbl': { symbol: 'ℓ_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
+    'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
+    'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
     'ssp':   { symbol: '⋋',   name: '上针的右上二针并一针 (ssp)',   color: '#F7C5BA', text: 'ssp' },
     'ssk':   { symbol: 'λ',   name: '右上二针并一针 (ssk)',         color: '#F4B8A5', text: 'ssk' },
     'p2tog': { symbol: '⋌',   name: '上针的左上二针并一针 (p2tog)', color: '#D4E0C8', text: 'p2tog' },
@@ -58,10 +58,10 @@ const Grid = {
         return '<line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'yo': // 挂针: 空心圆
         return '<circle cx="12" cy="12" r="5.5" stroke="currentColor" stroke-width="2" fill="none"/>';
-      case 'ktbl': // 扭针: 交叉扭曲闭合环线 (完美匹配用户 SVG 形状)
-        return '<path d="M 4 20 C 8 18 8 7 12 3.5 C 16 7 16 18 20 20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'p1tbl': // 扭上针: 扭针 + 底部横线
-        return '<path d="M 5 17 C 8 15 8 6 12 2.5 C 16 6 16 15 19 17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="20" x2="19" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'ktbl': // 扭针: 弧形人/山字顶 (100% 精确匹配图一 ∧ 样式)
+        return '<path d="M 6 18 C 8 13 10 5 12 5 C 14 5 16 13 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'p1tbl': // 扭上针: 弧形人/山字顶 + 底部横线
+        return '<path d="M 6 15 C 8 11 10 4 12 4 C 14 4 16 11 18 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="19" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'ssp': // 上针的右上二针并一针: 折角折线 + 底部横线
         return '<path d="M 18 6 L 6 12 L 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'ssk': // 右上二针并一针: 入字形 (斜线 + 左接线)
