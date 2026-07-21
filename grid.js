@@ -47,6 +47,56 @@ const Grid = {
     }
   },
 
+  /**
+   * 获取各针法 24x24 矢量 SVG 路径 (精确呈现图一原版符号)
+   */
+  getStitchSVGPaths(key) {
+    switch (key) {
+      case 'k': // 下针: 垂直竖线
+        return '<line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'p': // 上针: 水平横线
+        return '<line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'yo': // 挂针: 空心圆
+        return '<circle cx="12" cy="12" r="5.5" stroke="currentColor" stroke-width="2" fill="none"/>';
+      case 'ktbl': // 扭针: 扭曲打圈水滴线
+        return '<path d="M 12 19 L 12 13 C 12 10 7.5 5.5 12 3.5 C 16.5 5.5 12 10 12 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'p1tbl': // 扭上针: 扭针 + 底部横线
+        return '<path d="M 12 17 L 12 12 C 12 9.5 7.5 5.5 12 3.5 C 16.5 5.5 12 9.5 12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'ssp': // 上针的右上二针并一针: 折角折线 + 底部横线
+        return '<path d="M 18 6 L 6 12 L 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'ssk': // 右上二针并一针: 入字形 (斜线 + 左接线)
+        return '<line x1="6" y1="18" x2="18" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'p2tog': // 上针的左上二针并一针: 反向折角折线 + 底部横线
+        return '<path d="M 6 6 L 18 12 L 6 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'k2tog': // 左上二针并一针: 人字形 (反斜线 + 右接线)
+        return '<line x1="18" y1="18" x2="6" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'krl': // 右加针: 竖线 + 右上斜T臂
+        return '<line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="12" x2="19" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'prl': // 上针的右加针: 竖线 + 右上斜T臂 + 底部横线
+        return '<line x1="12" y1="4" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="11" x2="19" y2="7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'kll': // 左加针: 竖线 + 左上斜T臂
+        return '<line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="12" x2="5" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'pll': // 上针的左加针: 竖线 + 左上斜T臂 + 底部横线
+        return '<line x1="12" y1="4" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="11" x2="5" y2="7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'c21': // 右上2针与1针的交叉针: 2斜线交叉1斜线
+        return '<line x1="4" y1="19" x2="18" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="19" x2="22" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="19" x2="4" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      default:
+        return '';
+    }
+  },
+
+  /**
+   * 生成单个针法的 SVG HTML 字符串 (供 Palette 和 Legend 组装)
+   */
+  getStitchSVGIcon(key, color = 'currentColor', size = 18) {
+    const paths = this.getStitchSVGPaths(key);
+    if (!paths) {
+      const st = this.stitches[key];
+      return `<span style="color: ${color}; font-weight: bold;">${st ? st.symbol : ''}</span>`;
+    }
+    return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
+  },
+
   // 动态增减网格行与列
   addRow() {
     const newRow = [];
@@ -387,56 +437,6 @@ const Grid = {
         });
 
         svg.appendChild(rect);
-
-  /**
-   * 获取各针法 24x24 矢量 SVG 路径 (精确呈现图一原版符号)
-   */
-  getStitchSVGPaths(key) {
-    switch (key) {
-      case 'k': // 下针: 垂直竖线
-        return '<line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'p': // 上针: 水平横线
-        return '<line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'yo': // 挂针: 空心圆
-        return '<circle cx="12" cy="12" r="5.5" stroke="currentColor" stroke-width="2" fill="none"/>';
-      case 'ktbl': // 扭针: 扭曲打圈水滴线
-        return '<path d="M 12 19 L 12 13 C 12 10 7.5 5.5 12 3.5 C 16.5 5.5 12 10 12 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'p1tbl': // 扭上针: 扭针 + 底部横线
-        return '<path d="M 12 17 L 12 12 C 12 9.5 7.5 5.5 12 3.5 C 16.5 5.5 12 9.5 12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'ssp': // 上针的右上二针并一针: 折角折线 + 底部横线
-        return '<path d="M 18 6 L 6 12 L 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'ssk': // 右上二针并一针: 入字形 (斜线 + 左接线)
-        return '<line x1="6" y1="18" x2="18" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'p2tog': // 上针的左上二针并一针: 反向折角折线 + 底部横线
-        return '<path d="M 6 6 L 18 12 L 6 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'k2tog': // 左上二针并一针: 人字形 (反斜线 + 右接线)
-        return '<line x1="18" y1="18" x2="6" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'krl': // 右加针: 竖线 + 右上斜T臂
-        return '<line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="12" x2="19" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'prl': // 上针的右加针: 竖线 + 右上斜T臂 + 底部横线
-        return '<line x1="12" y1="4" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="11" x2="19" y2="7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'kll': // 左加针: 竖线 + 左上斜T臂
-        return '<line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="12" x2="5" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'pll': // 上针的左加针: 竖线 + 左上斜T臂 + 底部横线
-        return '<line x1="12" y1="4" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="11" x2="5" y2="7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'c21': // 右上2针与1针的交叉针: 2斜线交叉1斜线
-        return '<line x1="4" y1="19" x2="18" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="19" x2="22" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="19" x2="4" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      default:
-        return '';
-    }
-  },
-
-  /**
-   * 生成单个针法的 SVG HTML 字符串 (供 Palette 和 Legend 组装)
-   */
-  getStitchSVGIcon(key, color = 'currentColor', size = 18) {
-    const paths = this.getStitchSVGPaths(key);
-    if (!paths) {
-      const st = this.stitches[key];
-      return `<span style="color: ${color}; font-weight: bold;">${st ? st.symbol : ''}</span>`;
-    }
-    return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
-  },
 
         // 绘制针法 SVG 矢量符号
         const svgPaths = this.getStitchSVGPaths(stitchKey);

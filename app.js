@@ -1725,206 +1725,27 @@ const App = {
     addClick('btn-save-grid-project', (e) => this.createGridProject(e));
     addClick('btn-save-text-project', (e) => this.createTextProject(e));
     addClick('btn-save-csv-project', (e) => this.createCSVProject(e));
-  },
-
-  createGridProject(e) {
-    if (e && e.preventDefault) e.preventDefault();
-
-    try {
-      const nameInput = document.getElementById('grid-project-name');
-      const name = nameInput ? nameInput.value.trim() : '';
-
-      const widthInput = document.getElementById('grid-width');
-      let w = widthInput ? parseInt(widthInput.value, 10) : 20;
-      if (isNaN(w) || w < 1) w = 20;
-
-      const heightInput = document.getElementById('grid-height');
-      let h = heightInput ? parseInt(heightInput.value, 10) : 20;
-      if (isNaN(h) || h < 1) h = 20;
-
-      const checkedRadio = document.querySelector('input[name="grid-knit-type"]:checked');
-      const type = checkedRadio ? checkedRadio.value : 'flat';
-
-      const tutorialUrlInput = document.getElementById('grid-tutorial-url');
-      const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
-
-      if (!name) {
-        alert('请输入项目名称');
-        if (nameInput) nameInput.focus();
-        return;
-      }
-
-      // 初始化空白网格
-      Grid.initBlank(w, h, type);
-
-      const newProj = {
-        id: 'proj-' + Date.now(),
-        name: name,
-        type: 'grid',
-        currentLoc: 1,
-        knitType: type,
-        totalTime: 0,
-        referenceLinks: tutorialUrl ? [{ title: '项目主教程', url: tutorialUrl }] : [],
-        updatedAt: new Date().toISOString(),
-        data: JSON.parse(JSON.stringify(Grid.data))
-      };
-
-      this.projects.unshift(newProj);
-      this.saveProjects();
-      this.renderProjectList();
-      this.openProject(newProj.id);
-      this.showToast('空白像素网格创建成功！');
-    } catch (err) {
-      console.error('Create Grid Project Error:', err);
-      alert('创建空白网格失败: ' + err.message);
-    }
-  },
-
-  createTextProject(e) {
-    if (e && e.preventDefault) e.preventDefault();
-
-    try {
-      const nameInput = document.getElementById('text-project-name');
-      const name = nameInput ? nameInput.value.trim() : '';
-      const rawTextInput = document.getElementById('text-pattern-input');
-      const rawText = rawTextInput ? rawTextInput.value : '';
-      const tutorialUrlInput = document.getElementById('text-tutorial-url');
-      const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
-
-      if (!name) {
-        alert('请输入项目名称');
-        if (nameInput) nameInput.focus();
-        return;
-      }
-      if (!rawText.trim()) {
-        alert('请粘贴您的文字图解内容');
-        if (rawTextInput) rawTextInput.focus();
-        return;
-      }
-
-      const parsedRows = Parser.parse(rawText);
-      if (parsedRows.length === 0) {
-        alert('未解析出有效的行描述，请检查格式');
-        return;
-      }
-
-      const newProj = {
-        id: 'proj-' + Date.now(),
-        name: name,
-        type: 'text',
-        currentLoc: 1,
-        totalTime: 0,
-        referenceLinks: tutorialUrl ? [{ title: '项目主教程', url: tutorialUrl }] : [],
-        updatedAt: new Date().toISOString(),
-        data: parsedRows
-      };
-
-      this.projects.unshift(newProj);
-      this.saveProjects();
-      this.renderProjectList();
-      this.openProject(newProj.id);
-      this.showToast('项目创建并解析成功！');
-    } catch (err) {
-      console.error('Create Text Project Error:', err);
-      alert('创建文字图解失败: ' + err.message);
-    }
-  },
-
-  createCSVProject(e) {
-    if (e && e.preventDefault) e.preventDefault();
-
-    try {
-      const nameInput = document.getElementById('csv-project-name');
-      const name = nameInput ? nameInput.value.trim() : '';
-      const fileInput = document.getElementById('csv-file-input');
-      const rawCSVInput = document.getElementById('csv-raw-input');
-      const rawCSV = rawCSVInput ? rawCSVInput.value : '';
-      const checkedRadio = document.querySelector('input[name="csv-knit-type"]:checked');
-      const type = checkedRadio ? checkedRadio.value : 'flat';
-      const tutorialUrlInput = document.getElementById('csv-tutorial-url');
-      const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
-
-      if (!name) {
-        alert('请输入项目名称');
-        if (nameInput) nameInput.focus();
-        return;
-      }
-
-      const proceedWithText = (text) => {
-        const success = Grid.parseCSV(text, type);
-        if (!success) {
-          alert('Failed to parse CSV. Please check the CSV text format.');
-          return;
-        }
-
-        const newProj = {
-          id: 'proj-' + Date.now(),
-          name: name,
-          type: 'grid',
-          currentLoc: 1,
-          knitType: type,
-          totalTime: 0,
-          referenceLinks: tutorialUrl ? [{ title: 'Main Tutorial Link', url: tutorialUrl }] : [],
-          updatedAt: new Date().toISOString(),
-          data: JSON.parse(JSON.stringify(Grid.data))
-        };
-
-        this.projects.unshift(newProj);
-        this.saveProjects();
-        this.renderProjectList();
-        this.openProject(newProj.id);
-        this.showToast('CSV chart created successfully!');
-      };
-
-      // 优先读取文件
-      if (fileInput && fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          proceedWithText(ev.target.result);
-        };
-        reader.readAsText(fileInput.files[0], 'UTF-8');
-      } else if (rawCSV.trim()) {
-        proceedWithText(rawCSV);
-      } else {
-        alert('Please select a CSV file or paste CSV text');
-      }
-    } catch (err) {
-      console.error('Create CSV Project Error:', err);
-      alert('导入表格失败: ' + err.message);
-    }
-  },
 
     // 绑定左侧模板库新建按钮与保存项目为模板按钮
-    const btnDirectTpl = document.getElementById('btn-create-template-direct');
-    if (btnDirectTpl) {
-      btnDirectTpl.addEventListener('click', () => this.createTemplateDirect());
-    }
-
-    const btnSaveTplText = document.getElementById('btn-save-as-template-text');
-    if (btnSaveTplText) {
-      btnSaveTplText.addEventListener('click', () => this.saveCurrentProjectAsTemplate());
-    }
-
-    const btnSaveTplGrid = document.getElementById('btn-save-as-template-grid');
-    if (btnSaveTplGrid) {
-      btnSaveTplGrid.addEventListener('click', () => this.saveCurrentProjectAsTemplate());
-    }
+    addClick('btn-create-template-direct', () => this.createTemplateDirect());
+    addClick('btn-save-as-template-text', () => this.saveCurrentProjectAsTemplate());
+    addClick('btn-save-as-template-grid', () => this.saveCurrentProjectAsTemplate());
 
     // 文字播放控制
-    document.getElementById('btn-text-prev').addEventListener('click', () => this.prevRow());
-    document.getElementById('btn-text-next').addEventListener('click', () => this.nextRow());
-    document.getElementById('btn-text-reset').addEventListener('click', () => this.resetProgress());
-    document.getElementById('btn-text-edit').addEventListener('click', () => {
-      // 允许修改文字图解，返回表单并将内容填充回去
+    addClick('btn-text-prev', () => this.prevRow());
+    addClick('btn-text-next', () => this.nextRow());
+    addClick('btn-text-reset', () => this.resetProgress());
+    addClick('btn-text-edit', () => {
       if (confirm('修改图解将会重置您的编织进度，确认修改吗？')) {
         const p = this.currentProject;
-        document.getElementById('text-project-name').value = p.name;
+        if (!p) return;
+        const nameEl = document.getElementById('text-project-name');
+        if (nameEl) nameEl.value = p.name;
         
-        // 重新拼回文本
         const rawText = p.data.map(r => `第${r.rowNum}行：${r.text}`).join('\n');
-        document.getElementById('text-pattern-input').value = rawText;
+        const inputEl = document.getElementById('text-pattern-input');
+        if (inputEl) inputEl.value = rawText;
         
-        // 删除原来的，因为保存会新建
         this.projects = this.projects.filter(proj => proj.id !== p.id);
         this.saveProjects();
         this.switchView('view-create-text');
@@ -1932,22 +1753,22 @@ const App = {
     });
 
     // 网格播放控制与画布缩放
-    document.getElementById('btn-grid-prev').addEventListener('click', () => this.prevRow());
-    document.getElementById('btn-grid-next').addEventListener('click', () => this.nextRow());
-    document.getElementById('btn-grid-reset').addEventListener('click', () => this.resetProgress());
+    addClick('btn-grid-prev', () => this.prevRow());
+    addClick('btn-grid-next', () => this.nextRow());
+    addClick('btn-grid-reset', () => this.resetProgress());
     
-    document.getElementById('btn-grid-zoom-in').addEventListener('click', () => {
+    addClick('btn-grid-zoom-in', () => {
       Grid.zoom = Math.min((Grid.zoom || 1.0) + 0.15, 3.0);
       this.renderGridCanvas();
     });
 
-    document.getElementById('btn-grid-zoom-out').addEventListener('click', () => {
+    addClick('btn-grid-zoom-out', () => {
       Grid.zoom = Math.max((Grid.zoom || 1.0) - 0.15, 0.4);
       this.renderGridCanvas();
     });
 
     // 网格编辑模式切换
-    document.getElementById('btn-grid-toggle-mode').addEventListener('click', () => {
+    addClick('btn-grid-toggle-mode', () => {
       Grid.isEditMode = !Grid.isEditMode;
       this.updateGridPlayerUIState();
       this.renderGridCanvas();
@@ -1955,9 +1776,10 @@ const App = {
     });
 
     // 清空网格画布
-    document.getElementById('btn-edit-clear').addEventListener('click', () => {
+    addClick('btn-edit-clear', () => {
       if (confirm('Are you sure you want to clear all painted stitches on the grid canvas?')) {
         const p = this.currentProject;
+        if (!p) return;
         Grid.initBlank(p.data[0].length, p.data.length, p.knitType);
         p.data = Grid.data;
         this.saveProjects();
@@ -1965,106 +1787,88 @@ const App = {
         this.showToast('Canvas cleared');
       }
     });
-
     // 绑定添加自定义线材颜色按钮
-    const addYarnBtn = document.getElementById('btn-add-custom-yarn');
-    if (addYarnBtn) {
-      addYarnBtn.addEventListener('click', () => {
-        const hex = document.getElementById('input-custom-yarn-color').value;
-        const nameInput = document.getElementById('input-custom-yarn-name');
-        const name = nameInput.value.trim() || `Yarn ${hex.toUpperCase()}`;
-        const symbolType = document.getElementById('input-custom-yarn-symbol').value;
-        
-        const key = 'c_' + Date.now().toString(36);
-        let symbol = '';
-        if (symbolType && symbolType !== 'plain' && Grid.stitches[symbolType]) {
-          symbol = Grid.stitches[symbolType].symbol;
+    addClick('btn-add-custom-yarn', () => {
+      const hexInput = document.getElementById('input-custom-yarn-color');
+      const hex = hexInput ? hexInput.value : '#000000';
+      const nameInput = document.getElementById('input-custom-yarn-name');
+      const name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : `Yarn ${hex.toUpperCase()}`;
+      const symbolInput = document.getElementById('input-custom-yarn-symbol');
+      const symbolType = symbolInput ? symbolInput.value : '';
+      
+      const key = 'c_' + Date.now().toString(36);
+      let symbol = '';
+      if (symbolType && symbolType !== 'plain' && Grid.stitches[symbolType]) {
+        symbol = Grid.stitches[symbolType].symbol;
+      }
+
+      const stitchObj = {
+        symbol: symbol,
+        name: name,
+        color: hex,
+        text: name
+      };
+
+      Grid.stitches[key] = stitchObj;
+      
+      if (this.currentProject) {
+        if (!this.currentProject.customStitches) {
+          this.currentProject.customStitches = {};
         }
+        this.currentProject.customStitches[key] = stitchObj;
+        this.saveProjects();
+      }
 
-        const stitchObj = {
-          symbol: symbol,
-          name: name,
-          color: hex,
-          text: name
-        };
-
-        Grid.stitches[key] = stitchObj;
-        
-        if (this.currentProject) {
-          if (!this.currentProject.customStitches) {
-            this.currentProject.customStitches = {};
-          }
-          this.currentProject.customStitches[key] = stitchObj;
-          this.saveProjects();
-        }
-
-        Grid.selectedStitch = key;
-        this.renderStitchPalette();
-        this.renderStitchLegend();
-        
-        nameInput.value = '';
-        this.showToast(`Added custom yarn color: ${name}`);
-      });
-    }
+      Grid.selectedStitch = key;
+      this.renderStitchPalette();
+      this.renderStitchLegend();
+      
+      if (nameInput) nameInput.value = '';
+      this.showToast(`Added custom yarn color: ${name}`);
+    });
 
     // 绑定网格动态增减行与列按钮
-    const addRowBtn = document.getElementById('btn-grid-add-row');
-    if (addRowBtn) {
-      addRowBtn.addEventListener('click', () => {
-        Grid.addRow();
-        this.saveProjects();
-        this.renderGridCanvas();
-        this.updateGridPlayerUI();
-      });
-    }
+    addClick('btn-grid-add-row', () => {
+      Grid.addRow();
+      this.saveProjects();
+      this.renderGridCanvas();
+      this.updateGridPlayerUI();
+    });
 
-    const removeRowBtn = document.getElementById('btn-grid-remove-row');
-    if (removeRowBtn) {
-      removeRowBtn.addEventListener('click', () => {
-        Grid.removeRow();
-        this.saveProjects();
-        this.renderGridCanvas();
-        this.updateGridPlayerUI();
-      });
-    }
+    addClick('btn-grid-remove-row', () => {
+      Grid.removeRow();
+      this.saveProjects();
+      this.renderGridCanvas();
+      this.updateGridPlayerUI();
+    });
 
-    const addColBtn = document.getElementById('btn-grid-add-col');
-    if (addColBtn) {
-      addColBtn.addEventListener('click', () => {
-        Grid.addCol();
-        this.saveProjects();
-        this.renderGridCanvas();
-        this.updateGridPlayerUI();
-      });
-    }
+    addClick('btn-grid-add-col', () => {
+      Grid.addCol();
+      this.saveProjects();
+      this.renderGridCanvas();
+      this.updateGridPlayerUI();
+    });
 
-    const removeColBtn = document.getElementById('btn-grid-remove-col');
-    if (removeColBtn) {
-      removeColBtn.addEventListener('click', () => {
-        Grid.removeCol();
-        this.saveProjects();
-        this.renderGridCanvas();
-        this.updateGridPlayerUI();
-      });
-    }
+    addClick('btn-grid-remove-col', () => {
+      Grid.removeCol();
+      this.saveProjects();
+      this.renderGridCanvas();
+      this.updateGridPlayerUI();
+    });
 
     // 绑定添加教程和针法链接按钮
-    document.getElementById('btn-text-add-tutorial').addEventListener('click', () => this.addReferenceLink());
-    document.getElementById('btn-grid-add-tutorial').addEventListener('click', () => this.addReferenceLink());
+    addClick('btn-text-add-tutorial', () => this.addReferenceLink());
+    addClick('btn-grid-add-tutorial', () => this.addReferenceLink());
 
     // 绑定计时器切换按钮
-    document.getElementById('btn-text-timer-toggle').addEventListener('click', () => this.toggleTimer());
-    document.getElementById('btn-grid-timer-toggle').addEventListener('click', () => this.toggleTimer());
+    addClick('btn-text-timer-toggle', () => this.toggleTimer());
+    addClick('btn-grid-timer-toggle', () => this.toggleTimer());
 
     // 绑定打印与导出按钮
-    document.getElementById('btn-text-print').addEventListener('click', () => window.print());
-    document.getElementById('btn-grid-print').addEventListener('click', () => window.print());
-    
-    const textCopyBtn = document.getElementById('btn-text-copy');
-    if (textCopyBtn) textCopyBtn.addEventListener('click', () => this.copyTextPattern());
-
-    const gridExportBtn = document.getElementById('btn-grid-export-png');
-    if (gridExportBtn) gridExportBtn.addEventListener('click', () => this.exportGridPNG());
+    addClick('btn-text-print', () => window.print());
+    addClick('btn-grid-print', () => window.print());
+    addClick('btn-text-copy', () => this.copyTextPattern());
+    addClick('btn-grid-export-png', () => this.exportGridPNG());
   },
 
   // ==========================================================================
