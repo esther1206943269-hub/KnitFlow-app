@@ -234,17 +234,26 @@ const Grid = {
   render(container, activeRow, onCellClick) {
     container.innerHTML = '';
     
-    const cellSize = 30; // 每个格子的像素尺寸
+    const baseCellSize = 30; // 每个格子的基础像素尺寸
     const axisSize = 25; // 边框坐标轴大小
     const textMargin = 5;
 
-    const svgWidth = this.width * cellSize + axisSize * 2;
-    const svgHeight = this.height * cellSize + axisSize * 2;
+    const baseSvgWidth = this.width * baseCellSize + axisSize * 2;
+    const baseSvgHeight = this.height * baseCellSize + axisSize * 2;
 
-    // 创建 SVG 节点
+    const zoomFactor = this.zoom || 1.0;
+    const scaledWidth = Math.round(baseSvgWidth * zoomFactor);
+    const scaledHeight = Math.round(baseSvgHeight * zoomFactor);
+
+    const svgWidth = baseSvgWidth;
+    const svgHeight = baseSvgHeight;
+    const cellSize = baseCellSize;
+
+    // 创建 SVG 节点并应用真实 Layout 布局尺寸与 viewBox
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', svgWidth);
-    svg.setAttribute('height', svgHeight);
+    svg.setAttribute('viewBox', `0 0 ${baseSvgWidth} ${baseSvgHeight}`);
+    svg.setAttribute('width', scaledWidth);
+    svg.setAttribute('height', scaledHeight);
     svg.setAttribute('class', 'knitting-grid-svg');
     svg.addEventListener('dragstart', (e) => e.preventDefault());
     
@@ -460,8 +469,6 @@ const Grid = {
     }
 
     container.appendChild(svg);
-    // 应用缩放
-    svg.style.transform = `scale(${this.zoom})`;
   }
 };
 

@@ -1839,15 +1839,13 @@ const App = {
     document.getElementById('btn-grid-reset').addEventListener('click', () => this.resetProgress());
     
     document.getElementById('btn-grid-zoom-in').addEventListener('click', () => {
-      Grid.zoom = Math.min(Grid.zoom + 0.1, 2.5);
-      const svg = document.querySelector('.knitting-grid-svg');
-      if (svg) svg.style.transform = `scale(${Grid.zoom})`;
+      Grid.zoom = Math.min((Grid.zoom || 1.0) + 0.15, 3.0);
+      this.renderGridCanvas();
     });
 
     document.getElementById('btn-grid-zoom-out').addEventListener('click', () => {
-      Grid.zoom = Math.max(Grid.zoom - 0.1, 0.4);
-      const svg = document.querySelector('.knitting-grid-svg');
-      if (svg) svg.style.transform = `scale(${Grid.zoom})`;
+      Grid.zoom = Math.max((Grid.zoom || 1.0) - 0.15, 0.4);
+      this.renderGridCanvas();
     });
 
     // 网格编辑模式切换

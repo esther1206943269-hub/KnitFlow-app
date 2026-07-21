@@ -1619,16 +1619,20 @@ input:checked + .switch-slider:before {
   padding: 1.5rem;
   box-sizing: border-box;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .grid-canvas-container {
-  display: block;
-  margin: 0 auto;
-  width: fit-content;
-  height: fit-content;
-  transform-origin: top center;
-  transition: transform 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: min-content;
+  min-height: min-content;
+  padding: 0.5rem;
   user-select: none;
+  box-sizing: border-box;
 }
 
 /* 画布内部 SVG 渲染样式 */
@@ -1636,6 +1640,10 @@ input:checked + .switch-slider:before {
   background: white;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   border-radius: 4px;
+  flex-shrink: 0;
+  max-width: none !important;
+  max-height: none !important;
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
 .grid-cell {
