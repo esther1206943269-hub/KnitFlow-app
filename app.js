@@ -1234,10 +1234,10 @@ const App = {
     const dirIndicator = document.getElementById('grid-direction-indicator');
     
     if (isFlat && isEven) {
-      dirIndicator.innerHTML = 'Reading Direction: Left to Right <span class="arrow">←—</span>';
+      dirIndicator.innerHTML = '看图解方向：从左向右 <span class="arrow">←—</span> / Left to Right';
       dirIndicator.style.color = 'var(--secondary)';
     } else {
-      dirIndicator.innerHTML = 'Reading Direction: Right to Left <span class="arrow">—→</span>';
+      dirIndicator.innerHTML = '看图解方向：从右向左 <span class="arrow">—→</span> / Right to Left';
       dirIndicator.style.color = 'var(--primary)';
     }
 

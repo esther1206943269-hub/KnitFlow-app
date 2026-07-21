@@ -319,12 +319,12 @@
           <!-- 当前行指示卡片 -->
           <div class="card active-row-card" id="grid-active-row-card">
             <div class="row-info-header">
-              <span class="row-label">Active Row</span>
+              <span class="row-label">当前编织行 / Active Row</span>
 
               <!-- 移动后的 Knitting Progress 进度条 -->
               <div class="header-progress-inline">
                 <div class="progress-info-row">
-                  <span class="progress-title">Knitting Progress</span>
+                  <span class="progress-title">编织进度 / Progress</span>
                   <span id="grid-progress-percent" class="progress-pct">0%</span>
                 </div>
                 <div class="progress-track">
@@ -338,7 +338,7 @@
             <div class="huge-row-num" id="grid-huge-row-num">ROW 1</div>
             
             <div class="direction-indicator" id="grid-direction-indicator">
-              Reading Direction: Right to Left →
+              看图解方向：从右向左 → / Right to Left
             </div>
 
             <div class="active-row-stitch-preview" id="grid-row-stitch-preview">
@@ -346,21 +346,21 @@
             </div>
             
             <div class="player-controls">
-              <button id="btn-grid-prev" class="btn round-btn secondary" title="Previous Row (Backspace)">
+              <button id="btn-grid-prev" class="btn round-btn secondary" title="上一行 / Previous Row (Backspace)">
                 <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
               </button>
               
-              <button id="btn-grid-next" class="btn round-btn primary huge-btn" title="Next Row (Spacebar)">
-                <span class="btn-text">Next Row</span>
-                <span class="btn-subtext">Spacebar</span>
+              <button id="btn-grid-next" class="btn round-btn primary huge-btn" title="下一行 / Next Row (Spacebar)">
+                <span class="btn-text">下一行 / Next</span>
+                <span class="btn-subtext">空格键 Spacebar</span>
               </button>
             </div>
 
             <div class="mini-controls">
-              <button id="btn-grid-reset" class="btn text-btn">Reset Progress</button>
+              <button id="btn-grid-reset" class="btn text-btn">重置进度 / Reset</button>
               <button id="btn-save-as-template-grid" class="btn text-btn" style="border: 1px solid var(--accent); color: var(--accent);" title="保存当前网格图解为复用模板">⭐ 存为模板</button>
-              <button id="btn-grid-export-png" class="btn text-btn" style="border: 1px solid var(--primary); color: var(--primary);">Export PNG</button>
-              <button id="btn-grid-print" class="btn text-btn">Print Sheet</button>
+              <button id="btn-grid-export-png" class="btn text-btn" style="border: 1px solid var(--primary); color: var(--primary);">导出图片 / Export PNG</button>
+              <button id="btn-grid-print" class="btn text-btn">打印图解 / Print Sheet</button>
             </div>
           </div>
 
