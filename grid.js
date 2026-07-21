@@ -58,10 +58,10 @@ const Grid = {
         return '<line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'yo': // 挂针: 空心圆
         return '<circle cx="12" cy="12" r="5.5" stroke="currentColor" stroke-width="2" fill="none"/>';
-      case 'ktbl': // 扭针: 扭曲打圈水滴线
-        return '<path d="M 12 19 L 12 13 C 12 10 7.5 5.5 12 3.5 C 16.5 5.5 12 10 12 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'ktbl': // 扭针: 交叉扭曲闭合环线 (完美匹配用户 SVG 形状)
+        return '<path d="M 4 20 C 8 18 8 7 12 3.5 C 16 7 16 18 20 20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
       case 'p1tbl': // 扭上针: 扭针 + 底部横线
-        return '<path d="M 12 17 L 12 12 C 12 9.5 7.5 5.5 12 3.5 C 16.5 5.5 12 9.5 12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+        return '<path d="M 5 17 C 8 15 8 6 12 2.5 C 16 6 16 15 19 17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="20" x2="19" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'ssp': // 上针的右上二针并一针: 折角折线 + 底部横线
         return '<path d="M 18 6 L 6 12 L 18 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'ssk': // 右上二针并一针: 入字形 (斜线 + 左接线)
