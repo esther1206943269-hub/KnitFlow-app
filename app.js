@@ -1739,37 +1739,56 @@ const App = {
     });
 
     // 像素图解空网格创建
-    document.getElementById('btn-save-grid-project').addEventListener('click', () => {
-      const name = document.getElementById('grid-project-name').value.trim();
-      const w = parseInt(document.getElementById('grid-width').value, 10);
-      const h = parseInt(document.getElementById('grid-height').value, 10);
-      const type = document.querySelector('input[name="grid-knit-type"]:checked').value;
-      const tutorialUrl = document.getElementById('grid-tutorial-url').value.trim();
+    const btnSaveGrid = document.getElementById('btn-save-grid-project');
+    if (btnSaveGrid) {
+      btnSaveGrid.addEventListener('click', (e) => {
+        if (e && e.preventDefault) e.preventDefault();
 
-      if (!name) {
-        alert('请输入项目名称');
-        return;
-      }
+        const nameInput = document.getElementById('grid-project-name');
+        const name = nameInput ? nameInput.value.trim() : '';
 
-      Grid.initBlank(w, h, type);
+        const widthInput = document.getElementById('grid-width');
+        let w = widthInput ? parseInt(widthInput.value, 10) : 20;
+        if (isNaN(w) || w < 1) w = 20;
 
-      const newProj = {
-        id: 'proj-' + Date.now(),
-        name: name,
-        type: 'grid',
-        currentLoc: 1,
-        knitType: type,
-        totalTime: 0,
-        referenceLinks: tutorialUrl ? [{ title: '项目主教程', url: tutorialUrl }] : [],
-        updatedAt: new Date().toISOString(),
-        data: Grid.data
-      };
+        const heightInput = document.getElementById('grid-height');
+        let h = heightInput ? parseInt(heightInput.value, 10) : 20;
+        if (isNaN(h) || h < 1) h = 20;
 
-      this.projects.unshift(newProj);
-      this.saveProjects();
-      this.openProject(newProj.id);
-      this.showToast('空白像素网格创建成功！');
-    });
+        const checkedRadio = document.querySelector('input[name="grid-knit-type"]:checked');
+        const type = checkedRadio ? checkedRadio.value : 'flat';
+
+        const tutorialUrlInput = document.getElementById('grid-tutorial-url');
+        const tutorialUrl = tutorialUrlInput ? tutorialUrlInput.value.trim() : '';
+
+        if (!name) {
+          alert('请输入项目名称');
+          if (nameInput) nameInput.focus();
+          return;
+        }
+
+        // 初始化空白网格
+        Grid.initBlank(w, h, type);
+
+        const newProj = {
+          id: 'proj-' + Date.now(),
+          name: name,
+          type: 'grid',
+          currentLoc: 1,
+          knitType: type,
+          totalTime: 0,
+          referenceLinks: tutorialUrl ? [{ title: '项目主教程', url: tutorialUrl }] : [],
+          updatedAt: new Date().toISOString(),
+          data: JSON.parse(JSON.stringify(Grid.data))
+        };
+
+        this.projects.unshift(newProj);
+        this.saveProjects();
+        this.renderProjectList();
+        this.openProject(newProj.id);
+        this.showToast('空白像素网格创建成功！');
+      });
+    }
 
     // CSV 文件/文本解析创建
     document.getElementById('btn-save-csv-project').addEventListener('click', () => {
