@@ -2011,8 +2011,7 @@ input:checked + .switch-slider:before {
   display: none !important;
 }
 
-.modal-card,
-.auth-modal-card {
+.modal-card {
   position: relative !important;
   margin: auto !important;
   max-height: 90vh !important;
@@ -2022,6 +2021,41 @@ input:checked + .switch-slider:before {
   border-radius: var(--radius-lg) !important;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
   animation: modalFadeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+/* 登录/注册/密码管理弹窗：精致温柔浅粉色配色 */
+.auth-modal-card {
+  position: relative !important;
+  margin: auto !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  background: #FDF0F2 !important;
+  border: 1px solid rgba(209, 142, 151, 0.35) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 50px rgba(209, 142, 151, 0.25) !important;
+  color: var(--text-main) !important;
+  animation: modalFadeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+body.dark-mode .auth-modal-card {
+  background: #2E2224 !important;
+  border-color: rgba(209, 142, 151, 0.4) !important;
+}
+
+.auth-modal-card input[type="text"],
+.auth-modal-card input[type="password"] {
+  background-color: #FFFFFF !important;
+  border: 1px solid rgba(209, 142, 151, 0.3) !important;
+  border-radius: 8px !important;
+  color: var(--text-main) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-modal-card input[type="text"]:focus,
+.auth-modal-card input[type="password"]:focus {
+  border-color: #D18E97 !important;
+  box-shadow: 0 0 0 3px rgba(209, 142, 151, 0.25) !important;
+  outline: none !important;
 }
 
 @keyframes modalFadeIn {
