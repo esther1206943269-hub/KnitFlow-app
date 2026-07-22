@@ -78,8 +78,8 @@ const Grid = {
         return '<path d="M 18.24 7.2 L 18.24 17.28 M 18.24 12.72 L 5.28 8.16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
       case 'pll': // 上针的左加针: 右加针镜像 + 底部横线
         return '<path d="M 18.24 7.2 L 18.24 17.28 M 18.24 12.72 L 5.28 8.16 M 16.8 19.2 L 19.68 19.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'c21': // 右上2针与1针的交叉针: 2斜线交叉1斜线
-        return '<line x1="4" y1="19" x2="18" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="19" x2="22" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="19" x2="4" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'c21': // 右上2针与1针的交叉针: 100% 用户原版 3 格 SVG 代码 (M 50 15 L 158 85 M 25 80 L 98 62...)
+        return '<path d="M 4 3.6 L 12.64 20.4 M 2 19.2 L 7.84 14.88 M 12 3.6 L 20.64 20.4 M 16.16 9.12 L 22.4 4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
       default:
         return '';
     }
@@ -89,6 +89,10 @@ const Grid = {
    * 生成单个针法的 SVG HTML 字符串 (供 Palette 和 Legend 组装)
    */
   getStitchSVGIcon(key, color = 'currentColor', size = 18) {
+    if (key === 'c21') {
+      const paths = '<path d="M 50 15 L 158 85 M 25 80 L 98 62 M 150 15 L 258 85 M 202 38 L 280 20" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      return `<svg viewBox="0 0 300 100" width="${size * 2.5}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
+    }
     const paths = this.getStitchSVGPaths(key);
     if (!paths) {
       const st = this.stitches[key];
