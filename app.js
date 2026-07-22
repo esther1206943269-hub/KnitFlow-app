@@ -1157,9 +1157,10 @@ const App = {
     // 加载项目保存的自定义线材调色盘
     Grid.loadProjectStitches(p.customStitches);
 
-    // 初始化画笔调色盘与图例
+    // 初始化画笔调色盘与图例及针法选择下拉框
     this.renderStitchPalette();
     this.renderStitchLegend();
+    this.renderColorSelect();
     
     // 默认进入【逐行点击编织模式】(Row Tracker & Knitting Mode)
     Grid.isEditMode = false;
@@ -1319,8 +1320,27 @@ const App = {
     });
   },
 
+  renderColorSelect() {
+    const select = document.getElementById('input-custom-yarn-symbol');
+    if (!select) return;
+    const prevVal = select.value;
+    select.innerHTML = '<option value="plain">Color Block (No Symbol) / 纯色无符号</option>';
+    
+    Object.entries(Grid.getDefaultStitches()).forEach(([key, st]) => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = st.name;
+      select.appendChild(option);
+    });
+
+    if (prevVal && Array.from(select.options).some(o => o.value === prevVal)) {
+      select.value = prevVal;
+    }
+  },
+
   renderStitchPalette() {
     const container = document.getElementById('palette-colors');
+    if (!container) return;
     container.innerHTML = '';
     
     Object.entries(Grid.stitches).forEach(([key, st]) => {
@@ -1344,9 +1364,32 @@ const App = {
       }
 
       item.innerHTML = `
-        <div class="stitch-icon-box" style="background-color: ${st.color}">${Grid.getStitchSVGIcon(key, textColor, 18)}</div>
+        <div class="stitch-icon-box" style="background-color: ${st.color}; position: relative;" title="点击色块直接修改背景颜料 / Change color">
+          ${Grid.getStitchSVGIcon(key, textColor, 18)}
+          <input type="color" class="palette-color-picker" value="${st.color}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" title="点击修改颜料颜色">
+        </div>
         <span>${st.text}</span>
       `;
+
+      const colorPicker = item.querySelector('.palette-color-picker');
+      if (colorPicker) {
+        colorPicker.addEventListener('click', (e) => e.stopPropagation());
+        colorPicker.addEventListener('change', (e) => {
+          e.stopPropagation();
+          const newColor = e.target.value;
+          st.color = newColor;
+          if (this.currentProject) {
+            if (!this.currentProject.customStitches) {
+              this.currentProject.customStitches = {};
+            }
+            this.currentProject.customStitches[key] = { ...st, color: newColor };
+            this.saveProjects();
+          }
+          this.renderStitchPalette();
+          this.renderStitchLegend();
+          this.renderGridCanvas();
+        });
+      }
       
       if (key.startsWith('c_')) {
         const delBtn = document.createElement('div');
@@ -1796,22 +1839,29 @@ const App = {
         this.showToast('Canvas cleared');
       }
     });
-    // 绑定添加自定义线材颜色按钮
+    // 绑定添加自定义线材颜色与针法按钮
     addClick('btn-add-custom-yarn', () => {
       const hexInput = document.getElementById('input-custom-yarn-color');
       const hex = hexInput ? hexInput.value : '#000000';
       const nameInput = document.getElementById('input-custom-yarn-name');
-      const name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : `Yarn ${hex.toUpperCase()}`;
       const symbolInput = document.getElementById('input-custom-yarn-symbol');
       const symbolType = symbolInput ? symbolInput.value : '';
       
-      const key = 'c_' + Date.now().toString(36);
+      let baseStitch = null;
       let symbol = '';
+      let defaultName = `Yarn ${hex.toUpperCase()}`;
+
       if (symbolType && symbolType !== 'plain' && Grid.stitches[symbolType]) {
-        symbol = Grid.stitches[symbolType].symbol;
+        baseStitch = symbolType;
+        symbol = Grid.stitches[symbolType].symbol || '';
+        defaultName = `${Grid.stitches[symbolType].name} (自定义颜料)`;
       }
 
+      const name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : defaultName;
+      const key = 'c_' + Date.now().toString(36);
+
       const stitchObj = {
+        baseStitch: baseStitch,
         symbol: symbol,
         name: name,
         color: hex,
@@ -1831,9 +1881,10 @@ const App = {
       Grid.selectedStitch = key;
       this.renderStitchPalette();
       this.renderStitchLegend();
+      this.renderGridCanvas();
       
       if (nameInput) nameInput.value = '';
-      this.showToast(`Added custom yarn color: ${name}`);
+      this.showToast(`Added custom yarn & stitch: ${name}`);
     });
 
     // 绑定网格动态增减行与列按钮

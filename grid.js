@@ -55,6 +55,20 @@ const Grid = {
     }
   },
 
+  getMultiCellConfig(key) {
+    if (this.multiCellConfig[key]) return this.multiCellConfig[key];
+    const st = this.stitches[key];
+    if (st && st.baseStitch && this.multiCellConfig[st.baseStitch]) {
+      const baseCfg = this.multiCellConfig[st.baseStitch];
+      return {
+        ...baseCfg,
+        name: st.name || baseCfg.name,
+        color: st.color || baseCfg.color
+      };
+    }
+    return null;
+  },
+
   getDefaultStitches() {
     return {
       'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
@@ -112,12 +126,14 @@ const Grid = {
    * 获取各针法 24x24 矢量 SVG 路径 (精确呈现图一原版符号)
    */
   getStitchSVGPaths(key) {
-    if (this.multiCellConfig[key]) {
-      const cfg = this.multiCellConfig[key];
-      // 兜底 24x24 矢量路径 (可根据整体路径平滑转换)
-      return `<path d="${cfg.path}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const st = this.stitches[key];
+    const targetKey = (st && st.baseStitch) ? st.baseStitch : key;
+
+    const multiCfg = this.getMultiCellConfig(targetKey);
+    if (multiCfg) {
+      return `<path d="${multiCfg.path}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
     }
-    switch (key) {
+    switch (targetKey) {
       case 'k': // 下针: 垂直竖线
         return '<line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'p': // 上针: 水平横线
@@ -153,16 +169,16 @@ const Grid = {
    * 生成单个针法的 SVG HTML 字符串 (供 Palette 和 Legend 组装)
    */
   getStitchSVGIcon(key, color = 'currentColor', size = 18) {
-    if (this.multiCellConfig[key]) {
-      const cfg = this.multiCellConfig[key];
-      const paths = `<path d="${cfg.path}" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
-      const ratio = cfg.vbW / cfg.vbH;
-      return `<svg viewBox="0 0 ${cfg.vbW} ${cfg.vbH}" width="${size * ratio}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
+    const multiCfg = this.getMultiCellConfig(key);
+    if (multiCfg) {
+      const paths = `<path d="${multiCfg.path}" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      const ratio = multiCfg.vbW / multiCfg.vbH;
+      return `<svg viewBox="0 0 ${multiCfg.vbW} ${multiCfg.vbH}" width="${size * ratio}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
     }
     const paths = this.getStitchSVGPaths(key);
     if (!paths) {
       const st = this.stitches[key];
-      return `<span style="color: ${color}; font-weight: bold;">${st ? st.symbol : ''}</span>`;
+      return `<span style="color: ${color}; font-weight: bold;">${st ? (st.symbol || '') : ''}</span>`;
     }
     return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
   },
