@@ -246,6 +246,7 @@ const Grid = {
   knitType: 'flat', // flat (片织) 或 circular (圈织)
   zoom: 1.0,
   isEditMode: true,
+  showBindOffDots: true, // 最上面一排代表收针的小黑点显隐控制
   selectedStitch: 'k', // 选中的画笔针法
   isDrawing: false,
 
@@ -416,7 +417,7 @@ const Grid = {
     container.innerHTML = '';
     
     const baseCellSize = 30; // 每个格子的基础像素尺寸
-    const axisSize = 25; // 边框坐标轴大小
+    const axisSize = this.showBindOffDots ? 34 : 25; // 边框坐标轴大小 (若开启收针点，顶部留出更高空间)
     const textMargin = 5;
 
     const baseSvgWidth = this.width * baseCellSize + axisSize * 2;
@@ -471,7 +472,7 @@ const Grid = {
       svg.appendChild(textR);
     }
 
-    // 针目序号 (上下两侧均绘制)
+    // 针目序号 (上下两侧均绘制) 与最顶端收针点 (Bind-off Dots)
     // 编织习惯：从右往左数针目！右下角是第一针！
     for (let c = 0; c < this.width; c++) {
       const colNum = c + 1;
@@ -490,12 +491,27 @@ const Grid = {
       // 顶部针目号
       const textT = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       textT.setAttribute('x', x);
-      textT.setAttribute('y', axisSize - 8);
+      textT.setAttribute('y', this.showBindOffDots ? 26 : axisSize - 8);
       textT.setAttribute('text-anchor', 'middle');
       textT.setAttribute('font-size', '10px');
       textT.setAttribute('fill', '#867970');
       textT.textContent = colNum;
       svg.appendChild(textT);
+
+      // 最顶层收针黑点 (代表收针/伏针 Bind-off Stitch)
+      if (this.showBindOffDots) {
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        dot.setAttribute('cx', x);
+        dot.setAttribute('cy', 11);
+        dot.setAttribute('rx', 6.5);
+        dot.setAttribute('ry', 3.8);
+        dot.setAttribute('fill', '#2c2825');
+        dot.setAttribute('class', 'bind-off-dot');
+        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        title.textContent = `第 ${colNum} 针收针点 / Bind-off Stitch ${colNum}`;
+        dot.appendChild(title);
+        svg.appendChild(dot);
+      }
     }
 
     // 2. 绘制单元格网格 (分为背景层 cellsGroup 与 符号图层 iconsGroup，彻底解决跨格符号被后排单元格背景覆盖遮挡问题)

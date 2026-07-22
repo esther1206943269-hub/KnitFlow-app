@@ -1707,8 +1707,14 @@ const App = {
     document.getElementById('grid-player-title').textContent = p.name;
     document.getElementById('grid-meta-knit').textContent = p.knitType === 'flat' ? 'Flat' : 'Circular';
     
-    // 加载项目保存的自定义线材调色盘
+    // 加载项目保存的自定义线材调色盘与顶部收针点设置
     Grid.loadProjectStitches(p.customStitches);
+    if (typeof p.showBindOffDots === 'boolean') {
+      Grid.showBindOffDots = p.showBindOffDots;
+    } else {
+      Grid.showBindOffDots = true;
+    }
+    this.updateBindOffDotsUI();
 
     // 初始化画笔调色盘与图例及针法选择下拉框
     this.renderStitchPalette();
@@ -1723,6 +1729,24 @@ const App = {
     this.renderGridCanvas();
     this.renderReferenceLinks();
     this.updateGridPlayerUI();
+  },
+
+  updateBindOffDotsUI() {
+    const statusEl = document.getElementById('bindoff-dots-status');
+    if (statusEl) {
+      statusEl.textContent = Grid.showBindOffDots ? '⚫ 收针点: 显' : '⚪ 收针点: 隐';
+    }
+  },
+
+  toggleBindOffDots() {
+    Grid.showBindOffDots = !Grid.showBindOffDots;
+    if (this.currentProject) {
+      this.currentProject.showBindOffDots = Grid.showBindOffDots;
+      this.saveProjects();
+    }
+    this.updateBindOffDotsUI();
+    this.renderGridCanvas();
+    this.showToast(Grid.showBindOffDots ? '已显示最上方收针指示点 (Bind-off Dots)' : '已隐藏最上方收针指示点');
   },
 
   updateGridPlayerUIState() {
@@ -2718,6 +2742,8 @@ const App = {
       Grid.zoom = Math.max((Grid.zoom || 1.0) - 0.15, 0.4);
       this.renderGridCanvas();
     });
+
+    addClick('btn-grid-toggle-bindoff', () => this.toggleBindOffDots());
 
     // 网格编辑模式切换
     addClick('btn-grid-toggle-mode', () => {
