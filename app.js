@@ -721,11 +721,19 @@ const App = {
       const coverSrc = (p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'default_project_cover.png';
 
       item.innerHTML = `
+        <!-- 左上角完成标记勾选按钮 -->
+        <button class="btn icon-btn btn-toggle-complete-project ${p.isCompleted ? 'completed' : ''}" data-id="${p.id}" title="${p.isCompleted ? '取消完成标记' : '标记项目为已完成'}" style="position: absolute; top: 10px; left: 10px; z-index: 10; width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid ${p.isCompleted ? '#839958' : 'rgba(0,0,0,0.18)'}; background: ${p.isCompleted ? '#839958' : 'rgba(255,255,255,0.85)'}; color: ${p.isCompleted ? '#ffffff' : 'var(--text-muted)'}; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+          ${p.isCompleted ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '<div style="width: 13px; height: 13px; border: 1.5px solid rgba(0,0,0,0.25); border-radius: 3px;"></div>'}
+        </button>
+
         <div class="project-info" title="点击开始编织此项目">
-          <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff;">
+          <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff; position: relative;">
             <img src="${coverSrc}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5;" alt="${p.name} Cover" onerror="this.src='default_project_cover.png'">
           </div>
-          <div class="project-name">${p.name}</div>
+          <div class="project-name" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+            <span>${p.name}</span>
+            ${p.isCompleted ? '<span style="font-size: 0.65rem; font-weight: 700; color: #839958; background: rgba(131,153,88,0.18); padding: 1px 5px; border-radius: 4px; display: inline-flex; align-items: center;">✓ 已完成</span>' : ''}
+          </div>
           <div class="project-details">
             <span style="font-size: 0.75rem; opacity: 0.85;">${typeLabel} • ${specsLabel}</span>
             
@@ -756,11 +764,17 @@ const App = {
         </div>
       `;
 
-      // 点击整张卡片任意区域（除右侧操作按钮外）均可响应打开项目
+      // 点击整张卡片任意区域（除右侧操作按钮与左上角完成勾选按钮外）均可响应打开项目
       item.style.cursor = 'pointer';
       item.addEventListener('click', (e) => {
-        if (e.target.closest('.project-actions')) return;
+        if (e.target.closest('.project-actions') || e.target.closest('.btn-toggle-complete-project')) return;
         this.openProject(p.id);
+      });
+
+      // 切换项目完成状态
+      item.querySelector('.btn-toggle-complete-project').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleProjectCompletion(p.id);
       });
 
       // 更换封面
@@ -913,6 +927,19 @@ const App = {
       // 忽略声音播放异常
     }
   },
+
+  toggleProjectCompletion(id) {
+    const p = this.projects.find(proj => proj.id === id);
+    if (!p) return;
+
+    p.isCompleted = !p.isCompleted;
+    this.saveProjects();
+    this.renderProjectList();
+    this.playClickClackSound();
+    this.showToast(p.isCompleted ? `🎉 已将 “${p.name}” 标记为已完成！` : `已取消 “${p.name}” 的完成标记`);
+  },
+
+
 
   deleteProject(id) {
     this.projects = this.projects.filter(p => p.id !== id);
