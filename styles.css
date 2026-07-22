@@ -503,79 +503,40 @@ body.dark-mode .creation-title {
   transform: translateY(0);
 }
 
-/* 预设与自定义图解模板库按钮 */
-.btn-preset-chip-wrapper {
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+/* 预设与自定义图解模板库卡片网格 */
+.preset-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.1rem;
 }
 
-.btn-preset-chip-wrapper:hover {
-  transform: translateX(3px);
+.template-card-item {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease;
 }
 
-.btn-preset-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: var(--radius-sm);
-  background-color: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  color: var(--text-main);
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-  font-family: var(--font-sans);
-}
-
-body.dark-mode .btn-preset-chip {
-  background-color: rgba(45, 45, 45, 0.85);
+body.dark-mode .template-card-item {
+  background: rgba(30, 30, 30, 0.65);
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-.btn-preset-chip:hover {
+.template-card-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   border-color: var(--primary);
-  background-color: var(--primary-light);
-  box-shadow: var(--shadow-sm);
 }
 
-.btn-delete-preset-tpl,
-.btn-delete-custom-tpl {
-  opacity: 0.6;
-  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease, background-color 0.2s ease;
-  border-radius: var(--radius-sm);
+.template-card-item .tpl-card-body:hover svg {
+  transform: scale(1.15);
+  transition: transform 0.2s ease;
 }
 
-.btn-preset-chip-wrapper:hover .btn-delete-preset-tpl,
-.btn-preset-chip-wrapper:hover .btn-delete-custom-tpl {
-  opacity: 1;
-}
-
-.btn-delete-preset-tpl:hover,
-.btn-delete-custom-tpl:hover {
-  transform: scale(1.12);
-  color: var(--danger) !important;
-  background-color: rgba(220, 53, 69, 0.12);
-}
-
-.chip-icon {
-  font-size: 1.1rem;
-}
-
-.chip-text {
-  flex: 1;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text-main);
-}
-
-.chip-badge {
-  font-size: 0.68rem;
-  padding: 0.15rem 0.45rem;
-  border-radius: 4px;
-  background-color: rgba(208, 108, 84, 0.12);
-  color: var(--primary);
-  font-weight: 600;
-  text-transform: uppercase;
+.template-card-item .btn-add-tpl-to-project:hover {
+  background-color: var(--primary);
+  color: var(--bg-color);
+  border-color: var(--primary);
 }
 
 /* 项目列表 */

@@ -2617,24 +2617,31 @@ const App = {
         renderedCount++;
         const typeLabel = tpl.type === 'grid' ? 'Grid' : 'Written';
         const wrapper = document.createElement('div');
-        wrapper.className = 'btn-preset-chip-wrapper';
-        wrapper.style.cssText = 'display: flex; gap: 4px; align-items: center; width: 100%;';
+        wrapper.className = 'template-card-item';
+        wrapper.style.cssText = 'display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; border-radius: var(--radius-lg); min-height: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box;';
 
         wrapper.innerHTML = `
-          <button class="btn-preset-chip" data-custom-id="${tpl.id}" style="flex: 1;" title="点击使用此模板创建项目并开始编织">
+          <!-- 顶部：类型 Badge 标牌与删除按钮 -->
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="chip-badge" style="background: var(--primary-light); color: var(--primary); font-weight: 700; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; text-transform: uppercase;">CUSTOM (${typeLabel})</span>
+            <button class="btn icon-btn danger-text btn-delete-custom-tpl" data-custom-id="${tpl.id}" title="删除模板" aria-label="Delete template" style="padding: 4px; border-radius: 50%; opacity: 0.7;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+
+          <!-- 中间主体：点击直接开启编织 -->
+          <div class="tpl-card-body" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0.7rem 0; cursor: pointer; text-align: center;" title="点击使用此模板开始编织">
             ${unifiedIconSvg}
-            <span class="chip-text">${tpl.name}</span>
-            <span class="chip-badge" style="background: var(--primary-light); color: var(--primary); font-weight: 600;">Custom</span>
-          </button>
-          <button class="btn text-btn btn-add-tpl-to-project" data-custom-id="${tpl.id}" title="将此模板加入【我的项目】列表" style="padding: 4px 8px; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; border: 1px solid var(--card-border); background: var(--card-bg); cursor: pointer;">
+            <h4 style="margin: 0.4rem 0 0 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main); line-height: 1.35; word-break: break-word;">${tpl.name}</h4>
+          </div>
+
+          <!-- 底部：导入我的项目/My Projects 按钮 -->
+          <button class="btn text-btn btn-add-tpl-to-project" data-custom-id="${tpl.id}" title="将此模板加入【我的项目】列表" style="width: 100%; padding: 0.45rem 0; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--card-border); background: var(--primary-light); color: var(--primary); border-radius: var(--radius-sm); cursor: pointer; text-align: center; transition: var(--transition);">
             ➕ 导入我的项目/My Projects
-          </button>
-          <button class="btn icon-btn danger-text btn-delete-custom-tpl" data-custom-id="${tpl.id}" title="删除模板" aria-label="Delete template" style="padding: 6px; flex-shrink: 0;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
         `;
 
-        wrapper.querySelector('.btn-preset-chip').addEventListener('click', () => {
+        wrapper.querySelector('.tpl-card-body').addEventListener('click', () => {
           this.loadCustomTemplate(tpl.id, true);
         });
 
