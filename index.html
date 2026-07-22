@@ -53,10 +53,6 @@
               <span class="creation-title">网格图解 / Pixel Grid</span>
               <span class="creation-desc">制作交互填色网格图解与编织行数追踪 / Design multi-color grids with interactive drawing</span>
             </button>
-            <button type="button" id="btn-new-pdf" class="creation-link-item" style="--hover-bg: #839958; --hover-text: #F7F4D5; --title-color: #839958; --dark-title-color: #839958;">
-              <span class="creation-title">📄 导入 PDF 图解 / Import PDF Pattern</span>
-              <span class="creation-desc">自动读取 PDF 电子书/图文文档并智能提取图解 / Auto-extract written instructions from PDF document</span>
-            </button>
           </div>
         </div>
 
@@ -89,20 +85,6 @@
       <div class="card form-card">
         <button class="back-link" id="btn-back-text-create">← 返回主控制台 / Back to Dashboard</button>
         <h2>新建文字图解 / NEW WRITTEN PATTERN</h2>
-
-        <!-- PDF 导入快捷体验区域 -->
-        <div class="pdf-parse-box" style="margin-bottom: 1.2rem; padding: 1rem; border: 2px dashed rgba(209, 142, 151, 0.4); border-radius: var(--radius-md); background: rgba(253, 240, 242, 0.6); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-          <div>
-            <strong style="font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 6px; margin-bottom: 0.2rem;">
-              📄 导入 PDF 文件自动解析图解 / Auto-Parse PDF Pattern
-            </strong>
-            <span style="font-size: 0.78rem; color: var(--text-muted);">选择电子版 PDF 格式编织说明，系统将自动读取全部文字并填充至下方。</span>
-          </div>
-          <input type="file" id="input-pdf-file" accept=".pdf" style="display: none;">
-          <button type="button" id="btn-trigger-pdf-upload" class="btn secondary" style="padding: 0.45rem 1rem; font-size: 0.82rem; font-weight: 700; white-space: nowrap; cursor: pointer;">
-            📁 选择 PDF 文件 / Select PDF
-          </button>
-        </div>
 
         <div class="form-group">
           <label for="text-project-name">项目名称 / Project Name</label>
@@ -645,8 +627,7 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
   <!-- 提示弹窗 (Toast) -->
   <div id="toast" class="toast hidden"></div>
 
-  <!-- 引入 PDF 解析与逻辑脚本 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- 引入逻辑脚本 -->
   <script src="speech.js"></script>
   <script src="parser.js"></script>
   <script src="grid.js"></script>

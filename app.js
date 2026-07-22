@@ -2503,63 +2503,6 @@ const App = {
     this.showToast(`成功创建网格图解项目 “${name}”！`);
   },
 
-  async parsePDFFile(file) {
-    if (!file || file.type !== 'application/pdf') {
-      alert('请选择有效的 .pdf 格式文件！');
-      return;
-    }
-
-    if (file.size > 15 * 1024 * 1024) {
-      alert('PDF 文件大小不能超过 15MB！');
-      return;
-    }
-
-    this.showToast('📄 正在读取与解析 PDF 内容，请稍候...');
-
-    try {
-      if (!window.pdfjsLib) {
-        alert('PDF 解析库尚未完成加载，请确保网络连接正常！');
-        return;
-      }
-
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-      let fullText = '';
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        fullText += pageText + '\n';
-      }
-
-      const cleanText = fullText.trim();
-      if (!cleanText) {
-        alert('未能从该 PDF 中提取到可编辑文本（可能是纯扫描图片类 PDF）。建议使用包含可选中文字的编织说明文档！');
-        return;
-      }
-
-      const defaultName = file.name.replace(/\.pdf$/i, '');
-      const nameInput = document.getElementById('text-project-name');
-      const patternInput = document.getElementById('text-pattern-input');
-
-      if (nameInput && !nameInput.value.trim()) {
-        nameInput.value = defaultName;
-      }
-
-      if (patternInput) {
-        patternInput.value = cleanText;
-      }
-
-      this.showToast(`🎉 成功从 PDF (共${pdf.numPages}页) 提取全部文字说明！`);
-    } catch (e) {
-      console.error('PDF 解析失败：', e);
-      alert('解析 PDF 文件失败，请检查文件是否加密或损坏！');
-    }
-  },
-
   // ==========================================================================
   // 事件交互绑定 (全防御性包装，避免任一元素缺失影响页面功能)
   // ==========================================================================
@@ -2672,29 +2615,6 @@ const App = {
     addClick('btn-new-text', (e) => this.openCreateText(e));
     addClick('btn-new-grid', (e) => this.openCreateGrid(e));
     addClick('btn-import-csv', (e) => this.openImportCSV(e));
-    
-    addClick('btn-new-pdf', (e) => {
-      this.openCreateText(e);
-      setTimeout(() => {
-        const uploadBtn = document.getElementById('btn-trigger-pdf-upload');
-        if (uploadBtn) uploadBtn.click();
-      }, 150);
-    });
-
-    addClick('btn-trigger-pdf-upload', () => {
-      const fileInput = document.getElementById('input-pdf-file');
-      if (fileInput) fileInput.click();
-    });
-
-    const pdfFileInput = document.getElementById('input-pdf-file');
-    if (pdfFileInput) {
-      pdfFileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          this.parsePDFFile(file);
-        }
-      });
-    }
 
     // 返回按钮
     addClick('btn-back-text-create', () => this.switchView('view-dashboard'));
