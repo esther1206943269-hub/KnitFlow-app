@@ -2205,86 +2205,7 @@ const App = {
   // 图解模板库管理 (Preset & Custom Template Library)
   // ==========================================================================
   getBuiltinTemplates() {
-    return {
-      'nordic-mittens': {
-        name: 'Nordic Fair Isle Mittens',
-        type: 'grid',
-        knitType: 'flat',
-        referenceLinks: [
-          { title: '🎥 Stranded Colorwork Technique', url: 'https://www.youtube.com', memo: 'Fair isle float tension management guide' }
-        ],
-        data: [
-          ['k','k','k','c1','c1','k','k','c1','c1','k','k','k'],
-          ['k','k','c1','c3','c3','c1','c1','c3','c3','c1','k','k'],
-          ['k','c1','c3','c1','c1','c3','c3','c1','c1','c3','c1','k'],
-          ['c1','c3','c1','c2','c2','c1','c1','c2','c2','c1','c3','c1'],
-          ['c1','c3','c1','c2','c2','c1','c1','c2','c2','c1','c3','c1'],
-          ['k','c1','c3','c1','c1','c3','c3','c1','c1','c3','c1','k'],
-          ['k','k','c1','c3','c3','c1','c1','c3','c3','c1','k','k'],
-          ['k','k','k','c1','c1','k','k','c1','c1','k','k','k'],
-          ['c2','c2','k','k','c2','c2','c2','c2','k','k','c2','c2'],
-          ['c2','c2','k','k','c2','c2','c2','c2','k','k','c2','c2'],
-          ['k','k','c3','c3','k','k','k','k','c3','c3','k','k'],
-          ['k','k','c3','c3','k','k','k','k','c3','c3','k','k'],
-          ['c1','c1','c1','c1','c1','c1','c1','c1','c1','c1','c1','c1'],
-          ['c1','c1','c1','c1','c1','c1','c1','c1','c1','c1','c1','c1']
-        ]
-      },
-      'cable-scarf': {
-        name: 'Winter Cable Scarf',
-        type: 'text',
-        referenceLinks: [
-          { title: '📖 6-Stitch Cable Twist Guide', url: 'https://www.google.com', memo: 'Hold cable needle in front on C6F' }
-        ],
-        data: [
-          { rowNum: 1, text: 'R1 (RS): K2, P2, K6 (Cable Panel), P2, K2' },
-          { rowNum: 2, text: 'R2 (WS): P2, K2, P6, K2, P2' },
-          { rowNum: 3, text: 'R3 (RS): K2, P2, C6F (Cross 6 Front), P2, K2' },
-          { rowNum: 4, text: 'R4 (WS): P2, K2, P6, K2, P2' },
-          { rowNum: 5, text: 'R5 (RS): K2, P2, K6, P2, K2' },
-          { rowNum: 6, text: 'R6 (WS): P2, K2, P6, K2, P2' },
-          { rowNum: 7, text: 'R7 (RS): Repeat Row 3 (C6F Cable Twist)' },
-          { rowNum: 8, text: 'R8 (WS): P2, K2, P6, K2, P2' }
-        ]
-      },
-      'houndstooth-vest': {
-        name: 'Houndstooth Check Vest',
-        type: 'grid',
-        knitType: 'flat',
-        referenceLinks: [
-          { title: '📖 Classic Houndstooth Chart Guide', url: 'https://www.google.com', memo: 'Alternate Color A and B every 2 stitches' }
-        ],
-        data: [
-          ['c4','c4','k','k','c4','c4','k','k','c4','c4'],
-          ['c4','k','c4','k','c4','k','c4','k','c4','k'],
-          ['k','k','c4','c4','k','k','c4','c4','k','k'],
-          ['k','c4','k','c4','k','c4','k','c4','k','c4'],
-          ['c4','c4','k','k','c4','c4','k','k','c4','c4'],
-          ['c4','k','c4','k','c4','k','c4','k','c4','k'],
-          ['k','k','c4','c4','k','k','c4','c4','k','k'],
-          ['k','c4','k','c4','k','c4','k','c4','k','c4'],
-          ['c4','c4','k','k','c4','c4','k','k','c4','c4'],
-          ['c4','k','c4','k','c4','k','c4','k','c4','k']
-        ]
-      },
-      'ripple-blanket': {
-        name: 'Boho Wave Blanket',
-        type: 'text',
-        referenceLinks: [
-          { title: '🎥 Chevron Wave Stitch Guide', url: 'https://www.youtube.com', memo: 'YO increases and K2tog decreases' }
-        ],
-        data: [
-          { rowNum: 1, text: 'R1 (RS): K1, *YO, K4, SSK, K2tog, K4, YO, K1; rep from * across' },
-          { rowNum: 2, text: 'R2 (WS): Purl all stitches across' },
-          { rowNum: 3, text: 'R3 (RS): K1, *YO, K4, SSK, K2tog, K4, YO, K1; rep from * across' },
-          { rowNum: 4, text: 'R4 (WS): Purl all stitches across' },
-          { rowNum: 5, text: 'R5 (RS): Switch Color B: K1, *YO, K4, SSK, K2tog, K4, YO, K1; rep from *' },
-          { rowNum: 6, text: 'R6 (WS): Purl all stitches across' },
-          { rowNum: 7, text: 'R7 (RS): Switch Color C: K1, *YO, K4, SSK, K2tog, K4, YO, K1; rep from *' },
-          { rowNum: 8, text: 'R8 (WS): Purl all stitches across' }
-        ]
-      }
-    };
+    return {};
   },
 
   renderPresetTemplates() {
@@ -2365,8 +2286,8 @@ const App = {
 
     if (renderedCount === 0) {
       container.innerHTML = `
-        <div style="color: var(--text-muted); font-size: 0.8rem; font-style: italic; text-align: center; padding: 0.8rem 0;">
-          暂无图解模板，点击右上角 "+ New Template" 即可创建新模板！
+        <div style="color: var(--text-muted); font-size: 0.82rem; font-style: italic; text-align: center; padding: 0.8rem 0; width: 100%; grid-column: 1 / -1;">
+          暂无图解模板，点击右上角 “新建模板 / NEW TEMPLATE” 即可设计并保存属于您自己的图解模板！
         </div>
       `;
     }
