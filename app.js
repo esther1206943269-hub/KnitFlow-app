@@ -875,6 +875,45 @@ const App = {
     }
   },
 
+  // 播放清脆利落的机械键轴“咔哒咔哒”点击音效 (Web Audio API 双脉冲机械构型)
+  playClickClackSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+
+      // 第一声“咔” (High Crisp Snap)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(2400, now);
+      osc1.frequency.exponentialRampToValueAtTime(350, now + 0.015);
+      gain1.gain.setValueAtTime(0.4, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.018);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.02);
+
+      // 第二声“哒” (Clack Spring Return, 延迟 30ms)
+      const clackTime = now + 0.030;
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1100, clackTime);
+      osc2.frequency.exponentialRampToValueAtTime(180, clackTime + 0.022);
+      gain2.gain.setValueAtTime(0.35, clackTime);
+      gain2.gain.exponentialRampToValueAtTime(0.001, clackTime + 0.026);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(clackTime);
+      osc2.stop(clackTime + 0.028);
+    } catch (e) {
+      // 忽略声音播放异常
+    }
+  },
+
   deleteProject(id) {
     this.projects = this.projects.filter(p => p.id !== id);
     this.saveProjects();
@@ -2463,6 +2502,7 @@ const App = {
 
   openCreateText(e) {
     if (e && e.preventDefault) e.preventDefault();
+    this.playClickClackSound();
     const nameEl = document.getElementById('text-project-name');
     const inputEl = document.getElementById('text-pattern-input');
     if (nameEl) nameEl.value = '';
@@ -2472,6 +2512,7 @@ const App = {
 
   openCreateGrid(e) {
     if (e && e.preventDefault) e.preventDefault();
+    this.playClickClackSound();
     const nameEl = document.getElementById('grid-project-name');
     if (nameEl) nameEl.value = '';
     this.switchView('view-create-grid');
@@ -3141,6 +3182,7 @@ const App = {
   },
 
   createTemplateDirect() {
+    this.playClickClackSound();
     const typeChoice = prompt('制作新图解模板：\n输入 1 制作【文字针法图解模板】\n输入 2 制作【像素网格图解模板】', '1');
     if (typeChoice === null) return;
 
