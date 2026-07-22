@@ -182,10 +182,6 @@ const Grid = {
     const paths = this.getStitchSVGPaths(key);
     if (!paths) {
       const st = this.stitches[key];
-      const targetKey = (st && st.baseStitch) ? st.baseStitch : key;
-      if (targetKey === 'k' && st && st.symbolMode === 'blank') {
-        return `<span style="font-size: 0.65rem; color: ${color}; opacity: 0.65; font-weight: bold; border: 1px dashed ${color}; padding: 0 2px; border-radius: 2px;">空白</span>`;
-      }
       return `<span style="color: ${color}; font-weight: bold;">${st ? (st.symbol || '') : ''}</span>`;
     }
     return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
