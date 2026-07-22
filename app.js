@@ -17,7 +17,10 @@ const App = {
   registeredUsers: [],
 
   // 页面加载入口
-  init() {
+  CLOUD_USERS_BIN_ID: 'ff8081819f7e10ae019f893c3adf1162',
+  CLOUD_API_BASE: 'https://api.restful-api.dev/objects',
+
+  async init() {
     this.loadUserAuth();
     this.loadProjects();
     this.loadCustomTemplates();
@@ -28,10 +31,13 @@ const App = {
     this.renderProjectList();
     this.renderPresetTemplates();
     this.setupKeyboardShortcuts();
+
+    // 异步同步云端账号数据库，确保平板端/多设备即刻拉取最新账号
+    this.syncCloudUsers();
   },
 
   // ==========================================================================
-  // 用户账户与登录管理 (User Authentication & Cloud Storage Isolation)
+  // 用户账户与登录管理 (User Authentication & Multi-Device Cloud Sync)
   // ==========================================================================
   loadUserAuth() {
     try {
@@ -44,6 +50,41 @@ const App = {
       console.error('加载用户账号失败：', e);
       this.registeredUsers = [];
       this.currentUser = null;
+    }
+  },
+
+  async syncCloudUsers() {
+    try {
+      const res = await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_USERS_BIN_ID}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.data && Array.isArray(json.data.users)) {
+          const remoteUsers = json.data.users;
+          const mergedMap = new Map();
+          this.registeredUsers.forEach(u => mergedMap.set(u.id || u.account, u));
+          remoteUsers.forEach(u => mergedMap.set(u.id || u.account, u));
+          
+          this.registeredUsers = Array.from(mergedMap.values());
+          localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
+        }
+      }
+    } catch (e) {
+      console.warn('云端用户库同步跳过：', e);
+    }
+  },
+
+  async pushCloudUsers() {
+    try {
+      await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_USERS_BIN_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'knitflow_global_users_v1',
+          data: { users: this.registeredUsers }
+        })
+      });
+    } catch (e) {
+      console.warn('推送云端用户库失败：', e);
     }
   },
 
@@ -360,9 +401,12 @@ const App = {
     }
   },
 
-  registerUser(username, account, password) {
+  async registerUser(username, account, password) {
     const cleanUser = username.trim();
     const cleanAcc = account.trim();
+
+    // 先拉取云端，防止与其他设备注册账号冲突
+    await this.syncCloudUsers();
 
     const exists = this.registeredUsers.find(u => u.username.toLowerCase() === cleanUser.toLowerCase() || u.account.toLowerCase() === cleanAcc.toLowerCase());
     if (exists) {
@@ -383,13 +427,23 @@ const App = {
     this.registeredUsers.push(newUser);
     localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
 
+    // 即刻同步到云端数据库，方便平板端和其他设备登录！
+    this.pushCloudUsers();
+
     this.loginUserObject(newUser, true);
     this.showToast(`🎉 注册成功！欢迎您，${cleanUser}`);
   },
 
-  loginUser(account, password) {
+  async loginUser(account, password) {
     const cleanAcc = account.trim().toLowerCase();
-    const user = this.registeredUsers.find(u => (u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc) && u.password === password);
+    let user = this.registeredUsers.find(u => (u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc) && u.password === password);
+
+    // 如果平板端或新设备本地未查找到账号，自动连接云端检索最新账号库！
+    if (!user) {
+      this.showToast('🔍 正在连接云端校验账号...');
+      await this.syncCloudUsers();
+      user = this.registeredUsers.find(u => (u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc) && u.password === password);
+    }
 
     if (!user) {
       alert('账号或密码不正确，请重新输入！');
@@ -397,7 +451,7 @@ const App = {
     }
 
     this.loginUserObject(user, false);
-    this.showToast(`欢迎回来，${user.username}！`);
+    this.showToast(`🎉 欢迎回来，${user.username}！多端云同步已开启。`);
   },
 
   loginUserObject(userObj, isNewReg = false) {
