@@ -2621,12 +2621,17 @@ const App = {
         wrapper.style.cssText = 'display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; border-radius: var(--radius-lg); min-height: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box;';
 
         wrapper.innerHTML = `
-          <!-- 顶部：类型 Badge 标牌与删除按钮 -->
+          <!-- 顶部：类型 Badge 标牌与重命名/删除按钮 -->
           <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <span class="chip-badge" style="background: var(--primary-light); color: var(--primary); font-weight: 700; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; text-transform: uppercase;">CUSTOM (${typeLabel})</span>
-            <button class="btn icon-btn danger-text btn-delete-custom-tpl" data-custom-id="${tpl.id}" title="删除模板" aria-label="Delete template" style="padding: 4px; border-radius: 50%; opacity: 0.7;">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
+            <div style="display: flex; gap: 4px; align-items: center;">
+              <button class="btn icon-btn primary-text btn-rename-custom-tpl" data-custom-id="${tpl.id}" title="重命名模板" aria-label="Rename template" style="padding: 4px; border-radius: 50%; opacity: 0.75; cursor: pointer; color: var(--primary);">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+              </button>
+              <button class="btn icon-btn danger-text btn-delete-custom-tpl" data-custom-id="${tpl.id}" title="删除模板" aria-label="Delete template" style="padding: 4px; border-radius: 50%; opacity: 0.7; cursor: pointer;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
           </div>
 
           <!-- 中间主体：点击直接开启编织 -->
@@ -2650,6 +2655,11 @@ const App = {
           this.loadCustomTemplate(tpl.id, false);
         });
 
+        wrapper.querySelector('.btn-rename-custom-tpl').addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.renameCustomTemplate(tpl.id);
+        });
+
         wrapper.querySelector('.btn-delete-custom-tpl').addEventListener('click', (e) => {
           e.stopPropagation();
           this.deleteCustomTemplate(tpl.id);
@@ -2666,6 +2676,24 @@ const App = {
         </div>
       `;
     }
+  },
+
+  renameCustomTemplate(id) {
+    const tpl = this.customTemplates.find(t => t.id === id);
+    if (!tpl) return;
+
+    const newName = prompt('修改图解模板名称 / Rename Template:', tpl.name);
+    if (newName === null) return;
+    const cleanName = newName.trim();
+    if (!cleanName) {
+      alert('模板名称不能为空！');
+      return;
+    }
+
+    tpl.name = cleanName;
+    this.saveCustomTemplates();
+    this.renderPresetTemplates();
+    this.showToast(`✏️ 模板已成功重命名为 “${cleanName}”！`);
   },
 
   deletePresetTemplate(key) {
