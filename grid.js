@@ -632,15 +632,21 @@ const Grid = {
       overlay.setAttribute('y', highlightY);
       overlay.setAttribute('width', highlightW);
       overlay.setAttribute('height', highlightH);
+      overlay.setAttribute('fill', 'rgba(208, 108, 84, 0.15)');
+      overlay.setAttribute('pointer-events', 'none');
       overlay.setAttribute('class', 'active-row-overlay');
       svg.appendChild(overlay);
 
-      // 活跃行外框
+      // 活跃行外框 (必须显式设置 fill="none"，防止 SVG 导出或独立渲染时默认填充纯黑色)
       const mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       mask.setAttribute('x', highlightX);
       mask.setAttribute('y', highlightY);
       mask.setAttribute('width', highlightW);
       mask.setAttribute('height', highlightH);
+      mask.setAttribute('fill', 'none');
+      mask.setAttribute('stroke', '#d06c54');
+      mask.setAttribute('stroke-width', '2.5');
+      mask.setAttribute('stroke-dasharray', '4 2');
       mask.setAttribute('class', 'active-row-mask');
       svg.appendChild(mask);
 

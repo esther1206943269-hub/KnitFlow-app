@@ -2445,6 +2445,10 @@ const App = {
     try {
       const clone = svg.cloneNode(true);
       clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+      // 移除活跃行追查虚线框、半透明遮罩与箭头线，确保导出的图解 PNG 纯净高精，无黑色阴影遮挡
+      const activeElements = clone.querySelectorAll('.active-row-overlay, .active-row-mask, .direction-arrow-path');
+      activeElements.forEach(el => el.remove());
       
       const svgWidth = parseFloat(svg.getAttribute('width')) || svg.clientWidth || 600;
       const svgHeight = parseFloat(svg.getAttribute('height')) || svg.clientHeight || 600;
