@@ -1304,11 +1304,11 @@ const App = {
 
       // 编辑绘制模式
       const selectedKey = Grid.selectedStitch;
-      if (selectedKey === 'c21') {
-        // 右上2针与1针的交叉针：点击后自动连续占用 3 个格子！
-        for (let offset = 0; offset < 3; offset++) {
+      if (Grid.multiCellConfig && Grid.multiCellConfig[selectedKey]) {
+        const span = Grid.multiCellConfig[selectedKey].span;
+        for (let offset = 0; offset < span; offset++) {
           if (colIndex + offset < Grid.width) {
-            p.data[rowIndex][colIndex + offset] = 'c21';
+            p.data[rowIndex][colIndex + offset] = selectedKey;
           }
         }
       } else {

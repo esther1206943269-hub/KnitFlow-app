@@ -4,6 +4,57 @@
  */
 
 const Grid = {
+  multiCellConfig: {
+    'c21': {
+      span: 3,
+      vbW: 300,
+      vbH: 100,
+      name: '右上2针与1针的交叉针',
+      color: '#F3DBBD',
+      path: 'M 50 15 L 158 85 M 25 80 L 98 62 M 150 15 L 258 85 M 202 38 L 280 20'
+    },
+    'c21p': {
+      span: 3,
+      vbW: 300,
+      vbH: 100,
+      name: '上针的右上2针与1针交叉针',
+      color: '#E6CBB2',
+      path: 'M 50 15 L 158 85 M 25 80 L 98 62 M 85 76 L 115 76 M 150 15 L 258 85 M 202 38 L 280 18'
+    },
+    'c12': {
+      span: 3,
+      vbW: 300,
+      vbH: 100,
+      name: '左上1针与2针交叉针',
+      color: '#EAD7C5',
+      path: 'M 20 18 L 98 38 M 45 85 L 155 15 M 145 85 L 255 15 M 202 62 L 280 80'
+    },
+    'c12p': {
+      span: 3,
+      vbW: 300,
+      vbH: 100,
+      name: '上针的左上1针与2针交叉针',
+      color: '#DFCBB9',
+      path: 'M 20 18 L 98 38 M 45 85 L 155 15 M 145 85 L 255 15 M 185 76 L 215 76 M 205 45 L 278 65'
+    },
+    'c22r': {
+      span: 4,
+      vbW: 400,
+      vbH: 100,
+      name: '右上2针与2针交叉针',
+      color: '#F6E3CC',
+      path: 'M 35 15 L 265 85 M 35 85 L 110 58 M 125 18 L 245 62 M 125 85 L 155 72 M 215 38 L 255 20 M 285 42 L 370 15'
+    },
+    'c22l': {
+      span: 4,
+      vbW: 400,
+      vbH: 100,
+      name: '左上2针与2针交叉针',
+      color: '#EDD9C1',
+      path: 'M 35 85 L 350 15 M 35 15 L 125 42 M 145 18 L 215 42 M 145 85 L 235 58 M 205 72 L 235 85 M 265 42 L 350 85'
+    }
+  },
+
   getDefaultStitches() {
     return {
       'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
@@ -19,7 +70,12 @@ const Grid = {
       'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: '#BACECF', text: '上针的右加针 (prl)' },
       'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: '#E3D8ED', text: '左加针 (kll)' },
       'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: '#CDBEDC', text: '上针的左加针 (pll)' },
-      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' }
+      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' },
+      'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: '#E6CBB2', text: '上针的右上2针与1针交叉针' },
+      'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: '#EAD7C5', text: '左上1针与2针交叉针' },
+      'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: '#DFCBB9', text: '上针的左上1针与2针交叉针' },
+      'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: '#F6E3CC', text: '右上2针与2针交叉针' },
+      'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: '#EDD9C1', text: '左上2针与2针交叉针' }
     };
   },
 
@@ -37,7 +93,12 @@ const Grid = {
     'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: '#BACECF', text: '上针的右加针 (prl)' },
     'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: '#E3D8ED', text: '左加针 (kll)' },
     'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: '#CDBEDC', text: '上针的左加针 (pll)' },
-    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' }
+    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' },
+    'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: '#E6CBB2', text: '上针的右上2针与1针交叉针' },
+    'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: '#EAD7C5', text: '左上1针与2针交叉针' },
+    'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: '#DFCBB9', text: '上针的左上1针与2针交叉针' },
+    'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: '#F6E3CC', text: '右上2针与2针交叉针' },
+    'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: '#EDD9C1', text: '左上2针与2针交叉针' }
   },
 
   loadProjectStitches(customStitches) {
@@ -51,6 +112,11 @@ const Grid = {
    * 获取各针法 24x24 矢量 SVG 路径 (精确呈现图一原版符号)
    */
   getStitchSVGPaths(key) {
+    if (this.multiCellConfig[key]) {
+      const cfg = this.multiCellConfig[key];
+      // 兜底 24x24 矢量路径 (可根据整体路径平滑转换)
+      return `<path d="${cfg.path}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    }
     switch (key) {
       case 'k': // 下针: 垂直竖线
         return '<line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
@@ -78,8 +144,6 @@ const Grid = {
         return '<path d="M 18.24 7.2 L 18.24 17.28 M 18.24 12.72 L 5.28 8.16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
       case 'pll': // 上针的左加针: 右加针镜像 + 底部横线
         return '<path d="M 18.24 7.2 L 18.24 17.28 M 18.24 12.72 L 5.28 8.16 M 16.8 19.2 L 19.68 19.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'c21': // 右上2针与1针的交叉针: 100% 用户原版 3 格 SVG 代码 (M 50 15 L 158 85 M 25 80 L 98 62...)
-        return '<path d="M 4 3.6 L 12.64 20.4 M 2 19.2 L 7.84 14.88 M 12 3.6 L 20.64 20.4 M 16.16 9.12 L 22.4 4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
       default:
         return '';
     }
@@ -89,9 +153,11 @@ const Grid = {
    * 生成单个针法的 SVG HTML 字符串 (供 Palette 和 Legend 组装)
    */
   getStitchSVGIcon(key, color = 'currentColor', size = 18) {
-    if (key === 'c21') {
-      const paths = '<path d="M 50 15 L 158 85 M 25 80 L 98 62 M 150 15 L 258 85 M 202 38 L 280 20" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>';
-      return `<svg viewBox="0 0 300 100" width="${size * 2.5}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
+    if (this.multiCellConfig[key]) {
+      const cfg = this.multiCellConfig[key];
+      const paths = `<path d="${cfg.path}" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      const ratio = cfg.vbW / cfg.vbH;
+      return `<svg viewBox="0 0 ${cfg.vbW} ${cfg.vbH}" width="${size * ratio}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
     }
     const paths = this.getStitchSVGPaths(key);
     if (!paths) {
@@ -238,8 +304,12 @@ const Grid = {
     if (clean === 'krl' || clean === '右加针' || clean === 'ᵀ/') return 'krl';
     if (clean === 'prl' || clean === '上针的右加针' || clean === 'ᵀ/_') return 'prl';
     if (clean === 'kll' || clean === '左加针' || clean === '\\ᵀ') return 'kll';
-    if (clean === 'pll' || clean === '上针的左加针' || clean === '\\ᵀ_') return 'pll';
-    if (clean === 'c21' || clean === '右上2针与1针的交叉针' || clean === '交叉针' || clean === '╳') return 'c21';
+    if (clean === 'c21' || clean === '右上2针与1针的交叉针' || clean === '交叉针') return 'c21';
+    if (clean === 'c21p' || clean === '上针的右上2针与1针交叉针') return 'c21p';
+    if (clean === 'c12' || clean === '左上1针与2针交叉针') return 'c12';
+    if (clean === 'c12p' || clean === '上针的左上1针与2针交叉针') return 'c12p';
+    if (clean === 'c22r' || clean === '右上2针与2针交叉针') return 'c22r';
+    if (clean === 'c22l' || clean === '左上2针与2针交叉针') return 'c22l';
     
     // 默认兜底为下针
     return 'k';
@@ -448,12 +518,13 @@ const Grid = {
         cellsGroup.appendChild(rect);
 
         // 绘制针法 SVG 矢量符号 (放入顶部符号图层 iconsGroup)
-        if (stitchKey === 'c21') {
-          // 如果前一格 (colIndex - 1) 也是 c21，说明这已经是跨 3 格符号的一部分，跳过避免重复渲染
-          if (colIndex > 0 && this.data[rowIndex][colIndex - 1] === 'c21') {
-            // 已在起始格统一跨 3 格绘制，跳过
+        if (this.multiCellConfig[stitchKey]) {
+          const cfg = this.multiCellConfig[stitchKey];
+          // 如果前一格 (colIndex - 1) 也是相同的多格针法，说明已经是跨格符号的一部分，跳过避免重复渲染
+          if (colIndex > 0 && this.data[rowIndex][colIndex - 1] === stitchKey) {
+            // 已在起始格统一跨格绘制，跳过
           } else {
-            // 这是跨 3 格交叉针的起始单元格，计算 3 格总像素宽度与整体伸展 SVG 路径
+            // 这是跨格交叉针的起始单元格，计算连续格子总像素宽度与整体伸展 SVG 路径
             let strokeColor = '#3c3530';
             if (stitch.color) {
               let hex = stitch.color.replace('#', '');
@@ -467,20 +538,25 @@ const Grid = {
               }
             }
 
-            // 计算实际占据的连续 c21 格子数 (最大 3 格)
+            // 计算实际占据的连续格子数 (最大 cfg.span 格)
             let spanCount = 1;
-            if (colIndex + 1 < this.width && this.data[rowIndex][colIndex + 1] === 'c21') spanCount++;
-            if (colIndex + 2 < this.width && this.data[rowIndex][colIndex + 2] === 'c21') spanCount++;
+            for (let offset = 1; offset < cfg.span; offset++) {
+              if (colIndex + offset < this.width && this.data[rowIndex][colIndex + offset] === stitchKey) {
+                spanCount++;
+              } else {
+                break;
+              }
+            }
 
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             const targetWidth = cellSize * spanCount;
             const targetHeight = cellSize;
-            const scaleX = targetWidth / 300;
-            const scaleY = targetHeight / 100;
+            const scaleX = targetWidth / cfg.vbW;
+            const scaleY = targetHeight / cfg.vbH;
             
             group.setAttribute('transform', `translate(${x}, ${y}) scale(${scaleX}, ${scaleY})`);
             group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
-            group.innerHTML = '<path d="M 50 15 L 158 85 M 25 80 L 98 62 M 150 15 L 258 85 M 202 38 L 280 20" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>';
+            group.innerHTML = `<path d="${cfg.path}" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
             iconsGroup.appendChild(group);
           }
         } else {
