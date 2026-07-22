@@ -17,7 +17,10 @@
       <div class="logo-area" id="btn-home">
         <h1>KnitFlow <span class="subtitle">编织行行好</span></h1>
       </div>
-      <div class="header-actions">
+      <div class="header-actions" style="display: flex; align-items: center; gap: 0.75rem;">
+        <div id="user-auth-entry" class="user-auth-entry">
+          <!-- Rendered dynamically by App.renderUserAuthUI() -->
+        </div>
         <button id="btn-toggle-theme" class="icon-button" title="切换深浅主题">
           <svg class="theme-icon" viewBox="0 0 24 24" width="20" height="20">
             <path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9zm0 16a7 7 0 1 1 7-7 7.008 7.008 0 0 1-7 7z"/>
@@ -456,6 +459,53 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
           <button id="btn-save-motif-single" class="btn primary">保存花样</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 模态框：用户登录与注册 -->
+  <div id="auth-modal" class="modal-backdrop hidden">
+    <div class="modal-card auth-modal-card" style="max-width: 380px; padding: 1.5rem; position: relative;">
+      <button class="modal-close-btn" id="btn-close-auth-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      
+      <div class="auth-header" style="text-align: center; margin-bottom: 1.2rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">✨ 欢迎使用 KnitFlow</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">登录个人账号，保存属于你的项目与图解库</p>
+      </div>
+
+      <div class="auth-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px dashed var(--card-border); padding-bottom: 0.5rem;">
+        <button id="auth-tab-login" class="btn text-btn auth-tab-btn active" style="flex: 1; padding: 0.4rem 0; font-weight: 700; border-bottom: 2px solid var(--primary); border-radius: 0;">登录 / Login</button>
+        <button id="auth-tab-register" class="btn text-btn auth-tab-btn" style="flex: 1; padding: 0.4rem 0; font-weight: 600; opacity: 0.7; border-radius: 0;">注册 / Register</button>
+      </div>
+
+      <!-- 登录表单 -->
+      <form id="form-login" class="auth-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="login-account" style="font-size: 0.8rem; font-weight: 500;">邮箱 / 手机号 / 用户名</label>
+          <input type="text" id="login-account" placeholder="Email, phone or username" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="login-password" style="font-size: 0.8rem; font-weight: 500;">密码 / Password</label>
+          <input type="password" id="login-password" placeholder="输入你的登录密码" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">登录账号 / Log In</button>
+      </form>
+
+      <!-- 注册表单 -->
+      <form id="form-register" class="auth-form hidden" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-username" style="font-size: 0.8rem; font-weight: 500;">用户名 / Username</label>
+          <input type="text" id="reg-username" placeholder="设置你的昵称 (如：小毛球)" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-account" style="font-size: 0.8rem; font-weight: 500;">邮箱或手机号 / Email or Phone</label>
+          <input type="text" id="reg-account" placeholder="name@example.com 或 138..." required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-password" style="font-size: 0.8rem; font-weight: 500;">设置密码 / Password</label>
+          <input type="password" id="reg-password" placeholder="至少 6 位密码" minlength="6" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">注册并开始使用 / Sign Up</button>
+      </form>
     </div>
   </div>
 

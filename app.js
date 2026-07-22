@@ -13,32 +13,201 @@ const App = {
   isRecordingTime: false,
   sessionTime: 0,
   isTimerPaused: false,
-  
+  currentUser: null,
+  registeredUsers: [],
+
   // 页面加载入口
   init() {
+    this.loadUserAuth();
     this.loadProjects();
     this.loadCustomTemplates();
     this.loadDeletedPresets();
     this.bindEvents();
     this.initTTSControls();
+    this.renderUserAuthUI();
     this.renderProjectList();
     this.renderPresetTemplates();
     this.setupKeyboardShortcuts();
   },
 
   // ==========================================================================
-  // 本地存储管理 (Local Storage)
+  // 用户账户与登录管理 (User Authentication & Cloud Storage Isolation)
+  // ==========================================================================
+  loadUserAuth() {
+    try {
+      const usersStr = localStorage.getItem('knitflow_registered_users');
+      this.registeredUsers = usersStr ? JSON.parse(usersStr) : [];
+
+      const currentStr = localStorage.getItem('knitflow_current_user');
+      this.currentUser = currentStr ? JSON.parse(currentStr) : null;
+    } catch (e) {
+      console.error('加载用户账号失败：', e);
+      this.registeredUsers = [];
+      this.currentUser = null;
+    }
+  },
+
+  renderUserAuthUI() {
+    const container = document.getElementById('user-auth-entry');
+    if (!container) return;
+
+    if (this.currentUser) {
+      const initial = (this.currentUser.username || 'U').substring(0, 1).toUpperCase();
+      container.innerHTML = `
+        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
+          <span style="width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--bg-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${initial}</span>
+          <span style="color: var(--text-main); font-weight: 600; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.currentUser.username}</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted);">☁️已同步</span>
+          <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="退出登录">退出</button>
+        </div>
+      `;
+      const logoutBtn = container.querySelector('#btn-logout-inline');
+      if (logoutBtn) {
+        logoutBtn.onclick = (e) => {
+          e.stopPropagation();
+          this.logoutUser();
+        };
+      }
+    } else {
+      container.innerHTML = `
+        <button id="btn-open-auth-modal" class="btn text-btn" style="padding: 0.3rem 0.75rem; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--primary); border-radius: 18px; color: var(--primary); display: flex; align-items: center; gap: 4px; cursor: pointer;">
+          <span>👤 登录 / 注册</span>
+        </button>
+      `;
+      const loginBtn = container.querySelector('#btn-open-auth-modal');
+      if (loginBtn) {
+        loginBtn.onclick = () => this.openAuthModal();
+      }
+    }
+  },
+
+  openAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) modal.classList.remove('hidden');
+  },
+
+  closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  switchAuthTab(tab) {
+    const loginForm = document.getElementById('form-login');
+    const regForm = document.getElementById('form-register');
+    const loginTabBtn = document.getElementById('auth-tab-login');
+    const regTabBtn = document.getElementById('auth-tab-register');
+
+    if (tab === 'login') {
+      loginForm.classList.remove('hidden');
+      regForm.classList.add('hidden');
+      loginTabBtn.classList.add('active');
+      loginTabBtn.style.opacity = '1';
+      loginTabBtn.style.borderBottom = '2px solid var(--primary)';
+      regTabBtn.classList.remove('active');
+      regTabBtn.style.opacity = '0.7';
+      regTabBtn.style.borderBottom = 'none';
+    } else {
+      regForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+      regTabBtn.classList.add('active');
+      regTabBtn.style.opacity = '1';
+      regTabBtn.style.borderBottom = '2px solid var(--primary)';
+      loginTabBtn.classList.remove('active');
+      loginTabBtn.style.opacity = '0.7';
+      loginTabBtn.style.borderBottom = 'none';
+    }
+  },
+
+  registerUser(username, account, password) {
+    const cleanUser = username.trim();
+    const cleanAcc = account.trim();
+
+    const exists = this.registeredUsers.find(u => u.username.toLowerCase() === cleanUser.toLowerCase() || u.account.toLowerCase() === cleanAcc.toLowerCase());
+    if (exists) {
+      alert('该用户名、邮箱或手机号已被注册，请直接登录！');
+      this.switchAuthTab('login');
+      document.getElementById('login-account').value = cleanAcc;
+      return;
+    }
+
+    const newUser = {
+      id: 'u_' + Date.now(),
+      username: cleanUser,
+      account: cleanAcc,
+      password: password,
+      createdAt: new Date().toISOString()
+    };
+
+    this.registeredUsers.push(newUser);
+    localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
+
+    this.loginUserObject(newUser, true);
+    this.showToast(`🎉 注册成功！欢迎您，${cleanUser}`);
+  },
+
+  loginUser(account, password) {
+    const cleanAcc = account.trim().toLowerCase();
+    const user = this.registeredUsers.find(u => (u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc) && u.password === password);
+
+    if (!user) {
+      alert('账号或密码不正确，请重新输入！');
+      return;
+    }
+
+    this.loginUserObject(user, false);
+    this.showToast(`欢迎回来，${user.username}！`);
+  },
+
+  loginUserObject(userObj, isNewReg = false) {
+    this.currentUser = {
+      id: userObj.id,
+      username: userObj.username,
+      account: userObj.account
+    };
+
+    localStorage.setItem('knitflow_current_user', JSON.stringify(this.currentUser));
+    this.closeAuthModal();
+    this.renderUserAuthUI();
+
+    this.loadProjects();
+    this.loadCustomTemplates();
+    this.renderProjectList();
+    this.renderPresetTemplates();
+  },
+
+  logoutUser() {
+    if (confirm('确认要退出登录吗？退出后项目将保存在云端账号中。')) {
+      this.currentUser = null;
+      localStorage.removeItem('knitflow_current_user');
+      this.renderUserAuthUI();
+      this.loadProjects();
+      this.loadCustomTemplates();
+      this.renderProjectList();
+      this.renderPresetTemplates();
+      this.showToast('已安全退出登录');
+    }
+  },
+
+  getProjectsStorageKey() {
+    return this.currentUser ? `knitflow_projects_user_${this.currentUser.id}` : 'knitflow_projects_guest';
+  },
+
+  getCustomTemplatesStorageKey() {
+    return this.currentUser ? `knitflow_custom_templates_user_${this.currentUser.id}` : 'knitflow_custom_templates_guest';
+  },
+
+  // ==========================================================================
+  // 本地/云端账户项目存储管理
   // ==========================================================================
   loadProjects() {
     try {
-      const stored = localStorage.getItem('knitflow_projects');
+      const key = this.getProjectsStorageKey();
+      const stored = localStorage.getItem(key);
       const parsed = stored ? JSON.parse(stored) : null;
       this.projects = (parsed && Array.isArray(parsed)) ? parsed : [];
       
-      // 过滤清空初始示例项目 sample-text 和 sample-grid
       this.projects = this.projects.filter(p => p.id !== 'sample-text' && p.id !== 'sample-grid');
       
-      // 自动迁移项目，确保都有 referenceLinks 数组
       this.projects.forEach(p => {
         if (!p.referenceLinks) {
           p.referenceLinks = [];
@@ -48,22 +217,24 @@ const App = {
         }
       });
     } catch (e) {
-      console.error('加载本地项目失败：', e);
+      console.error('加载项目失败：', e);
       this.projects = [];
     }
   },
 
   saveProjects() {
     try {
-      localStorage.setItem('knitflow_projects', JSON.stringify(this.projects));
+      const key = this.getProjectsStorageKey();
+      localStorage.setItem(key, JSON.stringify(this.projects));
     } catch (e) {
-      console.error('保存本地项目失败：', e);
+      console.error('保存项目失败：', e);
     }
   },
 
   loadCustomTemplates() {
     try {
-      const stored = localStorage.getItem('knitflow_custom_templates');
+      const key = this.getCustomTemplatesStorageKey();
+      const stored = localStorage.getItem(key);
       this.customTemplates = stored ? JSON.parse(stored) : [];
     } catch (e) {
       console.error('加载自定义模板库失败：', e);
@@ -73,7 +244,8 @@ const App = {
 
   saveCustomTemplates() {
     try {
-      localStorage.setItem('knitflow_custom_templates', JSON.stringify(this.customTemplates));
+      const key = this.getCustomTemplatesStorageKey();
+      localStorage.setItem(key, JSON.stringify(this.customTemplates));
     } catch (e) {
       console.error('保存自定义模板库失败：', e);
     }
@@ -1958,6 +2130,32 @@ const App = {
         el.addEventListener('click', fn);
       }
     };
+
+    // 绑定用户注册与登录 Tab 切换与提交
+    addClick('auth-tab-login', () => this.switchAuthTab('login'));
+    addClick('auth-tab-register', () => this.switchAuthTab('register'));
+    addClick('btn-close-auth-modal', () => this.closeAuthModal());
+
+    const loginForm = document.getElementById('form-login');
+    if (loginForm) {
+      loginForm.onsubmit = (e) => {
+        e.preventDefault();
+        const acc = document.getElementById('login-account').value;
+        const pwd = document.getElementById('login-password').value;
+        this.loginUser(acc, pwd);
+      };
+    }
+
+    const regForm = document.getElementById('form-register');
+    if (regForm) {
+      regForm.onsubmit = (e) => {
+        e.preventDefault();
+        const user = document.getElementById('reg-username').value;
+        const acc = document.getElementById('reg-account').value;
+        const pwd = document.getElementById('reg-password').value;
+        this.registerUser(user, acc, pwd);
+      };
+    }
 
     // 仪表盘大厅跳转
     addClick('btn-home', () => {
