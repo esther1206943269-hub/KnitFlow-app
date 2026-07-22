@@ -537,6 +537,49 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
     </div>
   </div>
 
+  <!-- 模态框：设置个人头像 -->
+  <div id="avatar-modal" class="modal-backdrop hidden">
+    <div class="modal-card auth-modal-card" style="max-width: 400px; padding: 1.5rem; position: relative;">
+      <button class="modal-close-btn" id="btn-close-avatar-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      
+      <div class="auth-header" style="text-align: center; margin-bottom: 1rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">🖼️ 设置个人头像 / Set Profile Avatar</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">选择可爱预设头像或上传自定义图片</p>
+      </div>
+
+      <!-- 头像当前预览区 -->
+      <div style="display: flex; justify-content: center; margin-bottom: 1.2rem;">
+        <div id="avatar-current-preview" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--primary); background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.12);">
+          🐱
+        </div>
+      </div>
+
+      <!-- 预设可爱图标选择区 -->
+      <div style="margin-bottom: 1.2rem;">
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">预设可爱图案 / Preset Icons:</label>
+        <div id="avatar-preset-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem;">
+          <button type="button" class="avatar-preset-item active" data-avatar="🐱" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid var(--primary); background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🐱</button>
+          <button type="button" class="avatar-preset-item" data-avatar="🧶" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🧶</button>
+          <button type="button" class="avatar-preset-item" data-avatar="🦙" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🦙</button>
+          <button type="button" class="avatar-preset-item" data-avatar="🌸" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🌸</button>
+          <button type="button" class="avatar-preset-item" data-avatar="🐻" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🐻</button>
+          <button type="button" class="avatar-preset-item" data-avatar="🦔" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🦔</button>
+        </div>
+      </div>
+
+      <!-- 自定义本地文件上传 -->
+      <div style="margin-bottom: 1.2rem;">
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">自定义本地图片上传 / Upload Local Image:</label>
+        <input type="file" id="input-avatar-file" accept="image/*" style="font-size: 0.8rem; width: 100%;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button type="button" id="btn-cancel-avatar" class="btn text-btn">取消</button>
+        <button type="button" id="btn-save-avatar" class="btn primary" style="padding: 0.45rem 1.2rem; font-weight: 700;">保存头像 / Save Avatar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 提示弹窗 (Toast) -->
   <div id="toast" class="toast hidden"></div>
 

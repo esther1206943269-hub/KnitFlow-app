@@ -53,14 +53,32 @@ const App = {
 
     if (this.currentUser) {
       const initial = (this.currentUser.username || 'U').substring(0, 1).toUpperCase();
+      let avatarHtml = `<span style="width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--bg-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; overflow: hidden; flex-shrink: 0;">${initial}</span>`;
+      
+      if (this.currentUser.avatar) {
+        if (this.currentUser.avatar.startsWith('data:image') || this.currentUser.avatar.startsWith('http')) {
+          avatarHtml = `<img src="${this.currentUser.avatar}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">`;
+        } else {
+          avatarHtml = `<span style="width: 22px; height: 22px; border-radius: 50%; background: var(--primary-light); display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0;">${this.currentUser.avatar}</span>`;
+        }
+      }
+
       container.innerHTML = `
-        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
-          <span style="width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--bg-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${initial}</span>
+        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
+          ${avatarHtml}
           <span style="color: var(--text-main); font-weight: 600; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.currentUser.username}</span>
-          <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="修改密码">🔑 改密</button>
+          <button id="btn-open-avatar-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="设置头像">🖼️ 头像</button>
+          <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px;" title="修改密码">🔑 改密</button>
           <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px;" title="退出登录">退出</button>
         </div>
       `;
+      const avatarBtn = container.querySelector('#btn-open-avatar-modal');
+      if (avatarBtn) {
+        avatarBtn.onclick = (e) => {
+          e.stopPropagation();
+          this.openAvatarModal();
+        };
+      }
       const pwdBtn = container.querySelector('#btn-open-pwd-modal');
       if (pwdBtn) {
         pwdBtn.onclick = (e) => {
@@ -86,6 +104,59 @@ const App = {
         loginBtn.onclick = () => this.openAuthModal();
       }
     }
+  },
+
+  openAvatarModal() {
+    if (!this.currentUser) return;
+    const modal = document.getElementById('avatar-modal');
+    this.tempSelectedAvatar = this.currentUser.avatar || '🐱';
+    this.updateAvatarPreviewUI(this.tempSelectedAvatar);
+
+    document.querySelectorAll('.avatar-preset-item').forEach(btn => {
+      if (btn.getAttribute('data-avatar') === this.tempSelectedAvatar) {
+        btn.style.borderColor = 'var(--primary)';
+      } else {
+        btn.style.borderColor = 'transparent';
+      }
+    });
+
+    const fileInput = document.getElementById('input-avatar-file');
+    if (fileInput) fileInput.value = null;
+
+    if (modal) modal.classList.remove('hidden');
+  },
+
+  closeAvatarModal() {
+    const modal = document.getElementById('avatar-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  updateAvatarPreviewUI(avatarValue) {
+    const previewEl = document.getElementById('avatar-current-preview');
+    if (!previewEl) return;
+
+    if (avatarValue && (avatarValue.startsWith('data:image') || avatarValue.startsWith('http'))) {
+      previewEl.innerHTML = `<img src="${avatarValue}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    } else {
+      previewEl.innerHTML = avatarValue || '🐱';
+    }
+  },
+
+  saveAvatar() {
+    if (!this.currentUser) return;
+
+    this.currentUser.avatar = this.tempSelectedAvatar;
+    localStorage.setItem('knitflow_current_user', JSON.stringify(this.currentUser));
+
+    const user = this.registeredUsers.find(u => u.id === this.currentUser.id);
+    if (user) {
+      user.avatar = this.tempSelectedAvatar;
+      localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
+    }
+
+    this.renderUserAuthUI();
+    this.closeAvatarModal();
+    this.showToast('🎉 头像设置成功！');
   },
 
   openAuthModal() {
@@ -2228,6 +2299,40 @@ const App = {
         const confirmP = document.getElementById('pwd-confirm').value;
         this.changePassword(oldP, newP, confirmP);
       };
+    }
+
+    addClick('btn-close-avatar-modal', () => this.closeAvatarModal());
+    addClick('btn-cancel-avatar', () => this.closeAvatarModal());
+    addClick('btn-save-avatar', () => this.saveAvatar());
+
+    document.querySelectorAll('.avatar-preset-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-avatar');
+        this.tempSelectedAvatar = val;
+        this.updateAvatarPreviewUI(val);
+        document.querySelectorAll('.avatar-preset-item').forEach(b => b.style.borderColor = 'transparent');
+        btn.style.borderColor = 'var(--primary)';
+      });
+    });
+
+    const avatarFileInput = document.getElementById('input-avatar-file');
+    if (avatarFileInput) {
+      avatarFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.size > 2 * 1024 * 1024) {
+            alert('图片文件大小不能超过 2MB，请重新选择较小的图片！');
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            this.tempSelectedAvatar = evt.target.result;
+            this.updateAvatarPreviewUI(this.tempSelectedAvatar);
+            document.querySelectorAll('.avatar-preset-item').forEach(b => b.style.borderColor = 'transparent');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     }
 
     // 仪表盘大厅跳转
