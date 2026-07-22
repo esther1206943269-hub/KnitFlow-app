@@ -1985,28 +1985,43 @@ input:checked + .switch-slider:before {
   }
 }
 
-/* Modal Overlay Styling */
+/* Modal Overlay & Backdrop Floating Center Styling */
+.modal-backdrop,
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  box-sizing: border-box !important;
 }
 
+.modal-backdrop.hidden,
 .modal-overlay.hidden {
   display: none !important;
 }
 
-.modal-card {
-  animation: modalFadeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+.modal-card,
+.auth-modal-card {
+  position: relative !important;
+  margin: auto !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
+  animation: modalFadeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 @keyframes modalFadeIn {
