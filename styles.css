@@ -2016,11 +2016,17 @@ input:checked + .switch-slider:before {
   margin: auto !important;
   max-height: 90vh !important;
   overflow-y: auto !important;
-  background: var(--card-bg) !important;
-  border: 1px solid var(--card-border) !important;
+  background: #FAF6F0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
   border-radius: var(--radius-lg) !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+  opacity: 1 !important;
   animation: modalFadeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+body.dark-mode .modal-card {
+  background: #242424 !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* 登录/注册/密码管理弹窗：精致温柔浅粉色配色 */
