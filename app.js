@@ -38,6 +38,45 @@ const App = {
     this.renderProjectList();
     this.renderPresetTemplates();
     this.setupKeyboardShortcuts();
+
+    // 全球访问量 / PV 浏览量统计
+    this.trackPageview();
+  },
+
+  async trackPageview() {
+    const el = document.getElementById('pageview-count-number');
+    let count = parseInt(localStorage.getItem('knitflow_pageview_count') || '108', 10);
+
+    const hasVisitedSession = sessionStorage.getItem('knitflow_visited_session');
+    if (!hasVisitedSession) {
+      count++;
+      sessionStorage.setItem('knitflow_visited_session', 'true');
+      localStorage.setItem('knitflow_pageview_count', count.toString());
+    }
+
+    if (el) {
+      el.textContent = `${count.toLocaleString()} 次访问`;
+    }
+
+    try {
+      const endpoint = hasVisitedSession 
+        ? 'https://api.counterapi.dev/v1/knitflow_app_official_views/pageviews'
+        : 'https://api.counterapi.dev/v1/knitflow_app_official_views/pageviews/up';
+
+      const res = await fetch(endpoint);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && typeof json.count === 'number') {
+          const cloudCount = json.count;
+          if (el) {
+            el.textContent = `${cloudCount.toLocaleString()} 次访问`;
+          }
+          localStorage.setItem('knitflow_pageview_count', cloudCount.toString());
+        }
+      }
+    } catch (e) {
+      console.warn('云端浏览量统计连线跳过：', e);
+    }
   },
 
   // ==========================================================================

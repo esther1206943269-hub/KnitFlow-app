@@ -17,7 +17,12 @@
       <div class="logo-area" id="btn-home">
         <h1>KnitFlow <span class="subtitle">编织行行好</span></h1>
       </div>
-      <div class="header-actions" style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="header-actions" style="display: flex; align-items: center; gap: 0.65rem;">
+        <!-- 网页浏览量统计 Badge -->
+        <div id="pageview-counter-badge" style="display: flex; align-items: center; gap: 4px; background: rgba(209, 142, 151, 0.12); color: var(--primary); padding: 0.25rem 0.65rem; border-radius: 16px; font-size: 0.78rem; font-weight: 600; border: 1px solid rgba(209, 142, 151, 0.25); white-space: nowrap;" title="网页累计访问次数 / Total Pageviews">
+          <span style="font-size: 0.85rem;">👀</span>
+          <span id="pageview-count-number">...</span>
+        </div>
         <div id="user-auth-entry" class="user-auth-entry">
           <!-- Rendered dynamically by App.renderUserAuthUI() -->
         </div>
