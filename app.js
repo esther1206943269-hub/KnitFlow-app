@@ -33,9 +33,12 @@ const App = {
     try {
       const stored = localStorage.getItem('knitflow_projects');
       const parsed = stored ? JSON.parse(stored) : null;
-      this.projects = (parsed && Array.isArray(parsed) && parsed.length > 0) ? parsed : this.getSampleProjects();
+      this.projects = (parsed && Array.isArray(parsed)) ? parsed : [];
       
-      // 自动迁移旧项目，确保都有 referenceLinks 数组
+      // 过滤清空初始示例项目 sample-text 和 sample-grid
+      this.projects = this.projects.filter(p => p.id !== 'sample-text' && p.id !== 'sample-grid');
+      
+      // 自动迁移项目，确保都有 referenceLinks 数组
       this.projects.forEach(p => {
         if (!p.referenceLinks) {
           p.referenceLinks = [];
@@ -45,8 +48,8 @@ const App = {
         }
       });
     } catch (e) {
-      console.error('加载本地项目失败，将使用初始样例：', e);
-      this.projects = this.getSampleProjects();
+      console.error('加载本地项目失败：', e);
+      this.projects = [];
     }
   },
 
@@ -95,53 +98,7 @@ const App = {
   },
 
   getSampleProjects() {
-    return [
-      {
-        id: 'sample-text',
-        name: 'Winter Cable Scarf (Written)',
-        type: 'text',
-        currentLoc: 1,
-        totalTime: 120, // 2 mins
-        referenceLinks: [
-          { title: '🎥 Scarf Knitting Video Guide', url: 'https://www.youtube.com', memo: 'Cast-on and basic stitch demo for beginners' },
-          { title: '📖 Cable Stitch Diagram Tutorial', url: 'https://www.google.com', memo: 'Used for Row 3 and Row 4 cable twists' }
-        ],
-        updatedAt: new Date().toISOString(),
-        data: [
-          { rowNum: 1, text: 'R1 (RS): Knit all stitches (K100)' },
-          { rowNum: 2, text: 'R2 (WS): Purl all stitches (P100)' },
-          { rowNum: 3, text: 'R3 (RS): K3, P3 repeat across' },
-          { rowNum: 4, text: 'R4 (WS): P3, K3 repeat across' },
-          { rowNum: 5, text: 'R5-10: Repeat Row 3 & Row 4' }
-        ]
-      },
-      {
-        id: 'sample-grid',
-        name: 'Nordic Snowflake Jacquard (Grid)',
-        type: 'grid',
-        currentLoc: 1,
-        knitType: 'flat',
-        totalTime: 45,
-        referenceLinks: [
-          { title: '🎥 Fair Isle Stranded Knitting Guide', url: 'https://www.youtube.com', memo: 'How to manage float yarn tension on WS' },
-          { title: '📖 Elastic Two-Color Bind-Off', url: 'https://www.google.com', memo: 'Recommended for final bind off row' }
-        ],
-        updatedAt: new Date().toISOString(),
-        // 10*10 网格，第一行在最底 data[0]
-        data: [
-          ['k', 'k', 'yo', 'yo', 'k', 'k', 'yo', 'yo', 'k', 'k'],
-          ['k', 'p', 'k', 'p', 'k', 'p', 'k', 'p', 'k', 'p'],
-          ['yo', 'yo', 'k', 'k', 'yo', 'yo', 'k', 'k', 'yo', 'yo'],
-          ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-          ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k'],
-          ['c1', 'c1', 'c2', 'c2', 'c1', 'c1', 'c2', 'c2', 'c1', 'c1'],
-          ['c2', 'c2', 'c1', 'c1', 'c2', 'c2', 'c1', 'c1', 'c2', 'c2'],
-          ['ssk', 'k', 'k', 'k', 'yo', 'yo', 'k', 'k', 'k', 'k2tog'],
-          ['k', 'ssk', 'k', 'yo', 'k', 'k', 'yo', 'k', 'k2tog', 'k'],
-          ['k', 'k', 'ssk', 'yo', 'k', 'k', 'yo', 'k2tog', 'k', 'k']
-        ]
-      }
-    ];
+    return [];
   },
 
   // ==========================================================================
