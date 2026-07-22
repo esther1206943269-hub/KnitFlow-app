@@ -740,7 +740,7 @@ const App = {
       const typeLabel = p.type === 'text' ? 'Written' : 'Grid';
       const specsLabel = p.type === 'text' ? `${totalRows} Rows` : `Size ${colCount}×${totalRows}`;
 
-      const coverSrc = (p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'default_project_cover.png';
+      const coverSrc = (p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'knitting_cover.png';
 
       item.innerHTML = `
         <!-- 左上角完成标记勾选按钮 -->
@@ -750,7 +750,7 @@ const App = {
 
         <div class="project-info" title="点击开始编织此项目">
           <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff; position: relative;">
-            <img src="${coverSrc}" style="width: 100%; height: 100%; object-fit: contain; padding: 3px; box-sizing: border-box;" alt="${p.name} Cover" onerror="this.src='default_project_cover.png'">
+            <img src="${coverSrc}" style="width: 100%; height: 100%; object-fit: contain; padding: 3px; box-sizing: border-box;" alt="${p.name} Cover" onerror="this.src='knitting_cover.png'">
           </div>
           <div class="project-name" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
             <span>${p.name}</span>
@@ -3177,7 +3177,7 @@ const App = {
     let renderedCount = 0;
 
     // 统一的精致编织图标（棒针+毛线球）
-    const unifiedIconSvg = `<span class="chip-icon" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;"><img src="knitting_icon.png" alt="knitting" style="width: 48px; height: 48px; object-fit: contain; display: block;"></span>`;
+    const unifiedIconSvg = `<span class="chip-icon" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;"><img src="knitting_cover.png" alt="knitting" style="width: 48px; height: 48px; object-fit: contain; display: block;"></span>`;
 
     // 1. 渲染内置预设模板（如果未被用户删除）
     Object.entries(builtins).forEach(([key, tpl]) => {
