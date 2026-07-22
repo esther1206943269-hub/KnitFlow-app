@@ -226,29 +226,29 @@
               <span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">自动保存 / Auto-saved</span>
             </div>
 
-            <!-- 3大核心快速参数结构表 -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 0.8rem;">
+            <!-- 3大核心快速参数单列宽敞表 (解决文字显示不全问题) -->
+            <div style="display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 0.85rem;">
               <!-- 针号 -->
-              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
-                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🪡 针号 / Needle</label>
-                <input type="text" id="text-notes-needle" class="input-project-needle" placeholder="例如：4.5mm 环针" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              <div style="display: flex; align-items: center; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.7rem; gap: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 105px; flex-shrink: 0;">🪡 针号 / Needle:</span>
+                <input type="text" id="text-notes-needle" class="input-project-needle" placeholder="例如：4.5mm 环针" style="flex: 1; width: 100%; border: none; background: transparent; font-size: 0.82rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
               </div>
               <!-- 线材 -->
-              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
-                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🧶 线材 / Yarn</label>
-                <input type="text" id="text-notes-yarn" class="input-project-yarn" placeholder="例如：美丽诺羊毛 150g" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              <div style="display: flex; align-items: center; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.7rem; gap: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 105px; flex-shrink: 0;">🧶 线材 / Yarn:</span>
+                <input type="text" id="text-notes-yarn" class="input-project-yarn" placeholder="例如：美丽诺羊毛 150g" style="flex: 1; width: 100%; border: none; background: transparent; font-size: 0.82rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
               </div>
-              <!-- 密度/小样 -->
-              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
-                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">📏 密度小样 / Gauge</label>
-                <input type="text" id="text-notes-gauge" class="input-project-gauge" placeholder="例如：10cm=22针×30行" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              <!-- 密度小样 -->
+              <div style="display: flex; align-items: center; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.7rem; gap: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 105px; flex-shrink: 0;">📏 密度小样 / Gauge:</span>
+                <input type="text" id="text-notes-gauge" class="input-project-gauge" placeholder="例如：10cm=22针×30行" style="flex: 1; width: 100%; border: none; background: transparent; font-size: 0.82rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
               </div>
             </div>
 
             <!-- 自由文本备注区域 -->
             <div>
-              <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">自由备注与心得 / Memo & Notes:</label>
-              <textarea id="text-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录起针数、尺寸改动、洗涤注意、送人名字等编织心得..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">自由备注 / Notes:</label>
+              <textarea id="text-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录任何细节..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
             </div>
           </div>
 
@@ -417,29 +417,29 @@
               <span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">自动保存 / Auto-saved</span>
             </div>
 
-            <!-- 3大核心快速参数结构表 -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 0.8rem;">
+            <!-- 3大核心快速参数单列宽敞表 (解决文字显示不全问题) -->
+            <div style="display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 0.85rem;">
               <!-- 针号 -->
-              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
-                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🪡 针号 / Needle</label>
-                <input type="text" id="grid-notes-needle" class="input-project-needle" placeholder="例如：4.5mm 环针" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              <div style="display: flex; align-items: center; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.7rem; gap: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 105px; flex-shrink: 0;">🪡 针号 / Needle:</span>
+                <input type="text" id="grid-notes-needle" class="input-project-needle" placeholder="例如：4.5mm 环针" style="flex: 1; width: 100%; border: none; background: transparent; font-size: 0.82rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
               </div>
               <!-- 线材 -->
-              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
-                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🧶 线材 / Yarn</label>
-                <input type="text" id="grid-notes-yarn" class="input-project-yarn" placeholder="例如：美丽诺羊毛 150g" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              <div style="display: flex; align-items: center; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.7rem; gap: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 105px; flex-shrink: 0;">🧶 线材 / Yarn:</span>
+                <input type="text" id="grid-notes-yarn" class="input-project-yarn" placeholder="例如：美丽诺羊毛 150g" style="flex: 1; width: 100%; border: none; background: transparent; font-size: 0.82rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
               </div>
-              <!-- 密度/小样 -->
-              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
-                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">📏 密度小样 / Gauge</label>
-                <input type="text" id="grid-notes-gauge" class="input-project-gauge" placeholder="例如：10cm=22针×30行" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              <!-- 密度小样 -->
+              <div style="display: flex; align-items: center; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.7rem; gap: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 105px; flex-shrink: 0;">📏 密度小样 / Gauge:</span>
+                <input type="text" id="grid-notes-gauge" class="input-project-gauge" placeholder="例如：10cm=22针×30行" style="flex: 1; width: 100%; border: none; background: transparent; font-size: 0.82rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
               </div>
             </div>
 
             <!-- 自由文本备注区域 -->
             <div>
-              <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">自由备注与心得 / Memo & Notes:</label>
-              <textarea id="grid-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录起针数、尺寸改动、洗涤注意、送人名字等编织心得..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">自由备注 / Notes:</label>
+              <textarea id="grid-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录任何细节..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
             </div>
           </div>
         </div>
@@ -701,9 +701,9 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
   <div id="toast" class="toast hidden"></div>
 
   <!-- 引入逻辑脚本 (添加版本序列，绕过浏览器本地与 CDN 静态缓存) -->
-  <script src="speech.js?v=20260722_13"></script>
-  <script src="parser.js?v=20260722_13"></script>
-  <script src="grid.js?v=20260722_13"></script>
-  <script src="app.js?v=20260722_13"></script>
+  <script src="speech.js?v=20260722_14"></script>
+  <script src="parser.js?v=20260722_14"></script>
+  <script src="grid.js?v=20260722_14"></script>
+  <script src="app.js?v=20260722_14"></script>
 </body>
 </html>
