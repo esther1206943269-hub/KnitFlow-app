@@ -499,29 +499,7 @@ const Grid = {
       svg.appendChild(textR);
     }
 
-    // 若开启收针点，绘制最顶侧左右收针(正面/反面)标记文字
-    if (this.showBindOffDots) {
-      const boY = 15;
-      const textL_bo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      textL_bo.setAttribute('x', axisSize - textMargin);
-      textL_bo.setAttribute('y', boY);
-      textL_bo.setAttribute('text-anchor', 'end');
-      textL_bo.setAttribute('font-size', '9px');
-      textL_bo.setAttribute('font-weight', '700');
-      textL_bo.setAttribute('fill', bindOffInfo.color);
-      textL_bo.textContent = bindOffInfo.shortLabel;
-      svg.appendChild(textL_bo);
 
-      const textR_bo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      textR_bo.setAttribute('x', svgWidth - axisSize + textMargin);
-      textR_bo.setAttribute('y', boY);
-      textR_bo.setAttribute('text-anchor', 'start');
-      textR_bo.setAttribute('font-size', '9px');
-      textR_bo.setAttribute('font-weight', '700');
-      textR_bo.setAttribute('fill', bindOffInfo.color);
-      textR_bo.textContent = bindOffInfo.shortLabel;
-      svg.appendChild(textR_bo);
-    }
 
     // 针目序号 (上下两侧均绘制) 与最顶端收针点 (Bind-off Dots)
     // 编织习惯：从右往左数针目！右下角是第一针！
