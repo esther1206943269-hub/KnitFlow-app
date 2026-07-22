@@ -1734,7 +1734,11 @@ const App = {
   updateBindOffDotsUI() {
     const statusEl = document.getElementById('bindoff-dots-status');
     if (statusEl) {
-      statusEl.textContent = Grid.showBindOffDots ? '⚫ 收针点: 显' : '⚪ 收针点: 隐';
+      const info = Grid.getBindOffInfo();
+      statusEl.textContent = Grid.showBindOffDots ? `⚫ 收针点: 显 (${info.shortLabel})` : '⚪ 收针点: 隐';
+      if (statusEl.parentElement) {
+        statusEl.parentElement.title = `收针行：第 ${info.rowNum} 行 - ${info.label} ${info.directionText}`;
+      }
     }
   },
 
@@ -1746,7 +1750,8 @@ const App = {
     }
     this.updateBindOffDotsUI();
     this.renderGridCanvas();
-    this.showToast(Grid.showBindOffDots ? '已显示最上方收针指示点 (Bind-off Dots)' : '已隐藏最上方收针指示点');
+    const info = Grid.getBindOffInfo();
+    this.showToast(Grid.showBindOffDots ? `已显示顶层 ${info.label} 指示点` : '已隐藏顶层收针指示点');
   },
 
   updateGridPlayerUIState() {

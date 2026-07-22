@@ -412,12 +412,35 @@ const Grid = {
    * @param {HTMLElement} container 容器元素
    * @param {number} activeRow 当前活跃行号 (1-indexed)
    * @param {Function} onCellClick 单元格点击回调
+  getBindOffInfo() {
+    const bindOffRow = this.height + 1;
+    const isFlat = this.knitType === 'flat';
+    const isOdd = bindOffRow % 2 !== 0;
+    // 片织奇数行为正面(RS)，偶数行为反面(WS)；圈织均为正面(RS)
+    const isRS = (!isFlat) || isOdd;
+    
+    return {
+      rowNum: bindOffRow,
+      isRS: isRS,
+      label: isRS ? '正面行收针 (RS Bind-off)' : '反面行收针 (WS Bind-off)',
+      shortLabel: isRS ? '收针(正面)' : '收针(反面)',
+      color: isRS ? '#D18E97' : '#839958',
+      directionText: isRS ? '【从右向左 ←】' : '【从左向右 →】'
+    };
+  },
+
+  /**
+   * 渲染 SVG 网格
+   * @param {HTMLElement} container 容器元素
+   * @param {number} activeRow 当前活跃行号 (1-indexed)
+   * @param {Function} onCellClick 单元格点击回调
    */
   render(container, activeRow, onCellClick) {
     container.innerHTML = '';
     
+    const bindOffInfo = this.getBindOffInfo();
     const baseCellSize = 30; // 每个格子的基础像素尺寸
-    const axisSize = this.showBindOffDots ? 34 : 25; // 边框坐标轴大小 (若开启收针点，顶部留出更高空间)
+    const axisSize = this.showBindOffDots ? 36 : 25; // 边框坐标轴大小 (若开启收针点，顶部留出更高空间)
     const textMargin = 5;
 
     const baseSvgWidth = this.width * baseCellSize + axisSize * 2;
@@ -472,6 +495,30 @@ const Grid = {
       svg.appendChild(textR);
     }
 
+    // 若开启收针点，绘制最顶侧左右收针(正面/反面)标记文字
+    if (this.showBindOffDots) {
+      const boY = 15;
+      const textL_bo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textL_bo.setAttribute('x', axisSize - textMargin);
+      textL_bo.setAttribute('y', boY);
+      textL_bo.setAttribute('text-anchor', 'end');
+      textL_bo.setAttribute('font-size', '9px');
+      textL_bo.setAttribute('font-weight', '700');
+      textL_bo.setAttribute('fill', bindOffInfo.color);
+      textL_bo.textContent = bindOffInfo.shortLabel;
+      svg.appendChild(textL_bo);
+
+      const textR_bo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textR_bo.setAttribute('x', svgWidth - axisSize + textMargin);
+      textR_bo.setAttribute('y', boY);
+      textR_bo.setAttribute('text-anchor', 'start');
+      textR_bo.setAttribute('font-size', '9px');
+      textR_bo.setAttribute('font-weight', '700');
+      textR_bo.setAttribute('fill', bindOffInfo.color);
+      textR_bo.textContent = bindOffInfo.shortLabel;
+      svg.appendChild(textR_bo);
+    }
+
     // 针目序号 (上下两侧均绘制) 与最顶端收针点 (Bind-off Dots)
     // 编织习惯：从右往左数针目！右下角是第一针！
     for (let c = 0; c < this.width; c++) {
@@ -491,7 +538,7 @@ const Grid = {
       // 顶部针目号
       const textT = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       textT.setAttribute('x', x);
-      textT.setAttribute('y', this.showBindOffDots ? 26 : axisSize - 8);
+      textT.setAttribute('y', this.showBindOffDots ? 28 : axisSize - 8);
       textT.setAttribute('text-anchor', 'middle');
       textT.setAttribute('font-size', '10px');
       textT.setAttribute('fill', '#867970');
@@ -502,13 +549,13 @@ const Grid = {
       if (this.showBindOffDots) {
         const dot = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
         dot.setAttribute('cx', x);
-        dot.setAttribute('cy', 11);
+        dot.setAttribute('cy', 12);
         dot.setAttribute('rx', 6.5);
         dot.setAttribute('ry', 3.8);
         dot.setAttribute('fill', '#2c2825');
         dot.setAttribute('class', 'bind-off-dot');
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-        title.textContent = `第 ${colNum} 针收针点 / Bind-off Stitch ${colNum}`;
+        title.textContent = `第 ${colNum} 针收针点 - ${bindOffInfo.label} ${bindOffInfo.directionText}`;
         dot.appendChild(title);
         svg.appendChild(dot);
       }
