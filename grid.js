@@ -70,14 +70,14 @@ const Grid = {
         return '<path d="M 19.2 3.6 L 4.08 18.96 M 19.92 18.96 L 12.48 10.56 M 6.48 19.2 L 17.04 19.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'k2tog': // 左上二针并一针 (k2tog): 人字型 (无底部横线)
         return '<path d="M 19.2 3.6 L 4.08 18.96 M 19.92 18.96 L 12.48 10.56" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'krl': // 右加针: 竖线 + 右上斜T臂
-        return '<line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="12" x2="19" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'prl': // 上针的右加针: 竖线 + 右上斜T臂 + 底部横线
-        return '<line x1="12" y1="4" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="11" x2="19" y2="7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'kll': // 左加针: 竖线 + 左上斜T臂
-        return '<line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="12" x2="5" y2="8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
-      case 'pll': // 上针的左加针: 竖线 + 左上斜T臂 + 底部横线
-        return '<line x1="12" y1="4" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="11" x2="5" y2="7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+      case 'krl': // 右加针: 100% 用户原版 SVG 代码 (M 24 30 L 24 72 M 24 53 L 78 34)
+        return '<path d="M 5.76 7.2 L 5.76 17.28 M 5.76 12.72 L 18.72 8.16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'prl': // 上针的右加针: 100% 用户原版 SVG 代码 (含底部横线 M 18 80 L 30 80)
+        return '<path d="M 5.76 7.2 L 5.76 17.28 M 5.76 12.72 L 18.72 8.16 M 4.32 19.2 L 7.2 19.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'kll': // 左加针: 右加针的镜像对称路径
+        return '<path d="M 18.24 7.2 L 18.24 17.28 M 18.24 12.72 L 5.28 8.16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'pll': // 上针的左加针: 右加针镜像 + 底部横线
+        return '<path d="M 18.24 7.2 L 18.24 17.28 M 18.24 12.72 L 5.28 8.16 M 16.8 19.2 L 19.68 19.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
       case 'c21': // 右上2针与1针的交叉针: 2斜线交叉1斜线
         return '<line x1="4" y1="19" x2="18" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="19" x2="22" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="19" x2="4" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       default:
