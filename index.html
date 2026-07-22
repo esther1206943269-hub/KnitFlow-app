@@ -484,7 +484,10 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
           <input type="text" id="login-account" placeholder="Email, phone or username" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
         </div>
         <div class="form-group" style="margin-bottom: 0;">
-          <label for="login-password" style="font-size: 0.8rem; font-weight: 500;">密码 / Password</label>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label for="login-password" style="font-size: 0.8rem; font-weight: 500;">密码 / Password</label>
+            <button type="button" id="btn-open-forgot-pwd" style="background: none; border: none; font-size: 0.76rem; color: var(--primary); cursor: pointer; text-decoration: underline; padding: 0;">忘记密码？</button>
+          </div>
           <input type="password" id="login-password" placeholder="输入你的登录密码" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
         </div>
         <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">登录账号 / Log In</button>
@@ -505,6 +508,40 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
           <input type="password" id="reg-password" placeholder="至少 6 位密码" minlength="6" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
         </div>
         <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">注册并开始使用 / Sign Up</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 模态框：忘记密码/邮箱重置密码 -->
+  <div id="forgot-pwd-modal" class="modal-backdrop hidden">
+    <div class="modal-card auth-modal-card" style="max-width: 400px; padding: 1.5rem; position: relative;">
+      <button class="modal-close-btn" id="btn-close-forgot-pwd-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      
+      <div class="auth-header" style="text-align: center; margin-bottom: 1.2rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">📧 找回密码 / Reset Password</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">通过绑定的注册邮箱或手机号重置密码</p>
+      </div>
+
+      <form id="form-forgot-pwd" class="auth-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="forgot-account" style="font-size: 0.8rem; font-weight: 500;">注册邮箱或手机号 / Registered Email or Phone</label>
+          <input type="text" id="forgot-account" placeholder="输入注册时的邮箱或手机号" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="forgot-code" style="font-size: 0.8rem; font-weight: 500;">邮箱验证码 / Verification Code</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="forgot-code" placeholder="6 位验证码" required maxlength="6" style="flex: 1; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+            <button type="button" id="btn-send-forgot-code" class="btn secondary" style="padding: 0.45rem 0.75rem; font-size: 0.78rem; font-weight: 600; flex-shrink: 0; white-space: nowrap;">获取验证码</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="forgot-new-pwd" style="font-size: 0.8rem; font-weight: 500;">设置新密码 / New Password</label>
+          <input type="password" id="forgot-new-pwd" placeholder="至少 6 位新密码" minlength="6" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+
+        <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">重置密码并继续登录 / Reset Password</button>
       </form>
     </div>
   </div>

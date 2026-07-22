@@ -181,6 +181,105 @@ const App = {
     if (modal) modal.classList.add('hidden');
   },
 
+  openForgotPwdModal() {
+    this.closeAuthModal();
+    const modal = document.getElementById('forgot-pwd-modal');
+    const accInput = document.getElementById('forgot-account');
+    const codeInput = document.getElementById('forgot-code');
+    const pwdInput = document.getElementById('forgot-new-pwd');
+
+    if (accInput) accInput.value = '';
+    if (codeInput) codeInput.value = '';
+    if (pwdInput) pwdInput.value = '';
+
+    if (modal) modal.classList.remove('hidden');
+  },
+
+  closeForgotPwdModal() {
+    const modal = document.getElementById('forgot-pwd-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  sendResetCode() {
+    const accInput = document.getElementById('forgot-account');
+    const account = accInput ? accInput.value.trim() : '';
+
+    if (!account) {
+      alert('请先输入注册时的邮箱或手机号！');
+      return;
+    }
+
+    // 搜索注册用户
+    const cleanAcc = account.toLowerCase();
+    const user = this.registeredUsers.find(u => u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc);
+    if (!user) {
+      alert(`未找到账号 “${account}”，请确认是否已注册！`);
+      return;
+    }
+
+    // 生成随机 6 位验证码
+    this.generatedResetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    this.resetCodeTargetAccount = user.account;
+
+    const sendBtn = document.getElementById('btn-send-forgot-code');
+    if (sendBtn) {
+      let countdown = 60;
+      sendBtn.disabled = true;
+      sendBtn.textContent = `重发 (${countdown}s)`;
+      const timer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(timer);
+          sendBtn.disabled = false;
+          sendBtn.textContent = '获取验证码';
+        } else {
+          sendBtn.textContent = `重发 (${countdown}s)`;
+        }
+      }, 1000);
+    }
+
+    alert(`📩 【邮箱验证码已模拟发送】\n\n您的验证码为：${this.generatedResetCode}\n（已成功模拟发送至注册邮箱 ${user.account}）`);
+    this.showToast(`📩 验证码：${this.generatedResetCode} (已模拟发送)`);
+  },
+
+  resetPasswordWithCode(account, code, newPwd) {
+    const cleanAcc = account.trim().toLowerCase();
+    const cleanCode = code.trim();
+
+    if (!cleanAcc) {
+      alert('请输入注册时的邮箱或手机号！');
+      return;
+    }
+    if (!cleanCode) {
+      alert('请输入收到的验证码！');
+      return;
+    }
+    if (cleanCode !== this.generatedResetCode) {
+      alert('验证码输入不正确，请核对后再试！');
+      return;
+    }
+    if (!newPwd || newPwd.length < 6) {
+      alert('新密码长度不能少于 6 位字符！');
+      return;
+    }
+
+    const user = this.registeredUsers.find(u => u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc || (this.resetCodeTargetAccount && u.account.toLowerCase() === this.resetCodeTargetAccount.toLowerCase()));
+    if (!user) {
+      alert('未找到对应账号，重置失败！');
+      return;
+    }
+
+    user.password = newPwd;
+    localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
+
+    this.generatedResetCode = null;
+    this.resetCodeTargetAccount = null;
+
+    this.closeForgotPwdModal();
+    this.openAuthModal();
+    this.showToast(`🎉 账号 [${user.username}] 密码重置成功！请输入新密码登录。`);
+  },
+
   openChangePwdModal() {
     if (!this.currentUser) return;
     const modal = document.getElementById('change-pwd-modal');
@@ -2353,6 +2452,21 @@ const App = {
         const acc = document.getElementById('reg-account').value;
         const pwd = document.getElementById('reg-password').value;
         this.registerUser(user, acc, pwd);
+      };
+    }
+
+    addClick('btn-open-forgot-pwd', () => this.openForgotPwdModal());
+    addClick('btn-close-forgot-pwd-modal', () => this.closeForgotPwdModal());
+    addClick('btn-send-forgot-code', () => this.sendResetCode());
+
+    const forgotForm = document.getElementById('form-forgot-pwd');
+    if (forgotForm) {
+      forgotForm.onsubmit = (e) => {
+        e.preventDefault();
+        const acc = document.getElementById('forgot-account').value;
+        const code = document.getElementById('forgot-code').value;
+        const newPwd = document.getElementById('forgot-new-pwd').value;
+        this.resetPasswordWithCode(acc, code, newPwd);
       };
     }
 
