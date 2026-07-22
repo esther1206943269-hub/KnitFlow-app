@@ -2151,6 +2151,23 @@ const App = {
         <input type="range" class="popover-opacity-input" min="10" max="100" value="${initialAlpha}" style="width: 100%; cursor: pointer;">
       </div>
 
+      <!-- 如果是下针，提供 竖线 | 与 空白格 □ 符号表达形式切换 -->
+      ${(key === 'k' || (st && st.baseStitch === 'k')) ? `
+        <div style="border-top: 1px dashed var(--card-border); padding-top: 0.45rem; margin-top: 0.1rem; display: flex; flex-direction: column; gap: 0.35rem;">
+          <label style="font-size: 0.76rem; font-weight: 700; color: var(--primary); display: block;">下针符号表达 / Symbol Style:</label>
+          <div style="display: flex; gap: 0.8rem; font-size: 0.78rem;">
+            <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-main); font-weight: 500;">
+              <input type="radio" name="popover-k-symbol-mode" value="line" ${(st.symbolMode !== 'blank') ? 'checked' : ''} style="cursor: pointer;">
+              <span>竖线 ( | )</span>
+            </label>
+            <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-main); font-weight: 500;">
+              <input type="radio" name="popover-k-symbol-mode" value="blank" ${(st.symbolMode === 'blank') ? 'checked' : ''} style="cursor: pointer;">
+              <span>空白格 (□)</span>
+            </label>
+          </div>
+        </div>
+      ` : ''}
+
       <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.2rem;">
         <button class="btn text-btn popover-save-btn" style="padding: 0.35rem 0.85rem; font-size: 0.82rem; background: var(--primary); color: #fff; border-radius: 6px; font-weight: 600; border: none; cursor: pointer;">✅ 完成 / Done</button>
       </div>
@@ -2164,6 +2181,29 @@ const App = {
     const previewBox = popover.querySelector('.popover-color-preview');
     const closeBtn = popover.querySelector('.popover-close-btn');
     const saveBtn = popover.querySelector('.popover-save-btn');
+
+    const symbolRadios = popover.querySelectorAll('input[name="popover-k-symbol-mode"]');
+    if (symbolRadios.length > 0) {
+      symbolRadios.forEach(r => {
+        r.addEventListener('change', () => {
+          const selectedMode = r.value;
+          st.symbolMode = selectedMode;
+          st.symbol = (selectedMode === 'blank') ? '' : '|';
+
+          if (this.currentProject) {
+            if (!this.currentProject.customStitches) {
+              this.currentProject.customStitches = {};
+            }
+            this.currentProject.customStitches[key] = { ...st, symbolMode: selectedMode, symbol: st.symbol };
+            this.saveProjects();
+          }
+
+          this.renderStitchPalette();
+          this.renderStitchLegend();
+          this.renderGridCanvas();
+        });
+      });
+    }
 
     const updateColor = () => {
       const hex = hexInput.value;

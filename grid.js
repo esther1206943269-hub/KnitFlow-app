@@ -71,7 +71,7 @@ const Grid = {
 
   getDefaultStitches() {
     return {
-      'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
+      'k':     { symbol: '|',   symbolMode: 'line', name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
       'p':     { symbol: '—',   name: '上针 (P)',                      color: 'rgba(239, 235, 228, 0.65)', text: '上针 (P)' },
       'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: 'rgba(253, 232, 179, 0.65)', text: '挂针 (YO)' },
       'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: 'rgba(232, 207, 213, 0.65)', text: '扭针 (Ktbl)' },
@@ -94,7 +94,7 @@ const Grid = {
   },
 
   stitches: {
-    'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
+    'k':     { symbol: '|',   symbolMode: 'line', name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
     'p':     { symbol: '—',   name: '上针 (P)',                      color: 'rgba(239, 235, 228, 0.65)', text: '上针 (P)' },
     'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: 'rgba(253, 232, 179, 0.65)', text: '挂针 (YO)' },
     'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: 'rgba(232, 207, 213, 0.65)', text: '扭针 (Ktbl)' },
@@ -134,7 +134,11 @@ const Grid = {
       return `<path d="${multiCfg.path}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
     }
     switch (targetKey) {
-      case 'k': // 下针: 垂直竖线
+      case 'k': // 下针: 竖线 | 或 空白格
+        const kStitch = this.stitches[key] || this.stitches['k'];
+        if (kStitch && kStitch.symbolMode === 'blank') {
+          return ''; // 空白格，不绘制任何符号路径
+        }
         return '<line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
       case 'p': // 上针: 水平横线
         return '<line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
@@ -178,6 +182,10 @@ const Grid = {
     const paths = this.getStitchSVGPaths(key);
     if (!paths) {
       const st = this.stitches[key];
+      const targetKey = (st && st.baseStitch) ? st.baseStitch : key;
+      if (targetKey === 'k' && st && st.symbolMode === 'blank') {
+        return `<span style="font-size: 0.65rem; color: ${color}; opacity: 0.65; font-weight: bold; border: 1px dashed ${color}; padding: 0 2px; border-radius: 2px;">空白</span>`;
+      }
       return `<span style="color: ${color}; font-weight: bold;">${st ? (st.symbol || '') : ''}</span>`;
     }
     return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
