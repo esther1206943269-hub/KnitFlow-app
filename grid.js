@@ -387,7 +387,12 @@ const Grid = {
       svg.appendChild(textT);
     }
 
-    // 2. 绘制单元格网格
+    // 2. 绘制单元格网格 (分为背景层 cellsGroup 与 符号图层 iconsGroup，彻底解决跨格符号被后排单元格背景覆盖遮挡问题)
+    const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const iconsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    svg.appendChild(cellsGroup);
+    svg.appendChild(iconsGroup);
+
     for (let r = 0; r < this.height; r++) {
       const rowNum = r + 1;
       const rowIndex = r; // 0-indexed，底层往上
@@ -403,7 +408,7 @@ const Grid = {
         const x = axisSize + colIndex * cellSize;
         const y = svgHeight - axisSize - (rowIndex + 1) * cellSize;
 
-        // 格子矩形
+        // 格子矩形 (放入背景图层 cellsGroup)
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('x', x);
         rect.setAttribute('y', y);
@@ -440,9 +445,9 @@ const Grid = {
           }
         });
 
-        svg.appendChild(rect);
+        cellsGroup.appendChild(rect);
 
-        // 绘制针法 SVG 矢量符号
+        // 绘制针法 SVG 矢量符号 (放入顶部符号图层 iconsGroup)
         if (stitchKey === 'c21') {
           // 如果前一格 (colIndex - 1) 也是 c21，说明这已经是跨 3 格符号的一部分，跳过避免重复渲染
           if (colIndex > 0 && this.data[rowIndex][colIndex - 1] === 'c21') {
@@ -452,12 +457,12 @@ const Grid = {
             let strokeColor = '#3c3530';
             if (stitch.color) {
               let hex = stitch.color.replace('#', '');
-              if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+              if (hex.length === 3) hex = hex.split('').map(ch => ch + ch).join('');
               if (hex.length === 6) {
-                const r = parseInt(hex.substring(0, 2), 16);
-                const g = parseInt(hex.substring(2, 4), 16);
-                const b = parseInt(hex.substring(4, 6), 16);
-                const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                const red = parseInt(hex.substring(0, 2), 16);
+                const green = parseInt(hex.substring(2, 4), 16);
+                const blue = parseInt(hex.substring(4, 6), 16);
+                const yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
                 if (yiq < 128) strokeColor = 'rgba(255, 255, 255, 0.95)';
               }
             }
@@ -476,7 +481,7 @@ const Grid = {
             group.setAttribute('transform', `translate(${x}, ${y}) scale(${scaleX}, ${scaleY})`);
             group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
             group.innerHTML = '<path d="M 50 15 L 158 85 M 25 80 L 98 62 M 150 15 L 258 85 M 202 38 L 280 20" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>';
-            svg.appendChild(group);
+            iconsGroup.appendChild(group);
           }
         } else {
           const svgPaths = this.getStitchSVGPaths(stitchKey);
@@ -484,12 +489,12 @@ const Grid = {
             let strokeColor = '#3c3530';
             if (stitch.color) {
               let hex = stitch.color.replace('#', '');
-              if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+              if (hex.length === 3) hex = hex.split('').map(ch => ch + ch).join('');
               if (hex.length === 6) {
-                const r = parseInt(hex.substring(0, 2), 16);
-                const g = parseInt(hex.substring(2, 4), 16);
-                const b = parseInt(hex.substring(4, 6), 16);
-                const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                const red = parseInt(hex.substring(0, 2), 16);
+                const green = parseInt(hex.substring(2, 4), 16);
+                const blue = parseInt(hex.substring(4, 6), 16);
+                const yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
                 if (yiq < 128) strokeColor = 'rgba(255, 255, 255, 0.95)';
               }
             }
@@ -501,7 +506,7 @@ const Grid = {
             group.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${iconSize / 24})`);
             group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
             group.innerHTML = svgPaths;
-            svg.appendChild(group);
+            iconsGroup.appendChild(group);
           }
         }
       }
