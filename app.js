@@ -105,7 +105,7 @@ const App = {
           const remoteUsers = json.data.users;
           const mergedMap = new Map();
 
-          // 优先合并远端
+          // 先将远端写入 map
           remoteUsers.forEach(u => {
             if (u && (u.account || u.username)) {
               const key = (u.account || u.username).toLowerCase();
@@ -113,16 +113,36 @@ const App = {
             }
           });
 
-          // 再合并本地
+          // 再用本地数据做字段级智能合并：
+          // 对于每个用户，以本地版本为基准（本地密码最新），
+          // 但如果本地缺少某个资料字段（如 avatar），则保留远端的值。
           this.registeredUsers.forEach(u => {
             if (u && (u.account || u.username)) {
               const key = (u.account || u.username).toLowerCase();
-              mergedMap.set(key, u);
+              if (mergedMap.has(key)) {
+                const remote = mergedMap.get(key);
+                // 字段级合并：本地优先，但缺失的字段从远端补充
+                const merged = Object.assign({}, remote, u);
+                // 特别处理：若本地 avatar 为空而远端有值，用远端的
+                if (!merged.avatar && remote.avatar) merged.avatar = remote.avatar;
+                mergedMap.set(key, merged);
+              } else {
+                mergedMap.set(key, u);
+              }
             }
           });
           
           this.registeredUsers = Array.from(mergedMap.values());
           localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
+
+          // 如果当前已登录用户在合并后的列表里有 avatar，同步回 currentUser
+          if (this.currentUser) {
+            const updated = this.registeredUsers.find(u => u.id === this.currentUser.id);
+            if (updated && updated.avatar && !this.currentUser.avatar) {
+              this.currentUser.avatar = updated.avatar;
+              localStorage.setItem('knitflow_current_user', JSON.stringify(this.currentUser));
+            }
+          }
         }
       }
     } catch (e) {
@@ -527,10 +547,12 @@ const App = {
   },
 
   loginUserObject(userObj, isNewReg = false) {
+    // 保留用户所有资料字段（含 avatar），避免重新登录后头像丢失
     this.currentUser = {
       id: userObj.id,
       username: userObj.username,
-      account: userObj.account
+      account: userObj.account,
+      avatar: userObj.avatar || null
     };
 
     localStorage.setItem('knitflow_current_user', JSON.stringify(this.currentUser));
