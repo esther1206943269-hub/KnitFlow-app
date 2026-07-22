@@ -443,29 +443,66 @@ const Grid = {
         svg.appendChild(rect);
 
         // 绘制针法 SVG 矢量符号
-        const svgPaths = this.getStitchSVGPaths(stitchKey);
-        if (svgPaths) {
-          let strokeColor = '#3c3530';
-          if (stitch.color) {
-            let hex = stitch.color.replace('#', '');
-            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-            if (hex.length === 6) {
-              const r = parseInt(hex.substring(0, 2), 16);
-              const g = parseInt(hex.substring(2, 4), 16);
-              const b = parseInt(hex.substring(4, 6), 16);
-              const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-              if (yiq < 128) strokeColor = 'rgba(255, 255, 255, 0.95)';
+        if (stitchKey === 'c21') {
+          // 如果前一格 (colIndex - 1) 也是 c21，说明这已经是跨 3 格符号的一部分，跳过避免重复渲染
+          if (colIndex > 0 && this.data[rowIndex][colIndex - 1] === 'c21') {
+            // 已在起始格统一跨 3 格绘制，跳过
+          } else {
+            // 这是跨 3 格交叉针的起始单元格，计算 3 格总像素宽度与整体伸展 SVG 路径
+            let strokeColor = '#3c3530';
+            if (stitch.color) {
+              let hex = stitch.color.replace('#', '');
+              if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+              if (hex.length === 6) {
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                if (yiq < 128) strokeColor = 'rgba(255, 255, 255, 0.95)';
+              }
             }
-          }
 
-          const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          const iconSize = 20;
-          const offsetX = x + (cellSize - iconSize) / 2;
-          const offsetY = y + (cellSize - iconSize) / 2;
-          group.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${iconSize / 24})`);
-          group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
-          group.innerHTML = svgPaths;
-          svg.appendChild(group);
+            // 计算实际占据的连续 c21 格子数 (最大 3 格)
+            let spanCount = 1;
+            if (colIndex + 1 < this.width && this.data[rowIndex][colIndex + 1] === 'c21') spanCount++;
+            if (colIndex + 2 < this.width && this.data[rowIndex][colIndex + 2] === 'c21') spanCount++;
+
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            const targetWidth = cellSize * spanCount;
+            const targetHeight = cellSize;
+            const scaleX = targetWidth / 300;
+            const scaleY = targetHeight / 100;
+            
+            group.setAttribute('transform', `translate(${x}, ${y}) scale(${scaleX}, ${scaleY})`);
+            group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
+            group.innerHTML = '<path d="M 50 15 L 158 85 M 25 80 L 98 62 M 150 15 L 258 85 M 202 38 L 280 20" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>';
+            svg.appendChild(group);
+          }
+        } else {
+          const svgPaths = this.getStitchSVGPaths(stitchKey);
+          if (svgPaths) {
+            let strokeColor = '#3c3530';
+            if (stitch.color) {
+              let hex = stitch.color.replace('#', '');
+              if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+              if (hex.length === 6) {
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                if (yiq < 128) strokeColor = 'rgba(255, 255, 255, 0.95)';
+              }
+            }
+
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            const iconSize = 20;
+            const offsetX = x + (cellSize - iconSize) / 2;
+            const offsetY = y + (cellSize - iconSize) / 2;
+            group.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${iconSize / 24})`);
+            group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
+            group.innerHTML = svgPaths;
+            svg.appendChild(group);
+          }
         }
       }
     }
