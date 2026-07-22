@@ -6,38 +6,38 @@
 const Grid = {
   getDefaultStitches() {
     return {
-      'k':     { symbol: '|',   name: '下针 (K)',                    color: '#FFFFFF', text: '下针' },
-      'p':     { symbol: '—',   name: '上针 (P)',                    color: '#EFEBE4', text: '上针' },
-      'yo':    { symbol: '○',   name: '挂针 (YO)',                   color: '#FDE8B3', text: '挂针' },
-      'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
-      'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
-      'ssp':   { symbol: '⋋',   name: '上针的右上二针并一针 (ssp)',   color: '#F7C5BA', text: 'ssp' },
-      'ssk':   { symbol: 'λ',   name: '右上二针并一针 (ssk)',         color: '#F4B8A5', text: 'ssk' },
-      'p2tog': { symbol: '⋌',   name: '上针的左上二针并一针 (p2tog)', color: '#D4E0C8', text: 'p2tog' },
-      'k2tog': { symbol: '人',  name: '左上二针并一针 (k2tog)',       color: '#C3D5B5', text: 'k2tog' },
-      'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                 color: '#D1E3E2', text: 'krl' },
-      'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',          color: '#BACECF', text: 'prl' },
-      'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                 color: '#E3D8ED', text: 'kll' },
-      'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',          color: '#CDBEDC', text: 'pll' },
-      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',         color: '#F3DBBD', text: '交叉针' }
+      'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
+      'p':     { symbol: '—',   name: '上针 (P)',                      color: '#EFEBE4', text: '上针 (P)' },
+      'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: '#FDE8B3', text: '挂针 (YO)' },
+      'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: '#E8CFD5', text: '扭针 (Ktbl)' },
+      'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',               color: '#D6B5BD', text: '扭上针 (p1 tbl)' },
+      'ssp':   { symbol: '⋋',   name: '上针的右上2针并1针 (ssp)',      color: '#F7C5BA', text: '上针的右上2针并1针 (ssp)' },
+      'ssk':   { symbol: 'λ',   name: '右上2针并1针 (ssk)',            color: '#F4B8A5', text: '右上2针并1针 (ssk)' },
+      'p2tog': { symbol: '⋌',   name: '上针的左上2针并1针 (p2tog)',    color: '#D4E0C8', text: '上针的左上2针并1针 (p2tog)' },
+      'k2tog': { symbol: '人',  name: '左上2针并1针 (K2tog)',          color: '#C3D5B5', text: '左上2针并1针 (K2tog)' },
+      'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                  color: '#D1E3E2', text: '右加针 (krl)' },
+      'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: '#BACECF', text: '上针的右加针 (prl)' },
+      'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: '#E3D8ED', text: '左加针 (kll)' },
+      'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: '#CDBEDC', text: '上针的左加针 (pll)' },
+      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' }
     };
   },
 
   stitches: {
-    'k':     { symbol: '|',   name: '下针 (K)',                    color: '#FFFFFF', text: '下针' },
-    'p':     { symbol: '—',   name: '上针 (P)',                    color: '#EFEBE4', text: '上针' },
-    'yo':    { symbol: '○',   name: '挂针 (YO)',                   color: '#FDE8B3', text: '挂针' },
-    'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                 color: '#E8CFD5', text: '扭针' },
-    'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',             color: '#D6B5BD', text: '扭上针' },
-    'ssp':   { symbol: '⋋',   name: '上针的右上二针并一针 (ssp)',   color: '#F7C5BA', text: 'ssp' },
-    'ssk':   { symbol: 'λ',   name: '右上二针并一针 (ssk)',         color: '#F4B8A5', text: 'ssk' },
-    'p2tog': { symbol: '⋌',   name: '上针的左上二针并一针 (p2tog)', color: '#D4E0C8', text: 'p2tog' },
-    'k2tog': { symbol: '人',  name: '左上二针并一针 (k2tog)',       color: '#C3D5B5', text: 'k2tog' },
-    'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                 color: '#D1E3E2', text: 'krl' },
-    'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',          color: '#BACECF', text: 'prl' },
-    'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                 color: '#E3D8ED', text: 'kll' },
-    'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',          color: '#CDBEDC', text: 'pll' },
-    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',         color: '#F3DBBD', text: '交叉针' }
+    'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
+    'p':     { symbol: '—',   name: '上针 (P)',                      color: '#EFEBE4', text: '上针 (P)' },
+    'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: '#FDE8B3', text: '挂针 (YO)' },
+    'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: '#E8CFD5', text: '扭针 (Ktbl)' },
+    'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',               color: '#D6B5BD', text: '扭上针 (p1 tbl)' },
+    'ssp':   { symbol: '⋋',   name: '上针的右上2针并1针 (ssp)',      color: '#F7C5BA', text: '上针的右上2针并1针 (ssp)' },
+    'ssk':   { symbol: 'λ',   name: '右上2针并1针 (ssk)',            color: '#F4B8A5', text: '右上2针并1针 (ssk)' },
+    'p2tog': { symbol: '⋌',   name: '上针的左上2针并1针 (p2tog)',    color: '#D4E0C8', text: '上针的左上2针并1针 (p2tog)' },
+    'k2tog': { symbol: '人',  name: '左上2针并1针 (K2tog)',          color: '#C3D5B5', text: '左上2针并1针 (K2tog)' },
+    'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                  color: '#D1E3E2', text: '右加针 (krl)' },
+    'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: '#BACECF', text: '上针的右加针 (prl)' },
+    'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: '#E3D8ED', text: '左加针 (kll)' },
+    'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: '#CDBEDC', text: '上针的左加针 (pll)' },
+    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' }
   },
 
   loadProjectStitches(customStitches) {
