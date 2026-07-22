@@ -749,8 +749,8 @@ const App = {
         </button>
 
         <div class="project-info" title="点击开始编织此项目">
-          <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff8f6; position: relative;">
-            <img src="${coverSrc}" style="width: 100%; height: 100%; object-fit: contain; padding: 4px; box-sizing: border-box;" alt="${p.name} Cover" onerror="this.src='default_project_cover.png'">
+          <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff; position: relative;">
+            <img src="${coverSrc}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5;" alt="${p.name} Cover" onerror="this.src='default_project_cover.png'">
           </div>
           <div class="project-name" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
             <span>${p.name}</span>
