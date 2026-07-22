@@ -217,10 +217,43 @@
               <button id="btn-text-copy" class="btn text-btn">复制文本 / Copy Text</button>
               <button id="btn-text-print" class="btn text-btn">打印图解 / Print Sheet</button>
             </div>
+          <!-- 项目备注与编织参数卡片 -->
+          <div class="card project-notes-card" id="text-notes-card" style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                📌 项目备注与编织参数 / Notes & Specs
+              </h3>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">自动保存 / Auto-saved</span>
+            </div>
+
+            <!-- 3大核心快速参数结构表 -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 0.8rem;">
+              <!-- 针号 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🪡 针号 / Needle</label>
+                <input type="text" id="text-notes-needle" class="input-project-needle" placeholder="例如：4.5mm 环针" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              </div>
+              <!-- 线材 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🧶 线材 / Yarn</label>
+                <input type="text" id="text-notes-yarn" class="input-project-yarn" placeholder="例如：美丽诺羊毛 150g" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              </div>
+              <!-- 密度/小样 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">📏 密度小样 / Gauge</label>
+                <input type="text" id="text-notes-gauge" class="input-project-gauge" placeholder="例如：10cm=22针×30行" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              </div>
+            </div>
+
+            <!-- 自由文本备注区域 -->
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">自由备注与心得 / Memo & Notes:</label>
+              <textarea id="text-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录起针数、尺寸改动、洗涤注意、送人名字等编织心得..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
+            </div>
           </div>
 
           <!-- 教程与针法卡片 -->
-          <div class="card tutorials-card" id="text-tutorials-card" style="margin-top: 1.5rem;">
+          <div class="card tutorials-card" id="text-tutorials-card" style="margin-top: 1.25rem;">
             <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Reference Tutorials & Links</h3>
             <div class="tutorials-list" id="text-tutorials-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
               <!-- 动态填充 -->
@@ -372,6 +405,41 @@
             </div>
             <div class="tutorials-actions" style="margin-top: 0.5rem; display: flex; justify-content: flex-end;">
               <button id="btn-grid-add-tutorial" class="btn text-btn" style="padding: 4px 8px; font-size: 0.85rem;">➕ Add Tutorial / Link</button>
+            </div>
+          </div>
+
+          <!-- 项目备注与编织参数卡片 -->
+          <div class="card project-notes-card" id="grid-notes-card" style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                📌 项目备注与编织参数 / Notes & Specs
+              </h3>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">自动保存 / Auto-saved</span>
+            </div>
+
+            <!-- 3大核心快速参数结构表 -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 0.8rem;">
+              <!-- 针号 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🪡 针号 / Needle</label>
+                <input type="text" id="grid-notes-needle" class="input-project-needle" placeholder="例如：4.5mm 环针" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              </div>
+              <!-- 线材 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">🧶 线材 / Yarn</label>
+                <input type="text" id="grid-notes-yarn" class="input-project-yarn" placeholder="例如：美丽诺羊毛 150g" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              </div>
+              <!-- 密度/小样 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.6rem;">
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.2rem;">📏 密度小样 / Gauge</label>
+                <input type="text" id="grid-notes-gauge" class="input-project-gauge" placeholder="例如：10cm=22针×30行" style="width: 100%; border: none; background: transparent; font-size: 0.8rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0;">
+              </div>
+            </div>
+
+            <!-- 自由文本备注区域 -->
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">自由备注与心得 / Memo & Notes:</label>
+              <textarea id="grid-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录起针数、尺寸改动、洗涤注意、送人名字等编织心得..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
             </div>
           </div>
         </div>
@@ -633,9 +701,9 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
   <div id="toast" class="toast hidden"></div>
 
   <!-- 引入逻辑脚本 (添加版本序列，绕过浏览器本地与 CDN 静态缓存) -->
-  <script src="speech.js?v=20260722_12"></script>
-  <script src="parser.js?v=20260722_12"></script>
-  <script src="grid.js?v=20260722_12"></script>
-  <script src="app.js?v=20260722_12"></script>
+  <script src="speech.js?v=20260722_13"></script>
+  <script src="parser.js?v=20260722_13"></script>
+  <script src="grid.js?v=20260722_13"></script>
+  <script src="app.js?v=20260722_13"></script>
 </body>
 </html>

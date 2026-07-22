@@ -1068,6 +1068,7 @@ const App = {
     this.updateTextPlayerUI();
     this.renderTextRowsList();
     this.renderReferenceLinks();
+    this.renderProjectNotes();
     this.renderMotifs();
 
     const addBtn = document.getElementById('btn-add-motif');
@@ -1813,7 +1814,36 @@ const App = {
     // 渲染网格
     this.renderGridCanvas();
     this.renderReferenceLinks();
+    this.renderProjectNotes();
     this.updateGridPlayerUI();
+  },
+
+  renderProjectNotes() {
+    const p = this.currentProject;
+    if (!p) return;
+    if (!p.notes) {
+      p.notes = { needle: '', yarn: '', gauge: '', memo: '' };
+    }
+
+    const textNeedle = document.getElementById('text-notes-needle');
+    const textYarn = document.getElementById('text-notes-yarn');
+    const textGauge = document.getElementById('text-notes-gauge');
+    const textMemo = document.getElementById('text-notes-memo');
+
+    const gridNeedle = document.getElementById('grid-notes-needle');
+    const gridYarn = document.getElementById('grid-notes-yarn');
+    const gridGauge = document.getElementById('grid-notes-gauge');
+    const gridMemo = document.getElementById('grid-notes-memo');
+
+    if (textNeedle) textNeedle.value = p.notes.needle || '';
+    if (textYarn) textYarn.value = p.notes.yarn || '';
+    if (textGauge) textGauge.value = p.notes.gauge || '';
+    if (textMemo) textMemo.value = p.notes.memo || '';
+
+    if (gridNeedle) gridNeedle.value = p.notes.needle || '';
+    if (gridYarn) gridYarn.value = p.notes.yarn || '';
+    if (gridGauge) gridGauge.value = p.notes.gauge || '';
+    if (gridMemo) gridMemo.value = p.notes.memo || '';
   },
 
   updateBindOffDotsUI() {
@@ -2786,6 +2816,41 @@ const App = {
     addClick('btn-back-grid-player', () => {
       this.switchView('view-dashboard');
       this.renderProjectList();
+    });
+
+    // 项目备注与编织参数实时同步保存
+    const syncNotes = () => {
+      const p = this.currentProject;
+      if (!p) return;
+      if (!p.notes) {
+        p.notes = { needle: '', yarn: '', gauge: '', memo: '' };
+      }
+
+      const activeView = this.currentView;
+      let needleVal = '', yarnVal = '', gaugeVal = '', memoVal = '';
+      
+      if (activeView === 'view-text-player') {
+        needleVal = document.getElementById('text-notes-needle')?.value || '';
+        yarnVal = document.getElementById('text-notes-yarn')?.value || '';
+        gaugeVal = document.getElementById('text-notes-gauge')?.value || '';
+        memoVal = document.getElementById('text-notes-memo')?.value || '';
+      } else {
+        needleVal = document.getElementById('grid-notes-needle')?.value || '';
+        yarnVal = document.getElementById('grid-notes-yarn')?.value || '';
+        gaugeVal = document.getElementById('grid-notes-gauge')?.value || '';
+        memoVal = document.getElementById('grid-notes-memo')?.value || '';
+      }
+
+      p.notes.needle = needleVal;
+      p.notes.yarn = yarnVal;
+      p.notes.gauge = gaugeVal;
+      p.notes.memo = memoVal;
+
+      this.saveProjects();
+    };
+
+    document.querySelectorAll('.input-project-needle, .input-project-yarn, .input-project-gauge, .textarea-project-memo').forEach(el => {
+      el.addEventListener('input', () => syncNotes());
     });
 
     // 主题切换
