@@ -10,7 +10,7 @@ const Grid = {
       vbW: 300,
       vbH: 100,
       name: '右上2针与1针的交叉针',
-      color: '#F3DBBD',
+      color: '#D5C0A5',
       path: 'M 50 15 L 158 85 M 25 80 L 98 62 M 150 15 L 258 85 M 202 38 L 280 20'
     },
     'c21p': {
@@ -18,7 +18,7 @@ const Grid = {
       vbW: 300,
       vbH: 100,
       name: '上针的右上2针与1针交叉针',
-      color: '#E6CBB2',
+      color: '#B9B07B',
       path: 'M 50 15 L 158 85 M 25 80 L 98 62 M 85 76 L 115 76 M 150 15 L 258 85 M 202 38 L 280 18'
     },
     'c12': {
@@ -26,7 +26,7 @@ const Grid = {
       vbW: 300,
       vbH: 100,
       name: '左上1针与2针交叉针',
-      color: '#EAD7C5',
+      color: '#BA7770',
       path: 'M 20 18 L 98 38 M 45 85 L 155 15 M 145 85 L 255 15 M 202 62 L 280 80'
     },
     'c12p': {
@@ -34,7 +34,7 @@ const Grid = {
       vbW: 300,
       vbH: 100,
       name: '上针的左上1针与2针交叉针',
-      color: '#DFCBB9',
+      color: '#EDCE91',
       path: 'M 20 18 L 98 38 M 45 85 L 155 15 M 145 85 L 255 15 M 185 76 L 215 76 M 205 45 L 278 65'
     },
     'c22r': {
@@ -42,7 +42,7 @@ const Grid = {
       vbW: 400,
       vbH: 100,
       name: '右上2针与2针交叉针',
-      color: '#F6E3CC',
+      color: '#71744F',
       path: 'M 375 85 L 165 15 M 375 15 L 285 42 M 255 15 L 220 26 M 255 85 L 25 15 M 195 74 L 165 85 M 135 42 L 25 85'
     },
     'c22l': {
@@ -50,7 +50,7 @@ const Grid = {
       vbW: 400,
       vbH: 100,
       name: '左上2针与2针交叉针',
-      color: '#EDD9C1',
+      color: '#5C2120',
       path: 'M 25 85 L 235 15 M 25 15 L 115 42 M 145 15 L 180 26 M 145 85 L 375 15 M 205 74 L 235 85 M 265 42 L 375 85'
     }
   },
@@ -84,12 +84,12 @@ const Grid = {
       'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: 'rgba(186, 206, 207, 0.65)', text: '上针的右加针 (prl)' },
       'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: 'rgba(227, 216, 237, 0.65)', text: '左加针 (kll)' },
       'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: 'rgba(205, 190, 220, 0.65)', text: '上针的左加针 (pll)' },
-      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: 'rgba(243, 219, 189, 0.65)', text: '右上2针与1针的交叉针' },
-      'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: 'rgba(230, 203, 178, 0.65)', text: '上针的右上2针与1针交叉针' },
-      'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: 'rgba(234, 215, 197, 0.65)', text: '左上1针与2针交叉针' },
-      'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: 'rgba(223, 203, 185, 0.65)', text: '上针的左上1针与2针交叉针' },
-      'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: 'rgba(246, 227, 204, 0.65)', text: '右上2针与2针交叉针' },
-      'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: 'rgba(237, 217, 193, 0.65)', text: '左上2针与2针交叉针' }
+      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#D5C0A5', text: '右上2针与1针的交叉针' },
+      'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: '#B9B07B', text: '上针的右上2针与1针交叉针' },
+      'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: '#BA7770', text: '左上1针与2针交叉针' },
+      'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: '#EDCE91', text: '上针的左上1针与2针交叉针' },
+      'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: '#71744F', text: '右上2针与2针交叉针' },
+      'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: '#5C2120', text: '左上2针与2针交叉针' }
     };
   },
 
@@ -107,12 +107,12 @@ const Grid = {
     'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: 'rgba(186, 206, 207, 0.65)', text: '上针的右加针 (prl)' },
     'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: 'rgba(227, 216, 237, 0.65)', text: '左加针 (kll)' },
     'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: 'rgba(205, 190, 220, 0.65)', text: '上针的左加针 (pll)' },
-    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: 'rgba(243, 219, 189, 0.65)', text: '右上2针与1针的交叉针' },
-    'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: 'rgba(230, 203, 178, 0.65)', text: '上针的右上2针与1针交叉针' },
-    'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: 'rgba(234, 215, 197, 0.65)', text: '左上1针与2针交叉针' },
-    'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: 'rgba(223, 203, 185, 0.65)', text: '上针的左上1针与2针交叉针' },
-    'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: 'rgba(246, 227, 204, 0.65)', text: '右上2针与2针交叉针' },
-    'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: 'rgba(237, 217, 193, 0.65)', text: '左上2针与2针交叉针' }
+    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#D5C0A5', text: '右上2针与1针的交叉针' },
+    'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: '#B9B07B', text: '上针的右上2针与1针交叉针' },
+    'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: '#BA7770', text: '左上1针与2针交叉针' },
+    'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: '#EDCE91', text: '上针的左上1针与2针交叉针' },
+    'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: '#71744F', text: '右上2针与2针交叉针' },
+    'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: '#5C2120', text: '左上2针与2针交叉针' }
   },
 
   loadProjectStitches(customStitches) {
