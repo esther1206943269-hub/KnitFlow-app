@@ -960,30 +960,39 @@ const App = {
   // 项目生命周期（打开、新建、重置、编辑）
   // ==========================================================================
   openProject(id) {
-    const project = this.projects.find(p => p.id === id);
-    if (!project) return;
+    try {
+      console.log('Attempting to open project:', id);
+      const project = this.projects.find(p => p && (String(p.id) === String(id) || p.name === id));
+      if (!project) {
+        console.warn('Project not found for id:', id, 'Available projects:', this.projects);
+        alert('未找到该项目，请刷新页面重试！');
+        return;
+      }
 
-    this.currentProject = project;
-    this.sessionTime = 0; // 重置本轮会话时间
-    this.isTimerPaused = false; // 重置暂停状态
-    this.startTimer();
-    
-    // 更新暂停按钮初始状态
-    const textToggle = document.getElementById('btn-text-timer-toggle');
-    const gridToggle = document.getElementById('btn-grid-timer-toggle');
-    if (textToggle) textToggle.textContent = '⏸️';
-    if (gridToggle) gridToggle.textContent = '⏸️';
+      this.currentProject = project;
+      this.sessionTime = 0; // 重置本轮会话时间
+      this.isTimerPaused = false; // 重置暂停状态
+      this.startTimer();
+      
+      // 更新暂停按钮初始状态
+      const textToggle = document.getElementById('btn-text-timer-toggle');
+      const gridToggle = document.getElementById('btn-grid-timer-toggle');
+      if (textToggle) textToggle.textContent = '⏸️';
+      if (gridToggle) gridToggle.textContent = '⏸️';
 
-    if (project.type === 'text') {
-      this.initTextPlayer();
-      this.switchView('view-text-player');
-    } else {
-      this.initGridPlayer();
-      this.switchView('view-grid-player');
+      if (project.type === 'text') {
+        this.initTextPlayer();
+        this.switchView('view-text-player');
+      } else {
+        this.initGridPlayer();
+        this.switchView('view-grid-player');
+      }
+      
+      this.triggerSpeechForActiveRow();
+    } catch (err) {
+      console.error('打开项目时发生错误：', err);
+      alert(`打开项目失败: ${err.message}`);
     }
-    
-    // 打开时进行首行播报（如果开启了 TTS 并且不是第一行，或者用户需要）
-    this.triggerSpeechForActiveRow();
   },
 
   // 1. 初始化文字模式 Player
@@ -1708,8 +1717,24 @@ const App = {
   // 2. 初始化网格模式 Player
   initGridPlayer() {
     const p = this.currentProject;
-    document.getElementById('grid-player-title').textContent = p.name;
-    document.getElementById('grid-meta-knit').textContent = p.knitType === 'flat' ? 'Flat' : 'Circular';
+    if (!p) return;
+
+    if (p.data && p.data.length > 0 && p.data[0]) {
+      Grid.width = p.data[0].length;
+      Grid.height = p.data.length;
+      Grid.data = p.data;
+      Grid.knitType = p.knitType || 'flat';
+    }
+
+    p.currentLoc = p.currentLoc || 1;
+    if (p.currentLoc > (p.data ? p.data.length : 1)) p.currentLoc = p.data ? p.data.length : 1;
+    if (p.currentLoc < 1) p.currentLoc = 1;
+
+    const titleEl = document.getElementById('grid-player-title');
+    if (titleEl) titleEl.textContent = p.name || 'Grid Knitting Project';
+    
+    const typeEl = document.getElementById('grid-meta-knit');
+    if (typeEl) typeEl.textContent = p.knitType === 'flat' ? 'Flat' : 'Circular';
     
     // 加载项目保存的自定义线材调色盘与顶部收针点设置
     Grid.loadProjectStitches(p.customStitches);
