@@ -1354,6 +1354,159 @@ const App = {
     return hex;
   },
 
+  parseRgba(colorStr) {
+    let hex = '#D18E97';
+    let alpha = 65;
+    if (!colorStr) return { hex, alpha };
+
+    if (colorStr.startsWith('rgb')) {
+      const parts = colorStr.match(/[\d.]+/g);
+      if (parts && parts.length >= 3) {
+        const r = parseInt(parts[0]);
+        const g = parseInt(parts[1]);
+        const b = parseInt(parts[2]);
+        const rHex = r.toString(16).padStart(2, '0');
+        const gHex = g.toString(16).padStart(2, '0');
+        const bHex = b.toString(16).padStart(2, '0');
+        hex = `#${rHex}${gHex}${bHex}`;
+        if (parts.length >= 4) {
+          alpha = Math.round(parseFloat(parts[3]) * 100);
+        }
+      }
+    } else if (colorStr.startsWith('#')) {
+      let c = colorStr.replace('#', '');
+      if (c.length === 3) c = c.split('').map(ch => ch + ch).join('');
+      if (c.length >= 6) {
+        hex = `#${c.substring(0, 6)}`;
+      }
+    }
+    return { hex, alpha };
+  },
+
+  openStitchColorPopover(key, st, targetElement) {
+    const existing = document.getElementById('stitch-color-popover');
+    if (existing) existing.remove();
+
+    const { hex: initialHex, alpha: initialAlpha } = this.parseRgba(st.color);
+
+    const popover = document.createElement('div');
+    popover.id = 'stitch-color-popover';
+    popover.className = 'color-popover-card';
+    popover.style.cssText = `
+      position: absolute;
+      z-index: 10000;
+      background: var(--card-bg, #ffffff);
+      border: 1px solid var(--card-border, #e0e0e0);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      font-family: var(--font-sans);
+    `;
+
+    const rect = targetElement.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+    let top = rect.bottom + scrollTop + 6;
+    let left = rect.left + scrollLeft;
+
+    if (left + 250 > window.innerWidth) {
+      left = Math.max(10, window.innerWidth - 260);
+    }
+
+    popover.style.top = `${top}px`;
+    popover.style.left = `${left}px`;
+
+    let textColor = Grid.getStrokeColor(st.color);
+
+    popover.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--card-border); padding-bottom: 0.4rem;">
+        <span style="font-weight: 700; font-size: 0.88rem; color: var(--text-main);">🎨 修改颜料与透明度</span>
+        <button class="popover-close-btn" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--primary); font-weight: 600; text-align: center; word-break: break-word;">${st.text || st.name}</div>
+      
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <label style="font-size: 0.78rem; color: var(--text-muted); flex-shrink: 0;">选色 Color:</label>
+        <input type="color" class="popover-hex-input" value="${initialHex}" style="width: 38px; height: 32px; border: 1px solid var(--card-border); border-radius: 6px; cursor: pointer; background: transparent; padding: 2px;">
+        <div class="popover-color-preview" style="flex: 1; height: 32px; border-radius: 6px; border: 1px solid var(--card-border); background-color: ${st.color}; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: ${textColor};">
+          预览 / Preview
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted);">
+          <span>透明度 Opacity:</span>
+          <span class="popover-opacity-val" style="font-weight: 700; color: var(--text-main);">${initialAlpha}%</span>
+        </div>
+        <input type="range" class="popover-opacity-input" min="10" max="100" value="${initialAlpha}" style="width: 100%; cursor: pointer;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.2rem;">
+        <button class="btn text-btn popover-save-btn" style="padding: 0.35rem 0.85rem; font-size: 0.82rem; background: var(--primary); color: #fff; border-radius: 6px; font-weight: 600; border: none; cursor: pointer;">✅ 完成 / Done</button>
+      </div>
+    `;
+
+    document.body.appendChild(popover);
+
+    const hexInput = popover.querySelector('.popover-hex-input');
+    const opacityInput = popover.querySelector('.popover-opacity-input');
+    const opacityValText = popover.querySelector('.popover-opacity-val');
+    const previewBox = popover.querySelector('.popover-color-preview');
+    const closeBtn = popover.querySelector('.popover-close-btn');
+    const saveBtn = popover.querySelector('.popover-save-btn');
+
+    const updateColor = () => {
+      const hex = hexInput.value;
+      const alpha = parseInt(opacityInput.value) / 100;
+      opacityValText.textContent = `${opacityInput.value}%`;
+
+      const newRgba = this.hexToRgba(hex, alpha);
+      st.color = newRgba;
+
+      const newStrokeColor = Grid.getStrokeColor(newRgba);
+      previewBox.style.backgroundColor = newRgba;
+      previewBox.style.color = newStrokeColor;
+
+      if (this.currentProject) {
+        if (!this.currentProject.customStitches) {
+          this.currentProject.customStitches = {};
+        }
+        this.currentProject.customStitches[key] = { ...st, color: newRgba };
+        this.saveProjects();
+      }
+
+      this.renderStitchPalette();
+      this.renderStitchLegend();
+      this.renderGridCanvas();
+    };
+
+    hexInput.addEventListener('input', updateColor);
+    opacityInput.addEventListener('input', updateColor);
+
+    const closePopover = (e) => {
+      if (e) e.stopPropagation();
+      popover.remove();
+      document.removeEventListener('click', outsideClick);
+    };
+
+    const outsideClick = (e) => {
+      if (!popover.contains(e.target) && !targetElement.contains(e.target)) {
+        closePopover();
+      }
+    };
+
+    closeBtn.addEventListener('click', closePopover);
+    saveBtn.addEventListener('click', closePopover);
+    setTimeout(() => {
+      document.addEventListener('click', outsideClick);
+    }, 100);
+  },
+
   renderStitchPalette() {
     const container = document.getElementById('palette-colors');
     if (!container) return;
@@ -1372,32 +1525,17 @@ const App = {
       }
 
       item.innerHTML = `
-        <div class="stitch-icon-box" style="background-color: ${st.color}; position: relative;" title="点击色块直接修改背景颜料 / Change color">
+        <div class="stitch-icon-box" style="background-color: ${st.color}; position: relative; cursor: pointer;" title="点击修改颜料与透明度 / Edit Color & Opacity">
           ${Grid.getStitchSVGIcon(key, textColor, 18)}
-          <input type="color" class="palette-color-picker" value="${st.color}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" title="点击修改颜料颜色">
         </div>
         <span>${st.text}</span>
       `;
 
-      const colorPicker = item.querySelector('.palette-color-picker');
-      if (colorPicker) {
-        colorPicker.addEventListener('click', (e) => e.stopPropagation());
-        colorPicker.addEventListener('change', (e) => {
+      const iconBox = item.querySelector('.stitch-icon-box');
+      if (iconBox) {
+        iconBox.addEventListener('click', (e) => {
           e.stopPropagation();
-          const opacityEl = document.getElementById('input-custom-yarn-opacity');
-          const alpha = opacityEl ? (parseInt(opacityEl.value) / 100) : 0.65;
-          const newColor = this.hexToRgba(e.target.value, alpha);
-          st.color = newColor;
-          if (this.currentProject) {
-            if (!this.currentProject.customStitches) {
-              this.currentProject.customStitches = {};
-            }
-            this.currentProject.customStitches[key] = { ...st, color: newColor };
-            this.saveProjects();
-          }
-          this.renderStitchPalette();
-          this.renderStitchLegend();
-          this.renderGridCanvas();
+          this.openStitchColorPopover(key, st, iconBox);
         });
       }
       
