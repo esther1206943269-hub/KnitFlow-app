@@ -154,8 +154,8 @@ const App = {
       let avatarContent = `<span style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: var(--bg-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; overflow: hidden; flex-shrink: 0;">${initial}</span>`;
       
       if (this.currentUser.avatar) {
-        if (this.currentUser.avatar.startsWith('data:image') || this.currentUser.avatar.startsWith('http')) {
-          avatarContent = `<img src="${this.currentUser.avatar}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">`;
+        if (this.currentUser.avatar.includes('/') || this.currentUser.avatar.startsWith('data:image') || this.currentUser.avatar.startsWith('http') || this.currentUser.avatar.endsWith('.png')) {
+          avatarContent = `<img src="${this.currentUser.avatar}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: contain; flex-shrink: 0; background: #fff;">`;
         } else {
           avatarContent = `<span style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary-light); display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">${this.currentUser.avatar}</span>`;
         }
@@ -219,7 +219,7 @@ const App = {
   openAvatarModal() {
     if (!this.currentUser) return;
     const modal = document.getElementById('avatar-modal');
-    this.tempSelectedAvatar = this.currentUser.avatar || '🐱';
+    this.tempSelectedAvatar = this.currentUser.avatar || 'avatar_preset_1.png';
     this.updateAvatarPreviewUI(this.tempSelectedAvatar);
 
     document.querySelectorAll('.avatar-preset-item').forEach(btn => {
@@ -245,10 +245,10 @@ const App = {
     const previewEl = document.getElementById('avatar-current-preview');
     if (!previewEl) return;
 
-    if (avatarValue && (avatarValue.startsWith('data:image') || avatarValue.startsWith('http'))) {
-      previewEl.innerHTML = `<img src="${avatarValue}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    if (avatarValue && (avatarValue.includes('/') || avatarValue.startsWith('data:image') || avatarValue.startsWith('http') || avatarValue.endsWith('.png') || avatarValue.endsWith('.jpg'))) {
+      previewEl.innerHTML = `<img src="${avatarValue}" style="width: 100%; height: 100%; object-fit: contain; padding: 4px; background: #fff;">`;
     } else {
-      previewEl.innerHTML = avatarValue || '🐱';
+      previewEl.innerHTML = avatarValue ? `<span style="font-size: 2rem;">${avatarValue}</span>` : `<img src="avatar_preset_1.png" style="width: 100%; height: 100%; object-fit: contain; padding: 4px; background: #fff;">`;
     }
   },
 

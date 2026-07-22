@@ -600,21 +600,19 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
 
       <!-- 头像当前预览区 -->
       <div style="display: flex; justify-content: center; margin-bottom: 1.2rem;">
-        <div id="avatar-current-preview" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--primary); background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.12);">
-          🐱
+        <div id="avatar-current-preview" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--primary); background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.12); padding: 4px;">
+          <img src="avatar_preset_1.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Avatar Preview">
         </div>
       </div>
 
-      <!-- 预设可爱图标选择区 -->
+      <!-- 预设图标选择区 (去除“可爱”二字，置换为4款极简星芒印记) -->
       <div style="margin-bottom: 1.2rem;">
-        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">预设可爱图案 / Preset Icons:</label>
-        <div id="avatar-preset-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem;">
-          <button type="button" class="avatar-preset-item active" data-avatar="🐱" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid var(--primary); background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🐱</button>
-          <button type="button" class="avatar-preset-item" data-avatar="🧶" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🧶</button>
-          <button type="button" class="avatar-preset-item" data-avatar="🦙" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🦙</button>
-          <button type="button" class="avatar-preset-item" data-avatar="🌸" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🌸</button>
-          <button type="button" class="avatar-preset-item" data-avatar="🐻" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🐻</button>
-          <button type="button" class="avatar-preset-item" data-avatar="🦔" style="font-size: 1.5rem; height: 44px; border-radius: 50%; border: 2px solid transparent; background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center;">🦔</button>
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">预设图案 / Preset Icons:</label>
+        <div id="avatar-preset-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
+          <button type="button" class="avatar-preset-item active" data-avatar="avatar_preset_1.png" style="height: 52px; border-radius: 50%; border: 2px solid var(--primary); background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="紫红星芒 / Dark Pink Star"><img src="avatar_preset_1.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 1"></button>
+          <button type="button" class="avatar-preset-item" data-avatar="avatar_preset_2.png" style="height: 52px; border-radius: 50%; border: 2px solid transparent; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="浅粉星芒 / Light Pink Star"><img src="avatar_preset_2.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 2"></button>
+          <button type="button" class="avatar-preset-item" data-avatar="avatar_preset_3.png" style="height: 52px; border-radius: 50%; border: 2px solid transparent; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="芥绿星芒 / Yellow-Green Star"><img src="avatar_preset_3.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 3"></button>
+          <button type="button" class="avatar-preset-item" data-avatar="avatar_preset_4.png" style="height: 52px; border-radius: 50%; border: 2px solid transparent; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="暖橙星芒 / Orange Star"><img src="avatar_preset_4.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 4"></button>
         </div>
       </div>
 
@@ -635,9 +633,9 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
   <div id="toast" class="toast hidden"></div>
 
   <!-- 引入逻辑脚本 (添加版本序列，绕过浏览器本地与 CDN 静态缓存) -->
-  <script src="speech.js?v=20260722_10"></script>
-  <script src="parser.js?v=20260722_10"></script>
-  <script src="grid.js?v=20260722_10"></script>
-  <script src="app.js?v=20260722_10"></script>
+  <script src="speech.js?v=20260722_11"></script>
+  <script src="parser.js?v=20260722_11"></script>
+  <script src="grid.js?v=20260722_11"></script>
+  <script src="app.js?v=20260722_11"></script>
 </body>
 </html>
