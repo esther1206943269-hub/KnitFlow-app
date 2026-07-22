@@ -667,8 +667,13 @@ body.dark-mode .project-name {
   color: var(--dark-title-color, var(--text-main));
 }
 
-/* 悬停时名字淡出，避免与详细信息遮挡 */
-.project-item:hover .project-name {
+.project-thumbnail-wrapper {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease, visibility 0.25s;
+}
+
+/* 悬停时名字与缩略图淡出，避免与详细信息遮挡 */
+.project-item:hover .project-name,
+.project-item:hover .project-thumbnail-wrapper {
   opacity: 0;
   visibility: hidden;
   transform: scale(0.9) translateY(-15px);

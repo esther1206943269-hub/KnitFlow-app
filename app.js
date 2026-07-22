@@ -491,8 +491,13 @@ const App = {
       const typeLabel = p.type === 'text' ? 'Written' : 'Grid';
       const specsLabel = p.type === 'text' ? `${totalRows} Rows` : `Size ${p.data[0].length}×${totalRows}`;
 
+      const coverSrc = (p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'default_project_cover.png';
+
       item.innerHTML = `
-        <div class="project-info">
+        <div class="project-info" title="点击开始编织此项目">
+          <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff;">
+            <img src="${coverSrc}" style="width: 100%; height: 100%; object-fit: cover;" alt="${p.name} Cover" onerror="this.src='default_project_cover.png'">
+          </div>
           <div class="project-name">${p.name}</div>
           <div class="project-details">
             <span style="font-size: 0.75rem; opacity: 0.85;">${typeLabel} • ${specsLabel}</span>
@@ -509,13 +514,16 @@ const App = {
           </div>
         </div>
         <div class="project-actions">
-          <button class="btn icon-btn btn-rename-project" data-id="${p.id}" title="Rename" aria-label="Rename">
+          <button class="btn icon-btn btn-change-cover-project" data-id="${p.id}" title="更换项目封面" aria-label="Change Cover">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </button>
+          <button class="btn icon-btn btn-rename-project" data-id="${p.id}" title="重命名项目" aria-label="Rename">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path></svg>
           </button>
-          <button class="btn icon-btn btn-duplicate-project" data-id="${p.id}" title="Duplicate" aria-label="Duplicate">
+          <button class="btn icon-btn btn-duplicate-project" data-id="${p.id}" title="复制项目" aria-label="Duplicate">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
           </button>
-          <button class="btn icon-btn danger-text btn-delete-project" data-id="${p.id}" title="Delete" aria-label="Delete">
+          <button class="btn icon-btn danger-text btn-delete-project" data-id="${p.id}" title="删除项目" aria-label="Delete">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
         </div>
@@ -524,6 +532,12 @@ const App = {
       // 点击项目信息进入播放器
       item.querySelector('.project-info').addEventListener('click', () => {
         this.openProject(p.id);
+      });
+
+      // 更换封面
+      item.querySelector('.btn-change-cover-project').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.changeProjectCover(p.id);
       });
 
       // 重命名项目
@@ -637,6 +651,33 @@ const App = {
     this.saveProjects();
     this.renderProjectList();
     this.showToast('Project deleted successfully');
+  },
+
+  changeProjectCover(id) {
+    const p = this.projects.find(proj => proj.id === id);
+    if (!p) return;
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 3 * 1024 * 1024) {
+          alert('图片文件大小不能超过 3MB，请选择较小的图片！');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          p.thumbnail = evt.target.result;
+          this.saveProjects();
+          this.renderProjectList();
+          this.showToast(`🖼️ 已成功更新项目“${p.name}”的封面缩略图！`);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    fileInput.click();
   },
 
   duplicateProject(id) {
