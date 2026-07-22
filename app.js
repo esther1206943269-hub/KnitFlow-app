@@ -2190,7 +2190,8 @@ const App = {
         </div>
       ` : ''}
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.2rem;">
+      <div style="display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 0.2rem;">
+        <button class="btn text-btn popover-reset-btn" title="恢复默认颜色" style="padding: 0.35rem 0.7rem; font-size: 0.78rem; background: transparent; color: var(--text-muted); border: 1px solid var(--card-border); border-radius: 6px; cursor: pointer;">🔄 重置</button>
         <button class="btn text-btn popover-save-btn" style="padding: 0.35rem 0.85rem; font-size: 0.82rem; background: var(--primary); color: #fff; border-radius: 6px; font-weight: 600; border: none; cursor: pointer;">✅ 完成 / Done</button>
       </div>
     `;
@@ -2203,6 +2204,7 @@ const App = {
     const previewBox = popover.querySelector('.popover-color-preview');
     const closeBtn = popover.querySelector('.popover-close-btn');
     const saveBtn = popover.querySelector('.popover-save-btn');
+    const resetBtn = popover.querySelector('.popover-reset-btn');
 
     const symbolRadios = popover.querySelectorAll('input[name="popover-k-symbol-mode"]');
     if (symbolRadios.length > 0) {
@@ -2269,6 +2271,49 @@ const App = {
 
     closeBtn.addEventListener('click', closePopover);
     saveBtn.addEventListener('click', closePopover);
+
+    // 重置默认颜色
+    if (resetBtn) {
+      resetBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const defaults = Grid.getDefaultStitches();
+        const def = defaults[key];
+        if (!def) return;
+
+        // 应用默认颜色到当前针法对象
+        st.color = def.color;
+        if (def.symbolMode !== undefined) {
+          st.symbolMode = def.symbolMode;
+          st.symbol = def.symbol;
+        }
+
+        // 同步到项目的 customStitches（删除该针法的自定义覆盖）
+        if (this.currentProject && this.currentProject.customStitches) {
+          delete this.currentProject.customStitches[key];
+          this.saveProjects();
+        }
+
+        // 更新弹窗中的预览 UI
+        const { hex: defHex, alpha: defAlpha } = this.parseRgba(def.color);
+        hexInput.value = defHex;
+        opacityInput.value = defAlpha;
+        opacityValText.textContent = `${defAlpha}%`;
+        previewBox.style.backgroundColor = def.color;
+        previewBox.style.color = Grid.getStrokeColor(def.color);
+
+        // 如果是下针，同步重置 radio
+        const radios = popover.querySelectorAll('input[name="popover-k-symbol-mode"]');
+        radios.forEach(r => { r.checked = (r.value === (def.symbolMode || 'line')); });
+
+        // 重新渲染画布、调色盘、图例
+        this.renderStitchPalette();
+        this.renderStitchLegend();
+        this.renderGridCanvas();
+
+        this.showToast('✅ 已重置为默认颜色！');
+      });
+    }
+
     setTimeout(() => {
       document.addEventListener('click', outsideClick);
     }, 100);
