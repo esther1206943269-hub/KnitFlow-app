@@ -567,7 +567,7 @@ body.dark-mode .template-card-item {
   text-align: center;
   padding: 1.25rem;
   border-radius: var(--radius-sm);
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   overflow: hidden;
@@ -575,7 +575,7 @@ body.dark-mode .template-card-item {
 }
 
 body.dark-mode .project-item {
-  background-color: rgba(45, 45, 45, 0.85);
+  background-color: rgba(45, 45, 45, 0.5);
   border-color: rgba(255, 255, 255, 0.08);
 }
 
