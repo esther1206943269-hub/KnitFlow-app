@@ -709,12 +709,14 @@ const App = {
       item.style.setProperty('--title-color', color.title);
       item.style.setProperty('--dark-title-color', color.darkTitle);
       
-      const totalRows = p.data.length;
-      const progressPct = totalRows > 0 ? Math.round((p.currentLoc / totalRows) * 100) : 0;
+      const totalRows = (p.data && Array.isArray(p.data)) ? p.data.length : 0;
+      const colCount = (p.data && p.data[0] && Array.isArray(p.data[0])) ? p.data[0].length : 0;
+      const currentLoc = p.currentLoc || 1;
+      const progressPct = totalRows > 0 ? Math.round((currentLoc / totalRows) * 100) : 0;
       const timeStr = this.formatCumulativeTime(p.totalTime || 0);
 
       const typeLabel = p.type === 'text' ? 'Written' : 'Grid';
-      const specsLabel = p.type === 'text' ? `${totalRows} Rows` : `Size ${p.data[0].length}×${totalRows}`;
+      const specsLabel = p.type === 'text' ? `${totalRows} Rows` : `Size ${colCount}×${totalRows}`;
 
       const coverSrc = (p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'default_project_cover.png';
 
@@ -735,7 +737,7 @@ const App = {
               <span style="font-size: 0.75rem; font-weight: 500;">${progressPct}%</span>
             </div>
             
-            <span style="font-size: 0.7rem; opacity: 0.8;">Row ${p.currentLoc}/${totalRows} • Time ${timeStr}</span>
+            <span style="font-size: 0.7rem; opacity: 0.8;">Row ${currentLoc}/${totalRows} • Time ${timeStr}</span>
           </div>
         </div>
         <div class="project-actions">
@@ -754,8 +756,10 @@ const App = {
         </div>
       `;
 
-      // 点击项目信息进入播放器
-      item.querySelector('.project-info').addEventListener('click', () => {
+      // 点击整张卡片任意区域（除右侧操作按钮外）均可响应打开项目
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.project-actions')) return;
         this.openProject(p.id);
       });
 
