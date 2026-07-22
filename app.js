@@ -2621,10 +2621,13 @@ const App = {
         wrapper.style.cssText = 'display: flex; gap: 4px; align-items: center; width: 100%;';
 
         wrapper.innerHTML = `
-          <button class="btn-preset-chip" data-custom-id="${tpl.id}" style="flex: 1;">
+          <button class="btn-preset-chip" data-custom-id="${tpl.id}" style="flex: 1;" title="点击使用此模板创建项目并开始编织">
             ${unifiedIconSvg}
             <span class="chip-text">${tpl.name}</span>
             <span class="chip-badge" style="background: var(--primary-light); color: var(--primary); font-weight: 600;">Custom</span>
+          </button>
+          <button class="btn text-btn btn-add-tpl-to-project" data-custom-id="${tpl.id}" title="将此模板加入【我的项目】列表" style="padding: 4px 8px; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; border: 1px solid var(--card-border); background: var(--card-bg); cursor: pointer;">
+            ➕ 导入项目
           </button>
           <button class="btn icon-btn danger-text btn-delete-custom-tpl" data-custom-id="${tpl.id}" title="删除模板" aria-label="Delete template" style="padding: 6px; flex-shrink: 0;">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -2632,7 +2635,12 @@ const App = {
         `;
 
         wrapper.querySelector('.btn-preset-chip').addEventListener('click', () => {
-          this.loadCustomTemplate(tpl.id);
+          this.loadCustomTemplate(tpl.id, true);
+        });
+
+        wrapper.querySelector('.btn-add-tpl-to-project').addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.loadCustomTemplate(tpl.id, false);
         });
 
         wrapper.querySelector('.btn-delete-custom-tpl').addEventListener('click', (e) => {
@@ -2692,7 +2700,7 @@ const App = {
     this.showToast(`Loaded preset template: ${tpl.name}`);
   },
 
-  loadCustomTemplate(id) {
+  loadCustomTemplate(id, openImmediately = true) {
     const tpl = this.customTemplates.find(t => t.id === id);
     if (!tpl) return;
 
@@ -2711,8 +2719,13 @@ const App = {
     this.projects.unshift(newProj);
     this.saveProjects();
     this.renderProjectList();
-    this.openProject(newProj.id);
-    this.showToast(`Loaded custom template: ${tpl.name}`);
+
+    if (openImmediately) {
+      this.openProject(newProj.id);
+      this.showToast(`已成功将模板“${tpl.name}”添加到项目并开始编织！`);
+    } else {
+      this.showToast(`已成功将模板“${tpl.name}”放置到【我的项目】区域！`);
+    }
   },
 
   deleteCustomTemplate(id) {
@@ -2814,8 +2827,26 @@ const App = {
 
     this.customTemplates.unshift(newTpl);
     this.saveCustomTemplates();
+
+    // 同步在【我的项目】区域中生成对应的新项目
+    const newProj = {
+      id: 'proj-custom-tpl-' + Date.now(),
+      name: cleanName,
+      type: isText ? 'text' : 'grid',
+      currentLoc: 1,
+      knitType: knitType,
+      totalTime: 0,
+      referenceLinks: [],
+      updatedAt: new Date().toISOString(),
+      data: JSON.parse(JSON.stringify(tplData))
+    };
+
+    this.projects.unshift(newProj);
+    this.saveProjects();
+    this.renderProjectList();
     this.renderPresetTemplates();
-    this.showToast(`⭐ 已成功制作并保存模板 “${cleanName}”！`);
+
+    this.showToast(`⭐ 已成功保存模板 “${cleanName}” 并同步放置到【我的项目】！`);
   },
 
   // 导出 PNG 图解图片
