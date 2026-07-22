@@ -240,8 +240,17 @@ const App = {
     if (modal) modal.classList.add('hidden');
   },
 
-  openForgotPwdModal() {
+  async forceCloudSync() {
+    this.showToast('☁️ 正在为您同步电脑与平板端账号...');
+    await this.pushCloudUsers();
+    await this.syncCloudUsers();
+    alert(`🎉 账号云端同步完成！\n\n已为您同步包含 ${this.registeredUsers.length} 个账号\n平板电脑与手机端现已可无缝登录！`);
+    this.showToast('🎉 云端账号同步完成！');
+  },
+
+  async openForgotPwdModal() {
     this.closeAuthModal();
+    await this.syncCloudUsers();
     const modal = document.getElementById('forgot-pwd-modal');
     const accInput = document.getElementById('forgot-account');
     const codeInput = document.getElementById('forgot-code');
@@ -259,7 +268,7 @@ const App = {
     if (modal) modal.classList.add('hidden');
   },
 
-  sendResetCode() {
+  async sendResetCode() {
     const accInput = document.getElementById('forgot-account');
     const account = accInput ? accInput.value.trim() : '';
 
@@ -268,11 +277,13 @@ const App = {
       return;
     }
 
-    // 搜索注册用户
+    // 搜索注册用户前先连接云端检索
+    await this.syncCloudUsers();
+
     const cleanAcc = account.toLowerCase();
-    const user = this.registeredUsers.find(u => u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc);
+    const user = this.registeredUsers.find(u => (u.account && u.account.toLowerCase() === cleanAcc) || (u.username && u.username.toLowerCase() === cleanAcc));
     if (!user) {
-      alert(`未找到账号 “${account}”，请确认是否已注册！`);
+      alert(`未找到账号 “${account}”，请确认输入是否正确，或在电脑端打开网页点击【一键同步电脑与平板账号】！`);
       return;
     }
 
@@ -2534,6 +2545,7 @@ const App = {
     addClick('btn-open-forgot-pwd', () => this.openForgotPwdModal());
     addClick('btn-close-forgot-pwd-modal', () => this.closeForgotPwdModal());
     addClick('btn-send-forgot-code', () => this.sendResetCode());
+    addClick('btn-force-cloud-sync', () => this.forceCloudSync());
 
     const forgotForm = document.getElementById('form-forgot-pwd');
     if (forgotForm) {
