@@ -2627,7 +2627,7 @@ const App = {
             <span class="chip-badge" style="background: var(--primary-light); color: var(--primary); font-weight: 600;">Custom</span>
           </button>
           <button class="btn text-btn btn-add-tpl-to-project" data-custom-id="${tpl.id}" title="将此模板加入【我的项目】列表" style="padding: 4px 8px; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; border: 1px solid var(--card-border); background: var(--card-bg); cursor: pointer;">
-            ➕ 导入项目
+            ➕ 导入我的项目/My Projects
           </button>
           <button class="btn icon-btn danger-text btn-delete-custom-tpl" data-custom-id="${tpl.id}" title="删除模板" aria-label="Delete template" style="padding: 6px; flex-shrink: 0;">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
