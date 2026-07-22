@@ -22,6 +22,13 @@ const App = {
 
   async init() {
     this.loadUserAuth();
+    
+    // 初始化时双向同步云端账号，将本地现有账号推上云端
+    await this.syncCloudUsers();
+    if (this.registeredUsers && this.registeredUsers.length > 0) {
+      this.pushCloudUsers();
+    }
+
     this.loadProjects();
     this.loadCustomTemplates();
     this.loadDeletedPresets();
@@ -31,9 +38,6 @@ const App = {
     this.renderProjectList();
     this.renderPresetTemplates();
     this.setupKeyboardShortcuts();
-
-    // 异步同步云端账号数据库，确保平板端/多设备即刻拉取最新账号
-    this.syncCloudUsers();
   },
 
   // ==========================================================================
@@ -61,8 +65,22 @@ const App = {
         if (json && json.data && Array.isArray(json.data.users)) {
           const remoteUsers = json.data.users;
           const mergedMap = new Map();
-          this.registeredUsers.forEach(u => mergedMap.set(u.id || u.account, u));
-          remoteUsers.forEach(u => mergedMap.set(u.id || u.account, u));
+
+          // 优先合并远端
+          remoteUsers.forEach(u => {
+            if (u && (u.account || u.username)) {
+              const key = (u.account || u.username).toLowerCase();
+              mergedMap.set(key, u);
+            }
+          });
+
+          // 再合并本地
+          this.registeredUsers.forEach(u => {
+            if (u && (u.account || u.username)) {
+              const key = (u.account || u.username).toLowerCase();
+              mergedMap.set(key, u);
+            }
+          });
           
           this.registeredUsers = Array.from(mergedMap.values());
           localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
@@ -435,23 +453,27 @@ const App = {
   },
 
   async loginUser(account, password) {
-    const cleanAcc = account.trim().toLowerCase();
-    let user = this.registeredUsers.find(u => (u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc) && u.password === password);
+    const cleanAcc = (account || '').trim().toLowerCase();
+    const cleanPwd = (password || '').trim();
 
-    // 如果平板端或新设备本地未查找到账号，自动连接云端检索最新账号库！
-    if (!user) {
-      this.showToast('🔍 正在连接云端校验账号...');
-      await this.syncCloudUsers();
-      user = this.registeredUsers.find(u => (u.account.toLowerCase() === cleanAcc || u.username.toLowerCase() === cleanAcc) && u.password === password);
-    }
+    // 每次登录前先同步云端最新的账号列表
+    await this.syncCloudUsers();
+
+    let user = this.registeredUsers.find(u => {
+      if (!u) return false;
+      const uAcc = (u.account || '').trim().toLowerCase();
+      const uName = (u.username || '').trim().toLowerCase();
+      const uPwd = (u.password || '').trim();
+      return (uAcc === cleanAcc || uName === cleanAcc) && uPwd === cleanPwd;
+    });
 
     if (!user) {
-      alert('账号或密码不正确，请重新输入！');
+      alert(`账号或密码不正确！\n\n核对信息：[${account}]\n若平板端尚未同步，请确认电脑端已刷新网页上架云端，或点击“忘记密码？”重置新密码。`);
       return;
     }
 
     this.loginUserObject(user, false);
-    this.showToast(`🎉 欢迎回来，${user.username}！多端云同步已开启。`);
+    this.showToast(`🎉 欢迎回来，${user.username}！多端同步已开启。`);
   },
 
   loginUserObject(userObj, isNewReg = false) {
