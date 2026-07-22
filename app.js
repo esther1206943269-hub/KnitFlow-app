@@ -53,32 +53,43 @@ const App = {
 
     if (this.currentUser) {
       const initial = (this.currentUser.username || 'U').substring(0, 1).toUpperCase();
-      let avatarHtml = `<span style="width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--bg-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; overflow: hidden; flex-shrink: 0;">${initial}</span>`;
+      let avatarContent = `<span style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: var(--bg-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; overflow: hidden; flex-shrink: 0;">${initial}</span>`;
       
       if (this.currentUser.avatar) {
         if (this.currentUser.avatar.startsWith('data:image') || this.currentUser.avatar.startsWith('http')) {
-          avatarHtml = `<img src="${this.currentUser.avatar}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">`;
+          avatarContent = `<img src="${this.currentUser.avatar}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">`;
         } else {
-          avatarHtml = `<span style="width: 22px; height: 22px; border-radius: 50%; background: var(--primary-light); display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0;">${this.currentUser.avatar}</span>`;
+          avatarContent = `<span style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary-light); display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">${this.currentUser.avatar}</span>`;
         }
       }
 
       container.innerHTML = `
-        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
-          ${avatarHtml}
-          <span style="color: var(--text-main); font-weight: 600; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.currentUser.username}</span>
-          <button id="btn-open-avatar-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="设置头像">🖼️ 头像</button>
-          <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px;" title="修改密码">🔑 改密</button>
+        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.2rem 0.65rem 0.2rem 0.3rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
+          <div id="btn-avatar-circle" style="display: flex; align-items: center; cursor: pointer; position: relative;" title="点击更换/设置头像">
+            ${avatarContent}
+          </div>
+          <span id="btn-username-text" style="color: var(--text-main); font-weight: 600; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="点击更换/设置头像">${this.currentUser.username}</span>
+          <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="修改密码">🔑 改密</button>
           <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px;" title="退出登录">退出</button>
         </div>
       `;
-      const avatarBtn = container.querySelector('#btn-open-avatar-modal');
-      if (avatarBtn) {
-        avatarBtn.onclick = (e) => {
+
+      const avatarCircle = container.querySelector('#btn-avatar-circle');
+      if (avatarCircle) {
+        avatarCircle.onclick = (e) => {
           e.stopPropagation();
           this.openAvatarModal();
         };
       }
+
+      const usernameText = container.querySelector('#btn-username-text');
+      if (usernameText) {
+        usernameText.onclick = (e) => {
+          e.stopPropagation();
+          this.openAvatarModal();
+        };
+      }
+
       const pwdBtn = container.querySelector('#btn-open-pwd-modal');
       if (pwdBtn) {
         pwdBtn.onclick = (e) => {
@@ -86,6 +97,7 @@ const App = {
           this.openChangePwdModal();
         };
       }
+
       const logoutBtn = container.querySelector('#btn-logout-inline');
       if (logoutBtn) {
         logoutBtn.onclick = (e) => {
