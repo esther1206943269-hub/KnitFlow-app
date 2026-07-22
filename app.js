@@ -1389,17 +1389,21 @@ const App = {
 
     const { hex: initialHex, alpha: initialAlpha } = this.parseRgba(st.color);
 
+    const isDark = document.body.classList.contains('dark-mode');
     const popover = document.createElement('div');
     popover.id = 'stitch-color-popover';
     popover.className = 'color-popover-card';
     popover.style.cssText = `
       position: absolute;
       z-index: 10000;
-      background: var(--card-bg, #ffffff);
-      border: 1px solid var(--card-border, #e0e0e0);
+      background: ${isDark ? '#262626' : '#ffffff'} !important;
+      opacity: 1 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: 1px solid ${isDark ? '#444444' : '#d8d8d8'} !important;
       border-radius: 12px;
       padding: 0.85rem 1rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
       width: 240px;
       display: flex;
       flex-direction: column;
