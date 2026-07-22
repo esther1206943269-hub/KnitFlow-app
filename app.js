@@ -3176,8 +3176,8 @@ const App = {
     const builtins = this.getBuiltinTemplates();
     let renderedCount = 0;
 
-    // 统一的精致矢量毛线球 SVG 图标
-    const unifiedIconSvg = `<span class="chip-icon" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--primary);"><svg viewBox="0 0 64 64" width="18" height="18" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="24" fill="rgba(208, 108, 84, 0.08)" /><path d="M16 26 C 26 18, 42 18, 52 26" /><path d="M10 34 C 24 24, 44 24, 58 34" /><path d="M16 42 C 26 34, 42 34, 52 42" /></svg></span>`;
+    // 统一的精致编织图标（棒针+毛线球）
+    const unifiedIconSvg = `<span class="chip-icon" style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;"><img src="knitting_icon.png" alt="knitting" style="width: 48px; height: 48px; object-fit: contain; display: block;"></span>`;
 
     // 1. 渲染内置预设模板（如果未被用户删除）
     Object.entries(builtins).forEach(([key, tpl]) => {
