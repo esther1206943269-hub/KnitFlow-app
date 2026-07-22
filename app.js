@@ -54,13 +54,20 @@ const App = {
     if (this.currentUser) {
       const initial = (this.currentUser.username || 'U').substring(0, 1).toUpperCase();
       container.innerHTML = `
-        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
+        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
           <span style="width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--bg-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${initial}</span>
           <span style="color: var(--text-main); font-weight: 600; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.currentUser.username}</span>
-          <span style="font-size: 0.7rem; color: var(--text-muted);">☁️已同步</span>
-          <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="退出登录">退出</button>
+          <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="修改密码">🔑 改密</button>
+          <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px;" title="退出登录">退出</button>
         </div>
       `;
+      const pwdBtn = container.querySelector('#btn-open-pwd-modal');
+      if (pwdBtn) {
+        pwdBtn.onclick = (e) => {
+          e.stopPropagation();
+          this.openChangePwdModal();
+        };
+      }
       const logoutBtn = container.querySelector('#btn-logout-inline');
       if (logoutBtn) {
         logoutBtn.onclick = (e) => {
@@ -89,6 +96,59 @@ const App = {
   closeAuthModal() {
     const modal = document.getElementById('auth-modal');
     if (modal) modal.classList.add('hidden');
+  },
+
+  openChangePwdModal() {
+    if (!this.currentUser) return;
+    const modal = document.getElementById('change-pwd-modal');
+    const hint = document.getElementById('pwd-user-hint');
+    if (hint) hint.textContent = `为您当前账号 [${this.currentUser.username}] 修改密码`;
+
+    const oldInput = document.getElementById('pwd-old');
+    const newInput = document.getElementById('pwd-new');
+    const confirmInput = document.getElementById('pwd-confirm');
+
+    if (oldInput) oldInput.value = '';
+    if (newInput) newInput.value = '';
+    if (confirmInput) confirmInput.value = '';
+
+    if (modal) modal.classList.remove('hidden');
+  },
+
+  closeChangePwdModal() {
+    const modal = document.getElementById('change-pwd-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  changePassword(oldPwd, newPwd, confirmPwd) {
+    if (!this.currentUser) return;
+
+    if (newPwd !== confirmPwd) {
+      alert('两次输入的‘新密码’不一致，请核对后重新输入！');
+      return;
+    }
+
+    if (newPwd.length < 6) {
+      alert('新密码长度不能少于 6 位字符！');
+      return;
+    }
+
+    const user = this.registeredUsers.find(u => u.id === this.currentUser.id);
+    if (!user) {
+      alert('未找到账号信息，请重新登录！');
+      return;
+    }
+
+    if (user.password !== oldPwd) {
+      alert('‘原密码’输入错误，修改失败！');
+      return;
+    }
+
+    user.password = newPwd;
+    localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
+
+    this.closeChangePwdModal();
+    this.showToast('🎉 密码修改成功！请牢记您的新密码。');
   },
 
   switchAuthTab(tab) {
@@ -2154,6 +2214,19 @@ const App = {
         const acc = document.getElementById('reg-account').value;
         const pwd = document.getElementById('reg-password').value;
         this.registerUser(user, acc, pwd);
+      };
+    }
+
+    addClick('btn-close-pwd-modal', () => this.closeChangePwdModal());
+
+    const pwdForm = document.getElementById('form-change-pwd');
+    if (pwdForm) {
+      pwdForm.onsubmit = (e) => {
+        e.preventDefault();
+        const oldP = document.getElementById('pwd-old').value;
+        const newP = document.getElementById('pwd-new').value;
+        const confirmP = document.getElementById('pwd-confirm').value;
+        this.changePassword(oldP, newP, confirmP);
       };
     }
 
