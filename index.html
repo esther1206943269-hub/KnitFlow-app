@@ -45,11 +45,11 @@
         <div class="card create-card">
           <h3 style="border-left: 2px solid var(--primary); padding-left: 0.6rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">添加新项目 / NEW PROJECTS</h3>
           <div class="creation-links">
-            <button type="button" id="btn-new-text" class="creation-link-item" onclick="App.openCreateText(event)" style="--hover-bg: #D18E97; --hover-text: #5B3B1E; --title-color: #D18E97; --dark-title-color: #D18E97;">
+            <button type="button" id="btn-new-text" class="creation-link-item" style="--hover-bg: #D18E97; --hover-text: #5B3B1E; --title-color: #D18E97; --dark-title-color: #D18E97;">
               <span class="creation-title">文字图解 / Written Pattern</span>
               <span class="creation-desc">解析文字文本，生成编织行数追踪 / Generate a row counter from written instructions</span>
             </button>
-            <button type="button" id="btn-new-grid" class="creation-link-item" onclick="App.openCreateGrid(event)" style="--hover-bg: #D2A432; --hover-text: #EAE1CB; --title-color: #D2A432; --dark-title-color: #D2A432;">
+            <button type="button" id="btn-new-grid" class="creation-link-item" style="--hover-bg: #D2A432; --hover-text: #EAE1CB; --title-color: #D2A432; --dark-title-color: #D2A432;">
               <span class="creation-title">网格图解 / Pixel Grid</span>
               <span class="creation-desc">制作交互填色网格图解与编织行数追踪 / Design multi-color grids with interactive drawing</span>
             </button>
@@ -99,7 +99,7 @@
           <textarea id="text-pattern-input" rows="12" placeholder="在此粘贴或输入你的文字图解说明... / Paste or type your written pattern instructions here..."></textarea>
         </div>
         <div class="form-actions">
-          <button type="button" id="btn-save-text-project" class="btn primary" onclick="App.createTextProject(event)">解析并开始编织 / Parse & Start Knitting</button>
+          <button type="button" id="btn-save-text-project" class="btn primary">解析并开始编织 / Parse & Start Knitting</button>
         </div>
       </div>
     </main>
@@ -139,7 +139,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <button type="button" id="btn-save-grid-project" class="btn primary" onclick="App.createGridProject(event)">创建空白网格 / Create Blank Grid</button>
+          <button type="button" id="btn-save-grid-project" class="btn primary">创建空白网格 / Create Blank Grid</button>
         </div>
       </div>
     </main>

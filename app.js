@@ -347,18 +347,33 @@ const App = {
       const key = this.getProjectsStorageKey();
       const stored = localStorage.getItem(key);
       const parsed = stored ? JSON.parse(stored) : null;
-      this.projects = (parsed && Array.isArray(parsed)) ? parsed : [];
-      
-      this.projects = this.projects.filter(p => p.id !== 'sample-text' && p.id !== 'sample-grid');
-      
-      this.projects.forEach(p => {
-        if (!p.referenceLinks) {
-          p.referenceLinks = [];
-          if (p.tutorialUrl && p.tutorialUrl.trim()) {
-            p.referenceLinks.push({ title: '项目主教程', url: p.tutorialUrl });
+
+      const uniqueProjects = [];
+      const seenSignatures = new Set();
+
+      if (parsed && Array.isArray(parsed)) {
+        parsed.forEach(p => {
+          if (!p || p.id === 'sample-text' || p.id === 'sample-grid') return;
+          // 根据 ID 或 (类型+名称+时间差) 防重
+          const sig = p.id ? p.id : `${p.type}_${p.name}`;
+          if (!seenSignatures.has(sig)) {
+            seenSignatures.add(sig);
+            if (!p.referenceLinks) {
+              p.referenceLinks = [];
+              if (p.tutorialUrl && p.tutorialUrl.trim()) {
+                p.referenceLinks.push({ title: '项目主教程', url: p.tutorialUrl });
+              }
+            }
+            uniqueProjects.push(p);
           }
-        }
-      });
+        });
+      }
+
+      this.projects = uniqueProjects;
+      // 保存去重后的数据
+      if (parsed && parsed.length !== this.projects.length) {
+        this.saveProjects();
+      }
     } catch (e) {
       console.error('加载项目失败：', e);
       this.projects = [];
