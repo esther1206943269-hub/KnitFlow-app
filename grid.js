@@ -407,13 +407,8 @@ const Grid = {
     return directionText + ' ' + runs.join('，');
   },
 
-  /**
-   * 渲染 SVG 网格
-   * @param {HTMLElement} container 容器元素
-   * @param {number} activeRow 当前活跃行号 (1-indexed)
-   * @param {Function} onCellClick 单元格点击回调
   getBindOffInfo() {
-    const bindOffRow = this.height + 1;
+    const bindOffRow = (this.height || 20) + 1;
     const isFlat = this.knitType === 'flat';
     const isOdd = bindOffRow % 2 !== 0;
     // 片织奇数行为正面(RS)，偶数行为反面(WS)；圈织均为正面(RS)
@@ -438,7 +433,16 @@ const Grid = {
   render(container, activeRow, onCellClick) {
     container.innerHTML = '';
     
-    const bindOffInfo = this.getBindOffInfo();
+    const bindOffInfo = (typeof this.getBindOffInfo === 'function')
+      ? this.getBindOffInfo()
+      : {
+          rowNum: (this.height || 20) + 1,
+          isRS: true,
+          label: '正面行收针 (RS Bind-off)',
+          shortLabel: '收针(正面)',
+          color: '#D18E97',
+          directionText: '【从右向左 ←】'
+        };
     const baseCellSize = 30; // 每个格子的基础像素尺寸
     const axisSize = this.showBindOffDots ? 36 : 25; // 边框坐标轴大小 (若开启收针点，顶部留出更高空间)
     const textMargin = 5;
