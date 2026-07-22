@@ -1338,6 +1338,22 @@ const App = {
     }
   },
 
+  hexToRgba(hex, alpha = 0.65) {
+    if (!hex) return `rgba(255, 255, 255, ${alpha})`;
+    if (hex.startsWith('rgba') || hex.startsWith('rgb')) {
+      return hex;
+    }
+    let c = hex.replace('#', '');
+    if (c.length === 3) c = c.split('').map(ch => ch + ch).join('');
+    if (c.length === 6) {
+      const r = parseInt(c.substring(0, 2), 16);
+      const g = parseInt(c.substring(2, 4), 16);
+      const b = parseInt(c.substring(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    return hex;
+  },
+
   renderStitchPalette() {
     const container = document.getElementById('palette-colors');
     if (!container) return;
@@ -1352,15 +1368,7 @@ const App = {
       
       let textColor = '#3c3530';
       if (st.color) {
-        let hex = st.color.replace('#', '');
-        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-        if (hex.length === 6) {
-          const r = parseInt(hex.substring(0, 2), 16);
-          const g = parseInt(hex.substring(2, 4), 16);
-          const b = parseInt(hex.substring(4, 6), 16);
-          const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-          if (yiq < 128) textColor = 'rgba(255, 255, 255, 0.95)';
-        }
+        textColor = Grid.getStrokeColor(st.color);
       }
 
       item.innerHTML = `
@@ -1376,7 +1384,9 @@ const App = {
         colorPicker.addEventListener('click', (e) => e.stopPropagation());
         colorPicker.addEventListener('change', (e) => {
           e.stopPropagation();
-          const newColor = e.target.value;
+          const opacityEl = document.getElementById('input-custom-yarn-opacity');
+          const alpha = opacityEl ? (parseInt(opacityEl.value) / 100) : 0.65;
+          const newColor = this.hexToRgba(e.target.value, alpha);
           st.color = newColor;
           if (this.currentProject) {
             if (!this.currentProject.customStitches) {
@@ -1839,10 +1849,22 @@ const App = {
         this.showToast('Canvas cleared');
       }
     });
+    const opacityInput = document.getElementById('input-custom-yarn-opacity');
+    const opacityValText = document.getElementById('text-custom-yarn-opacity-val');
+    if (opacityInput && opacityValText) {
+      opacityInput.addEventListener('input', (e) => {
+        opacityValText.textContent = `${e.target.value}%`;
+      });
+    }
+
     // 绑定添加自定义线材颜色与针法按钮
     addClick('btn-add-custom-yarn', () => {
       const hexInput = document.getElementById('input-custom-yarn-color');
-      const hex = hexInput ? hexInput.value : '#000000';
+      const hex = hexInput ? hexInput.value : '#D18E97';
+      const opacityEl = document.getElementById('input-custom-yarn-opacity');
+      const opacity = opacityEl ? (parseInt(opacityEl.value) / 100) : 0.6;
+      const color = this.hexToRgba(hex, opacity);
+
       const nameInput = document.getElementById('input-custom-yarn-name');
       const symbolInput = document.getElementById('input-custom-yarn-symbol');
       const symbolType = symbolInput ? symbolInput.value : '';
@@ -1864,7 +1886,7 @@ const App = {
         baseStitch: baseStitch,
         symbol: symbol,
         name: name,
-        color: hex,
+        color: color,
         text: name
       };
 

@@ -72,47 +72,47 @@ const Grid = {
   getDefaultStitches() {
     return {
       'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
-      'p':     { symbol: '—',   name: '上针 (P)',                      color: '#EFEBE4', text: '上针 (P)' },
-      'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: '#FDE8B3', text: '挂针 (YO)' },
-      'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: '#E8CFD5', text: '扭针 (Ktbl)' },
-      'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',               color: '#D6B5BD', text: '扭上针 (p1 tbl)' },
-      'ssp':   { symbol: '⋋',   name: '上针的右上2针并1针 (ssp)',      color: '#F7C5BA', text: '上针的右上2针并1针 (ssp)' },
-      'ssk':   { symbol: 'λ',   name: '右上2针并1针 (ssk)',            color: '#F4B8A5', text: '右上2针并1针 (ssk)' },
-      'p2tog': { symbol: '⋌',   name: '上针的左上2针并1针 (p2tog)',    color: '#D4E0C8', text: '上针的左上2针并1针 (p2tog)' },
-      'k2tog': { symbol: '人',  name: '左上2针并1针 (K2tog)',          color: '#C3D5B5', text: '左上2针并1针 (K2tog)' },
-      'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                  color: '#D1E3E2', text: '右加针 (krl)' },
-      'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: '#BACECF', text: '上针的右加针 (prl)' },
-      'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: '#E3D8ED', text: '左加针 (kll)' },
-      'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: '#CDBEDC', text: '上针的左加针 (pll)' },
-      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' },
-      'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: '#E6CBB2', text: '上针的右上2针与1针交叉针' },
-      'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: '#EAD7C5', text: '左上1针与2针交叉针' },
-      'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: '#DFCBB9', text: '上针的左上1针与2针交叉针' },
-      'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: '#F6E3CC', text: '右上2针与2针交叉针' },
-      'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: '#EDD9C1', text: '左上2针与2针交叉针' }
+      'p':     { symbol: '—',   name: '上针 (P)',                      color: 'rgba(239, 235, 228, 0.65)', text: '上针 (P)' },
+      'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: 'rgba(253, 232, 179, 0.65)', text: '挂针 (YO)' },
+      'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: 'rgba(232, 207, 213, 0.65)', text: '扭针 (Ktbl)' },
+      'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',               color: 'rgba(214, 181, 189, 0.65)', text: '扭上针 (p1 tbl)' },
+      'ssp':   { symbol: '⋋',   name: '上针的右上2针并1针 (ssp)',      color: 'rgba(247, 197, 186, 0.65)', text: '上针的右上2针并1针 (ssp)' },
+      'ssk':   { symbol: 'λ',   name: '右上2针并1针 (ssk)',            color: 'rgba(244, 184, 165, 0.65)', text: '右上2针并1针 (ssk)' },
+      'p2tog': { symbol: '⋌',   name: '上针的左上2针并1针 (p2tog)',    color: 'rgba(212, 224, 200, 0.65)', text: '上针的左上2针并1针 (p2tog)' },
+      'k2tog': { symbol: '人',  name: '左上2针并1针 (K2tog)',          color: 'rgba(195, 213, 181, 0.65)', text: '左上2针并1针 (K2tog)' },
+      'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                  color: 'rgba(209, 227, 226, 0.65)', text: '右加针 (krl)' },
+      'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: 'rgba(186, 206, 207, 0.65)', text: '上针的右加针 (prl)' },
+      'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: 'rgba(227, 216, 237, 0.65)', text: '左加针 (kll)' },
+      'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: 'rgba(205, 190, 220, 0.65)', text: '上针的左加针 (pll)' },
+      'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: 'rgba(243, 219, 189, 0.65)', text: '右上2针与1针的交叉针' },
+      'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: 'rgba(230, 203, 178, 0.65)', text: '上针的右上2针与1针交叉针' },
+      'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: 'rgba(234, 215, 197, 0.65)', text: '左上1针与2针交叉针' },
+      'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: 'rgba(223, 203, 185, 0.65)', text: '上针的左上1针与2针交叉针' },
+      'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: 'rgba(246, 227, 204, 0.65)', text: '右上2针与2针交叉针' },
+      'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: 'rgba(237, 217, 193, 0.65)', text: '左上2针与2针交叉针' }
     };
   },
 
   stitches: {
     'k':     { symbol: '|',   name: '下针 (K)',                      color: '#FFFFFF', text: '下针 (K)' },
-    'p':     { symbol: '—',   name: '上针 (P)',                      color: '#EFEBE4', text: '上针 (P)' },
-    'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: '#FDE8B3', text: '挂针 (YO)' },
-    'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: '#E8CFD5', text: '扭针 (Ktbl)' },
-    'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',               color: '#D6B5BD', text: '扭上针 (p1 tbl)' },
-    'ssp':   { symbol: '⋋',   name: '上针的右上2针并1针 (ssp)',      color: '#F7C5BA', text: '上针的右上2针并1针 (ssp)' },
-    'ssk':   { symbol: 'λ',   name: '右上2针并1针 (ssk)',            color: '#F4B8A5', text: '右上2针并1针 (ssk)' },
-    'p2tog': { symbol: '⋌',   name: '上针的左上2针并1针 (p2tog)',    color: '#D4E0C8', text: '上针的左上2针并1针 (p2tog)' },
-    'k2tog': { symbol: '人',  name: '左上2针并1针 (K2tog)',          color: '#C3D5B5', text: '左上2针并1针 (K2tog)' },
-    'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                  color: '#D1E3E2', text: '右加针 (krl)' },
-    'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: '#BACECF', text: '上针的右加针 (prl)' },
-    'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: '#E3D8ED', text: '左加针 (kll)' },
-    'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: '#CDBEDC', text: '上针的左加针 (pll)' },
-    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: '#F3DBBD', text: '右上2针与1针的交叉针' },
-    'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: '#E6CBB2', text: '上针的右上2针与1针交叉针' },
-    'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: '#EAD7C5', text: '左上1针与2针交叉针' },
-    'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: '#DFCBB9', text: '上针的左上1针与2针交叉针' },
-    'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: '#F6E3CC', text: '右上2针与2针交叉针' },
-    'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: '#EDD9C1', text: '左上2针与2针交叉针' }
+    'p':     { symbol: '—',   name: '上针 (P)',                      color: 'rgba(239, 235, 228, 0.65)', text: '上针 (P)' },
+    'yo':    { symbol: '○',   name: '挂针 (YO)',                     color: 'rgba(253, 232, 179, 0.65)', text: '挂针 (YO)' },
+    'ktbl':  { symbol: '∧',   name: '扭针 (Ktbl)',                   color: 'rgba(232, 207, 213, 0.65)', text: '扭针 (Ktbl)' },
+    'p1tbl': { symbol: '∧_',  name: '扭上针 (p1 tbl)',               color: 'rgba(214, 181, 189, 0.65)', text: '扭上针 (p1 tbl)' },
+    'ssp':   { symbol: '⋋',   name: '上针的右上2针并1针 (ssp)',      color: 'rgba(247, 197, 186, 0.65)', text: '上针的右上2针并1针 (ssp)' },
+    'ssk':   { symbol: 'λ',   name: '右上2针并1针 (ssk)',            color: 'rgba(244, 184, 165, 0.65)', text: '右上2针并1针 (ssk)' },
+    'p2tog': { symbol: '⋌',   name: '上针的左上2针并1针 (p2tog)',    color: 'rgba(212, 224, 200, 0.65)', text: '上针的左上2针并1针 (p2tog)' },
+    'k2tog': { symbol: '人',  name: '左上2针并1针 (K2tog)',          color: 'rgba(195, 213, 181, 0.65)', text: '左上2针并1针 (K2tog)' },
+    'krl':   { symbol: 'ᵀ/',  name: '右加针 (krl)',                  color: 'rgba(209, 227, 226, 0.65)', text: '右加针 (krl)' },
+    'prl':   { symbol: 'ᵀ/_', name: '上针的右加针 (prl)',           color: 'rgba(186, 206, 207, 0.65)', text: '上针的右加针 (prl)' },
+    'kll':   { symbol: '\\ᵀ', name: '左加针 (kll)',                  color: 'rgba(227, 216, 237, 0.65)', text: '左加针 (kll)' },
+    'pll':   { symbol: '\\ᵀ_',name: '上针的左加针 (pll)',           color: 'rgba(205, 190, 220, 0.65)', text: '上针的左加针 (pll)' },
+    'c21':   { symbol: '╳',   name: '右上2针与1针的交叉针',          color: 'rgba(243, 219, 189, 0.65)', text: '右上2针与1针的交叉针' },
+    'c21p':  { symbol: '╳',   name: '上针的右上2针与1针交叉针',      color: 'rgba(230, 203, 178, 0.65)', text: '上针的右上2针与1针交叉针' },
+    'c12':   { symbol: '╳',   name: '左上1针与2针交叉针',            color: 'rgba(234, 215, 197, 0.65)', text: '左上1针与2针交叉针' },
+    'c12p':  { symbol: '╳',   name: '上针的左上1针与2针交叉针',      color: 'rgba(223, 203, 185, 0.65)', text: '上针的左上1针与2针交叉针' },
+    'c22r':  { symbol: '╳╳',  name: '右上2针与2针交叉针',            color: 'rgba(246, 227, 204, 0.65)', text: '右上2针与2针交叉针' },
+    'c22l':  { symbol: '╳╳',  name: '左上2针与2针交叉针',            color: 'rgba(237, 217, 193, 0.65)', text: '左上2针与2针交叉针' }
   },
 
   loadProjectStitches(customStitches) {
@@ -181,6 +181,31 @@ const Grid = {
       return `<span style="color: ${color}; font-weight: bold;">${st ? (st.symbol || '') : ''}</span>`;
     }
     return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" style="color: ${color}; display: block; overflow: visible;">${paths}</svg>`;
+  },
+
+  getStrokeColor(colorStr) {
+    if (!colorStr) return '#3c3530';
+    let r = 255, g = 255, b = 255, a = 1;
+    if (colorStr.startsWith('rgb')) {
+      const parts = colorStr.match(/[\d.]+/g);
+      if (parts && parts.length >= 3) {
+        r = parseFloat(parts[0]);
+        g = parseFloat(parts[1]);
+        b = parseFloat(parts[2]);
+        if (parts.length >= 4) a = parseFloat(parts[3]);
+      }
+    } else {
+      let hex = colorStr.replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      if (hex.length >= 6) {
+        r = parseInt(hex.substring(0, 2), 16);
+        g = parseInt(hex.substring(2, 4), 16);
+        b = parseInt(hex.substring(4, 6), 16);
+      }
+    }
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    if (yiq < 128 && a > 0.4) return 'rgba(255, 255, 255, 0.95)';
+    return '#3c3530';
   },
 
   // 动态增减网格行与列
@@ -541,18 +566,7 @@ const Grid = {
             // 已在起始格统一跨格绘制，跳过
           } else {
             // 这是跨格交叉针的起始单元格，计算连续格子总像素宽度与整体伸展 SVG 路径
-            let strokeColor = '#3c3530';
-            if (stitch.color) {
-              let hex = stitch.color.replace('#', '');
-              if (hex.length === 3) hex = hex.split('').map(ch => ch + ch).join('');
-              if (hex.length === 6) {
-                const red = parseInt(hex.substring(0, 2), 16);
-                const green = parseInt(hex.substring(2, 4), 16);
-                const blue = parseInt(hex.substring(4, 6), 16);
-                const yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
-                if (yiq < 128) strokeColor = 'rgba(255, 255, 255, 0.95)';
-              }
-            }
+            const strokeColor = this.getStrokeColor(stitch.color);
 
             // 计算实际占据的连续格子数 (最大 cfg.span 格)
             let spanCount = 1;
@@ -578,18 +592,7 @@ const Grid = {
         } else {
           const svgPaths = this.getStitchSVGPaths(stitchKey);
           if (svgPaths) {
-            let strokeColor = '#3c3530';
-            if (stitch.color) {
-              let hex = stitch.color.replace('#', '');
-              if (hex.length === 3) hex = hex.split('').map(ch => ch + ch).join('');
-              if (hex.length === 6) {
-                const red = parseInt(hex.substring(0, 2), 16);
-                const green = parseInt(hex.substring(2, 4), 16);
-                const blue = parseInt(hex.substring(4, 6), 16);
-                const yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
-                if (yiq < 128) strokeColor = 'rgba(255, 255, 255, 0.95)';
-              }
-            }
+            const strokeColor = this.getStrokeColor(stitch.color);
 
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             const iconSize = 20;

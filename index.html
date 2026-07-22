@@ -372,20 +372,16 @@
             </div>
             
             <div class="custom-yarn-builder" style="margin-top: 1rem; border-top: 1px solid var(--card-border); padding-top: 0.75rem;">
-              <div style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem;">Add Custom Yarn Color / 自定义颜料</div>
+              <div style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem;">Add Custom Yarn Color / 自定义颜料与不透明度</div>
               <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
                 <select id="input-custom-yarn-symbol" style="flex: 1; font-size: 0.85rem; padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main);">
                   <option value="plain">Color Block (No Symbol) / 纯色无符号</option>
-                  <option value="k">Knit / 下针</option>
-                  <option value="p">Purl / 上针</option>
-                  <option value="yo">Yarn Over / 空加针</option>
-                  <option value="k2tog">K2tog / 左上2并1</option>
-                  <option value="ssk">SSK / 右上2并1</option>
-                  <option value="c2f">C2F Cable / 2针左上交叉</option>
-                  <option value="c2b">C2B Cable / 2针右上交叉</option>
-                  <option value="sl">Slip / 滑针</option>
-                  <option value="m1">Make 1 / 扭加针</option>
                 </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; width: 100%;">
+                <span style="font-size: 0.78rem; color: var(--text-muted); flex-shrink: 0;">透明度 / Opacity:</span>
+                <input type="range" id="input-custom-yarn-opacity" min="10" max="100" value="60" style="flex: 1; cursor: pointer;">
+                <span id="text-custom-yarn-opacity-val" style="font-size: 0.78rem; font-weight: 600; width: 36px; text-align: right; color: var(--text-main);">60%</span>
               </div>
               <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <input type="color" id="input-custom-yarn-color" value="#D18E97" style="width: 38px; height: 32px; border: 1px solid var(--card-border); border-radius: 4px; cursor: pointer; padding: 2px; background: transparent;">
