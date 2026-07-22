@@ -50,10 +50,6 @@
               <span class="creation-title">网格图解 / Pixel Grid</span>
               <span class="creation-desc">制作交互填色网格图解与编织行数追踪 / Design multi-color grids with interactive drawing</span>
             </button>
-            <button type="button" id="btn-import-csv" class="creation-link-item" onclick="App.openImportCSV(event)" style="--hover-bg: #979E6C; --hover-text: #BC5727; --title-color: #838e55; --dark-title-color: #979E6C;">
-              <span class="creation-title">导入表格 / Excel / CSV</span>
-              <span class="creation-desc">上传本地 CSV/Excel 表格生成网格图解 / Upload local spreadsheets and convert them into grids</span>
-            </button>
           </div>
         </div>
 
@@ -141,47 +137,6 @@
         </div>
         <div class="form-actions">
           <button type="button" id="btn-save-grid-project" class="btn primary" onclick="App.createGridProject(event)">创建空白网格 / Create Blank Grid</button>
-        </div>
-      </div>
-    </main>
-
-    <!-- 视图：导入 Excel/CSV 网格 -->
-    <main id="view-import-csv" class="app-view">
-      <div class="card form-card">
-        <button class="back-link" id="btn-back-csv-create">← 返回主控制台 / Back to Dashboard</button>
-        <h2>导入表格 / IMPORT EXCEL / CSV GRID</h2>
-        <div class="form-group">
-          <label for="csv-project-name">项目名称 / Project Name</label>
-          <input type="text" id="csv-project-name" placeholder="例如：提花背心图解 / e.g. Jacquard Sweater Vest" required>
-        </div>
-        <div class="form-group">
-          <label for="csv-tutorial-url">参考教程链接（可选） / Reference Tutorial Link (Optional)</label>
-          <input type="text" id="csv-tutorial-url" placeholder="例如：https://www.youtube.com/watch?v=... / e.g. https://...">
-        </div>
-        <div class="form-group">
-          <label for="csv-file-input">选择表格文件（从 Excel 导出的 .csv） / Select CSV File</label>
-          <input type="file" id="csv-file-input" accept=".csv,.txt">
-          <div class="helper-text">提示：在 Excel 中用符号标注每个格子（如 X, O, K, P），另存为 CSV (逗号分隔) 格式后上传即可。</div>
-        </div>
-        <div class="form-group">
-          <label for="csv-raw-input">Or paste CSV text directly below (comma / tab / space separated)</label>
-          <textarea id="csv-raw-input" rows="8" placeholder="X,X,O,O,X,X&#10;X,X,O,O,X,X&#10;O,O,X,X,O,O"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group full">
-            <label>Knitting Technique</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="csv-knit-type" value="flat" checked> Flat (Flat)
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="csv-knit-type" value="circular"> Circular (In the round)
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button type="button" id="btn-save-csv-project" class="btn primary" onclick="App.createCSVProject(event)">Parse & Generate Chart</button>
         </div>
       </div>
     </main>
