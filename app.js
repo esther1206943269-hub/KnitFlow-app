@@ -2906,6 +2906,30 @@ const App = {
 
     addClick('btn-grid-toggle-bindoff', () => this.toggleBindOffDots());
 
+    // 绑定针法图例表折叠与展开切换
+    addClick('btn-toggle-legend', () => {
+      const listEl = document.getElementById('stitch-legend-list');
+      const arrowEl = document.getElementById('legend-toggle-arrow');
+      if (!listEl) return;
+
+      const isHidden = listEl.classList.contains('hidden');
+      if (isHidden) {
+        listEl.classList.remove('hidden');
+        if (arrowEl) {
+          arrowEl.innerHTML = '▼ 折叠';
+          arrowEl.style.background = 'var(--primary-light)';
+          arrowEl.style.color = 'var(--primary)';
+        }
+      } else {
+        listEl.classList.add('hidden');
+        if (arrowEl) {
+          arrowEl.innerHTML = '▲ 展开';
+          arrowEl.style.background = 'var(--card-border)';
+          arrowEl.style.color = 'var(--text-muted)';
+        }
+      }
+    });
+
     // 网格编辑模式切换
     addClick('btn-grid-toggle-mode', () => {
       Grid.isEditMode = !Grid.isEditMode;
