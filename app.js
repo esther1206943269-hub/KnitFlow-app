@@ -1763,7 +1763,9 @@ const App = {
   updateBindOffDotsUI() {
     const statusEl = document.getElementById('bindoff-dots-status');
     if (statusEl) {
-      const info = Grid.getBindOffInfo();
+      const info = (typeof Grid.getBindOffInfo === 'function') 
+        ? Grid.getBindOffInfo() 
+        : { rowNum: (Grid.height || 20) + 1, isRS: true, label: '正面行收针', shortLabel: '收针(正面)', color: '#D18E97', directionText: '【从右向左 ←】' };
       statusEl.textContent = Grid.showBindOffDots ? `⚫ 收针点: 显 (${info.shortLabel})` : '⚪ 收针点: 隐';
       if (statusEl.parentElement) {
         statusEl.parentElement.title = `收针行：第 ${info.rowNum} 行 - ${info.label} ${info.directionText}`;
@@ -1779,7 +1781,9 @@ const App = {
     }
     this.updateBindOffDotsUI();
     this.renderGridCanvas();
-    const info = Grid.getBindOffInfo();
+    const info = (typeof Grid.getBindOffInfo === 'function') 
+      ? Grid.getBindOffInfo() 
+      : { label: '收针' };
     this.showToast(Grid.showBindOffDots ? `已显示顶层 ${info.label} 指示点` : '已隐藏顶层收针指示点');
   },
 
