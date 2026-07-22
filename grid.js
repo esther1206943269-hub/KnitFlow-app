@@ -507,11 +507,13 @@ const Grid = {
     for (let r = 0; r < this.height; r++) {
       const rowNum = r + 1;
       const rowIndex = r; // 0-indexed，底层往上
+      let skipUntilCol = 0; // 记录当前行跨格 Motif 的跳过截止列
       
       for (let c = 0; c < this.width; c++) {
         const colIndex = c; // 0-indexed，左往右
         const stitchKey = this.data[rowIndex][colIndex];
         const stitch = this.stitches[stitchKey] || this.stitches['k'];
+        const multiCfg = this.getMultiCellConfig(stitchKey);
 
         // 计算格子坐标
         // x轴：左侧轴宽度 + (colIndex * cellSize)
@@ -559,18 +561,14 @@ const Grid = {
         cellsGroup.appendChild(rect);
 
         // 绘制针法 SVG 矢量符号 (放入顶部符号图层 iconsGroup)
-        if (this.multiCellConfig[stitchKey]) {
-          const cfg = this.multiCellConfig[stitchKey];
-          // 如果前一格 (colIndex - 1) 也是相同的多格针法，说明已经是跨格符号的一部分，跳过避免重复渲染
-          if (colIndex > 0 && this.data[rowIndex][colIndex - 1] === stitchKey) {
-            // 已在起始格统一跨格绘制，跳过
+        if (multiCfg) {
+          // 如果当前列尚处于上一个跨格 Motif 的伸展绘制范围内，跳过避免重复覆盖
+          if (colIndex < skipUntilCol) {
+            // 已由起点的 Motif 统一拉伸绘制
           } else {
-            // 这是跨格交叉针的起始单元格，计算连续格子总像素宽度与整体伸展 SVG 路径
-            const strokeColor = this.getStrokeColor(stitch.color);
-
-            // 计算实际占据的连续格子数 (最大 cfg.span 格)
+            // 这是新的跨格 Motif 的起始列！计算它实际连续占用的格子数 (最大为 multiCfg.span)
             let spanCount = 1;
-            for (let offset = 1; offset < cfg.span; offset++) {
+            for (let offset = 1; offset < multiCfg.span; offset++) {
               if (colIndex + offset < this.width && this.data[rowIndex][colIndex + offset] === stitchKey) {
                 spanCount++;
               } else {
@@ -578,15 +576,19 @@ const Grid = {
               }
             }
 
+            // 标记后续连续被此 Motif 占用的单元格列
+            skipUntilCol = colIndex + spanCount;
+
+            const strokeColor = this.getStrokeColor(stitch.color);
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             const targetWidth = cellSize * spanCount;
             const targetHeight = cellSize;
-            const scaleX = targetWidth / cfg.vbW;
-            const scaleY = targetHeight / cfg.vbH;
+            const scaleX = targetWidth / multiCfg.vbW;
+            const scaleY = targetHeight / multiCfg.vbH;
             
             group.setAttribute('transform', `translate(${x}, ${y}) scale(${scaleX}, ${scaleY})`);
             group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
-            group.innerHTML = `<path d="${cfg.path}" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+            group.innerHTML = `<path d="${multiCfg.path}" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
             iconsGroup.appendChild(group);
           }
         } else {
