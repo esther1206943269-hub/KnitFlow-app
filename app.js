@@ -1872,15 +1872,121 @@ const App = {
     this.switchView('view-create-grid');
   },
 
-  openImportCSV(e) {
+  createTextProject(e) {
     if (e && e.preventDefault) e.preventDefault();
-    const nameEl = document.getElementById('csv-project-name');
-    const fileEl = document.getElementById('csv-file-input');
-    const rawEl = document.getElementById('csv-raw-input');
-    if (nameEl) nameEl.value = '';
-    if (fileEl) fileEl.value = null;
-    if (rawEl) rawEl.value = '';
-    this.switchView('view-import-csv');
+    const nameInput = document.getElementById('text-project-name');
+    const patternInput = document.getElementById('text-pattern-input');
+    const tutorialInput = document.getElementById('text-tutorial-url');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const rawPattern = patternInput ? patternInput.value.trim() : '';
+    const tutorialUrl = tutorialInput ? tutorialInput.value.trim() : '';
+
+    if (!name) {
+      alert('请填写项目名称 / Please enter project name');
+      if (nameInput) nameInput.focus();
+      return;
+    }
+    if (!rawPattern) {
+      alert('请填写文字图解内容 / Please enter pattern instructions');
+      if (patternInput) patternInput.focus();
+      return;
+    }
+
+    const rawLines = rawPattern.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const parsedData = [];
+
+    rawLines.forEach((line) => {
+      const rangeMatch = line.match(/^(?:R|row|第)?\s*(\d+)\s*[-~到]\s*(\d+)\s*(?:行|row)?[:：\s]*(.*)$/i);
+      if (rangeMatch) {
+        const start = parseInt(rangeMatch[1], 10);
+        const end = parseInt(rangeMatch[2], 10);
+        const text = rangeMatch[3].trim() || line;
+        for (let r = start; r <= end; r++) {
+          parsedData.push({ rowNum: r, text: text });
+        }
+      } else {
+        const textOnly = line.replace(/^(?:R|row|第)?\s*\d+\s*(?:行|row)?[:：\s]*/i, '').trim();
+        parsedData.push({
+          rowNum: parsedData.length + 1,
+          text: textOnly || line
+        });
+      }
+    });
+
+    if (parsedData.length === 0) {
+      alert('无法解析文字说明，请检查输入格式。');
+      return;
+    }
+
+    const referenceLinks = [];
+    if (tutorialUrl) {
+      referenceLinks.push({ title: '参考教程', url: tutorialUrl });
+    }
+
+    const newProj = {
+      id: 'proj-text-' + Date.now(),
+      name: name,
+      type: 'text',
+      currentLoc: 1,
+      totalTime: 0,
+      referenceLinks: referenceLinks,
+      updatedAt: new Date().toISOString(),
+      data: parsedData
+    };
+
+    this.projects.unshift(newProj);
+    this.saveProjects();
+    this.renderProjectList();
+    this.openProject(newProj.id);
+    this.showToast(`成功创建文字图解项目 “${name}”！`);
+  },
+
+  createGridProject(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const nameInput = document.getElementById('grid-project-name');
+    const widthInput = document.getElementById('grid-width');
+    const heightInput = document.getElementById('grid-height');
+    const tutorialInput = document.getElementById('grid-tutorial-url');
+
+    const knitTypeEl = document.querySelector('input[name="grid-knit-type"]:checked');
+    const knitType = knitTypeEl ? knitTypeEl.value : 'flat';
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const width = widthInput ? (parseInt(widthInput.value, 10) || 20) : 20;
+    const height = heightInput ? (parseInt(heightInput.value, 10) || 20) : 20;
+    const tutorialUrl = tutorialInput ? tutorialInput.value.trim() : '';
+
+    if (!name) {
+      alert('请填写项目名称 / Please enter project name');
+      if (nameInput) nameInput.focus();
+      return;
+    }
+
+    Grid.initBlank(width, height, knitType);
+
+    const referenceLinks = [];
+    if (tutorialUrl) {
+      referenceLinks.push({ title: '参考教程', url: tutorialUrl });
+    }
+
+    const newProj = {
+      id: 'proj-grid-' + Date.now(),
+      name: name,
+      type: 'grid',
+      currentLoc: 1,
+      knitType: knitType,
+      totalTime: 0,
+      referenceLinks: referenceLinks,
+      updatedAt: new Date().toISOString(),
+      data: Grid.data
+    };
+
+    this.projects.unshift(newProj);
+    this.saveProjects();
+    this.renderProjectList();
+    this.openProject(newProj.id);
+    this.showToast(`成功创建网格图解项目 “${name}”！`);
   },
 
   // ==========================================================================
