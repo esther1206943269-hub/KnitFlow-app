@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnitFlow - 智能棒针编织行数记录与图解助手</title>
+  <link rel="stylesheet" href="styles.css?v=20260723_200">
+  <!-- 引入 Google Fonts 提升排版质感 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 头部导航 -->
+    <header class="main-header">
+      <div class="logo-area" id="btn-home">
+        <h1>KnitFlow <span class="subtitle">编织行行好</span></h1>
+      </div>
+      <div class="header-actions" style="display: flex; align-items: center; gap: 0.65rem;">
+        <!-- 实时在线人数 Badge -->
+        <div id="online-users-badge" style="display: flex; align-items: center; gap: 6px; background: rgba(76, 175, 80, 0.12); color: #2e7d32; padding: 0.25rem 0.65rem; border-radius: 16px; font-size: 0.78rem; font-weight: 600; border: 1px solid rgba(76, 175, 80, 0.25); white-space: nowrap;" title="当前在线织友人数 / Real-time Online Users">
+          <span class="online-dot"></span>
+          <span id="online-users-count">1 人在线</span>
+        </div>
+        <!-- 网页浏览量统计 Badge -->
+        <div id="pageview-counter-badge" style="display: flex; align-items: center; gap: 4px; background: rgba(209, 142, 151, 0.12); color: var(--primary); padding: 0.25rem 0.65rem; border-radius: 16px; font-size: 0.78rem; font-weight: 600; border: 1px solid rgba(209, 142, 151, 0.25); white-space: nowrap;" title="网页累计访问次数 / Total Pageviews">
+          <span id="pageview-count-number">...</span>
+        </div>
+        <div id="user-auth-entry" class="user-auth-entry">
+          <!-- Rendered dynamically by App.renderUserAuthUI() -->
+        </div>
+        <button id="btn-toggle-theme" class="icon-button" title="切换深浅主题">
+          <svg class="theme-icon" viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9zm0 16a7 7 0 1 1 7-7 7.008 7.008 0 0 1-7 7z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 视图：主页 Dashboard -->
+    <main id="view-dashboard" class="app-view active">
+      <!-- 1:1 原图矢量线条猫咪（固定左上方位置，微晃呼吸动效） -->
+      <div class="fixed-cat-container">
+        <img src="cat_line_art.svg" alt="Line Art Cat">
+      </div>
+
+      <section class="welcome-hero" style="margin-bottom: 1.5rem;">
+        <h2>开始创作 / START YOUR CREATION</h2>
+      </section>
+
+      <div class="dashboard-grid">
+        <!-- 功能区 1: 添加新项目 -->
+        <div class="card create-card">
+          <h3 style="border-left: 2px solid var(--primary); padding-left: 0.6rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">添加新项目 / NEW PROJECTS</h3>
+          <div class="creation-links">
+            <button type="button" id="btn-new-text" class="creation-link-item" style="--hover-bg: #D18E97; --hover-text: #5B3B1E; --title-color: #D18E97; --dark-title-color: #D18E97;">
+              <span class="creation-title">文字图解 / Written Pattern</span>
+              <span class="creation-desc">解析文字文本，生成编织行数追踪 / Generate a row counter from written instructions</span>
+            </button>
+            <button type="button" id="btn-new-grid" class="creation-link-item" style="--hover-bg: #D2A432; --hover-text: #EAE1CB; --title-color: #D2A432; --dark-title-color: #D2A432;">
+              <span class="creation-title">网格图解 / Pixel Grid</span>
+              <span class="creation-desc">制作交互填色网格图解与编织行数追踪 / Design multi-color grids with interactive drawing</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 功能区 2: 我的项目 -->
+        <div class="card projects-card" style="min-height: 100%;">
+          <h3 style="border-left: 2px solid var(--primary); padding-left: 0.6rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">我的项目 / PROJECTS</h3>
+          <div id="project-list" class="project-list">
+            <!-- 动态生成 -->
+            <div class="empty-state">
+              <p>No saved projects yet. Create one to start!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 功能区 3: 预设与自定义图解模板库 -->
+      <div class="card preset-templates-section" style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: nowrap;">
+          <h3 style="border-left: 2px solid var(--accent); padding-left: 0.6rem; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.95rem; opacity: 0.9; white-space: nowrap;">图解库 / TEMPLATE LIBRARY</h3>
+          <button id="btn-create-template-direct" class="btn text-btn" style="padding: 3px 8px; font-size: 0.72rem; border: 1px dashed var(--primary); color: var(--primary); font-weight: 600; white-space: nowrap;" title="制作新图解模板保存至此处">新建模板 / NEW TEMPLATE</button>
+        </div>
+        <div id="preset-chips-list" class="preset-chips" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem;">
+          <!-- 动态渲染预设与自定义模板 -->
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：文字图解创建 -->
+    <main id="view-create-text" class="app-view">
+      <div class="card form-card">
+        <button class="back-link" id="btn-back-text-create">← 返回主控制台 / Back to Dashboard</button>
+        <h2>新建文字图解 / NEW WRITTEN PATTERN</h2>
+
+        <div class="form-group">
+          <label for="text-project-name">项目名称 / Project Name</label>
+          <input type="text" id="text-project-name" placeholder="例如：小野花披肩/Fiona Cappa" required>
+        </div>
+        <div class="form-group">
+          <label for="text-tutorial-url">参考教程链接（可选） / Reference Tutorial Link (Optional)</label>
+          <input type="text" id="text-tutorial-url" placeholder="例如：https://www.youtube.com/watch?v=... / e.g. https://...">
+        </div>
+        <div class="form-group">
+          <label for="text-pattern-input">文字图解针法说明 / Written Pattern Instructions</label>
+          <div class="helper-text">格式示例 / Format Example:<br>第1行: 3下, 3上, 3下 / Row 1: K3, P3, K3<br>第2行: 3上, 3下, 3上... 或 R1-5: 下针 / Row 2: P3, K3, P3... or R1-5: Knit</div>
+          <textarea id="text-pattern-input" rows="12" placeholder="在此粘贴或输入你的文字图解说明... / Paste or type your written pattern instructions here..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="btn-save-text-project" class="btn primary">解析并开始编织 / Parse & Start Knitting</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：像素图解创建 -->
+    <main id="view-create-grid" class="app-view">
+      <div class="card form-card">
+        <button class="back-link" id="btn-back-grid-create">← 返回主控制台 / Back to Dashboard</button>
+        <h2>新建网格图解 / NEW PIXEL GRID PROJECT</h2>
+        <div class="form-group">
+          <label for="grid-project-name">项目名称 / Project Name</label>
+          <input type="text" id="grid-project-name" placeholder="例如：secret showgirl coaster" required>
+        </div>
+        <div class="form-group">
+          <label for="grid-tutorial-url">参考教程链接（可选） / Reference Tutorial Link (Optional)</label>
+          <input type="text" id="grid-tutorial-url" placeholder="例如：https://www.youtube.com/watch?v=... / e.g. https://...">
+        </div>
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="grid-width">总针数（宽度） / Total Stitches (Width)</label>
+            <input type="number" id="grid-width" value="20" min="5" max="100">
+          </div>
+          <div class="form-group half">
+            <label for="grid-height">总行数（高度） / Total Rows (Height)</label>
+            <input type="number" id="grid-height" value="20" min="5" max="200">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>编织方式 / Knitting Technique</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="grid-knit-type" value="flat" checked> 片织 Flat (单数行右至左，双数行左至右)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="grid-knit-type" value="circular"> 圈织 Circular (所有行均为右至左)
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="btn-save-grid-project" class="btn primary">创建空白网格 / Create Blank Grid</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：文字编织模式 Player -->
+    <main id="view-text-player" class="app-view">
+      <div class="player-layout">
+        <!-- 左侧核心控制面板 -->
+        <div class="player-left">
+          <button class="back-link" id="btn-back-text-player">← Back to Dashboard</button>
+          
+          <div class="card project-header-card">
+            <h2 id="text-player-title">Knitting Project</h2>
+            <div class="project-meta" style="flex-wrap: wrap; gap: 0.5rem 0.75rem;">
+              <span id="text-meta-type" class="badge">Written Pattern</span>
+              <span class="badge time" style="display: inline-flex; align-items: center; gap: 4px; padding: 0.35rem 0.75rem;">
+                ⏱️ <span id="text-meta-time">00:00:00</span>
+                <button id="btn-text-timer-toggle" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0 2px; font-size: 0.8rem; line-height: 1; display: inline-flex; align-items: center;" title="Pause / Resume Timer">⏸️</button>
+              </span>
+              <span id="text-meta-cumulative-time" class="badge secondary" style="padding: 0.35rem 0.75rem;">Total Time: 0m</span>
+              <button id="btn-save-as-template-text" class="badge highlight-btn" style="border: 1px solid var(--accent); color: var(--accent); cursor: pointer; padding: 0.35rem 0.75rem; background: transparent; font-weight: 600;" title="保存当前图解为复用模板">存为模板</button>
+              <div id="text-tutorial-link-area" class="tutorial-link-area"></div>
+            </div>
+            
+          </div>
+
+          <!-- 当前行核心展示卡片 -->
+          <div class="card active-row-card">
+            <div class="row-info-header">
+              <span class="row-label">Active Row</span>
+              
+              <!-- 移动后的 Knitting Progress 进度条 -->
+              <div class="header-progress-inline">
+                <div class="progress-info-row">
+                  <span class="progress-title">Knitting Progress</span>
+                  <span id="text-progress-percent" class="progress-pct">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="text-progress-fill" class="progress-fill"></div>
+                </div>
+              </div>
+
+              <span class="row-total" id="text-row-progress">1 / 40 Rows</span>
+            </div>
+            
+            <div class="huge-row-num" id="text-huge-row-num">ROW 1</div>
+            
+            <div class="stitch-instructions" id="text-stitch-instructions">
+              Loading instructions...
+            </div>
+            
+            <!-- 动态同步的子图解针法展开提示区域 -->
+            <div id="text-motif-breakdown-area" class="motif-breakdown-card" style="margin-top: 1rem; width: 100%; border-radius: var(--radius-sm); transition: var(--transition);">
+            </div>
+            
+            <div class="player-controls">
+              <button id="btn-text-prev" class="btn round-btn secondary" title="Previous Row (Backspace)">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+              </button>
+              
+              <button id="btn-text-next" class="btn round-btn primary huge-btn" title="Next Row (Spacebar)">
+                <span class="btn-text">Next Row</span>
+                <span class="btn-subtext">Spacebar</span>
+              </button>
+            </div>
+
+            <div class="mini-controls">
+              <button id="btn-text-reset" class="btn text-btn">重置进度 / Reset</button>
+              <button id="btn-text-edit" class="btn text-btn">编辑图解 / Edit Pattern</button>
+              <button id="btn-text-copy" class="btn text-btn">复制文本 / Copy Text</button>
+              <button id="btn-text-print" class="btn text-btn">打印图解 / Print Sheet</button>
+            </div>
+          </div>
+
+          <!-- 项目备注与编织参数卡片 -->
+          <div class="card project-notes-card" id="text-notes-card" style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                📌 项目备注与编织参数 / Notes & Specs
+              </h3>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">自动保存 / Auto-saved</span>
+            </div>
+
+            <!-- 3大核心快速参数纵向全宽大框 (解决任意长文字显示与自动换行问题) -->
+            <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.85rem;">
+              <!-- 针号 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">🪡 针号 / Needle</label>
+                <textarea id="text-notes-needle" class="input-project-needle" rows="1" placeholder="例如：4.5mm 环针" style="width: 100%; border: none; background: transparent; font-size: 0.85rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0; resize: vertical; min-height: 24px; font-family: inherit; line-height: 1.45; box-sizing: border-box;"></textarea>
+              </div>
+              <!-- 线材 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">🧶 线材 / Yarn</label>
+                <textarea id="text-notes-yarn" class="input-project-yarn" rows="1" placeholder="例如：美丽诺羊毛 150g" style="width: 100%; border: none; background: transparent; font-size: 0.85rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0; resize: vertical; min-height: 24px; font-family: inherit; line-height: 1.45; box-sizing: border-box;"></textarea>
+              </div>
+              <!-- 密度小样 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">📏 密度小样 / Gauge</label>
+                <textarea id="text-notes-gauge" class="input-project-gauge" rows="1" placeholder="例如：10cm=22针×30行" style="width: 100%; border: none; background: transparent; font-size: 0.85rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0; resize: vertical; min-height: 24px; font-family: inherit; line-height: 1.45; box-sizing: border-box;"></textarea>
+              </div>
+            </div>
+
+            <!-- 自由文本备注区域 -->
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">自由备注 / Notes:</label>
+              <textarea id="text-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录任何细节..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
+            </div>
+          </div>
+
+          <!-- 教程与针法卡片 -->
+          <div class="card tutorials-card" id="text-tutorials-card" style="margin-top: 1.25rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Reference Tutorials & Links</h3>
+            <div class="tutorials-list" id="text-tutorials-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- 动态填充 -->
+            </div>
+            <div class="tutorials-actions" style="margin-top: 0.5rem; display: flex; justify-content: flex-end;">
+              <button id="btn-text-add-tutorial" class="btn text-btn" style="padding: 4px 8px; font-size: 0.85rem;">➕ Add Tutorial / Link</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧行数滚动预览与花样对照表 (放置于右侧空白区域) -->
+        <div class="player-right">
+          <div class="card list-card">
+            <h3>Rows Overview</h3>
+            <div class="list-container" id="text-rows-list">
+              <!-- 动态填充 -->
+            </div>
+          </div>
+
+          <!-- 子图解 / 花样对照表 -->
+          <div class="card motifs-card" id="text-motifs-card" style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0;">Sub-Patterns Glossary</h3>
+              <button id="btn-add-motif" class="btn text-btn" style="font-size: 0.78rem; padding: 2px 8px; border: 1px solid var(--primary); color: var(--primary); font-weight: 500;">+ Add Motif</button>
+            </div>
+            <div class="helper-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+              Sub-pattern codes & motif keys used in instructions (e.g. [F1], [F2], [Cable A])
+            </div>
+            <div class="motifs-list" id="text-motifs-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 260px; overflow-y: auto;">
+              <!-- 动态渲染子图解对照列表 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 视图：像素网格编织模式 Player -->
+    <main id="view-grid-player" class="app-view">
+      <div class="player-layout grid-layout-override">
+        <!-- 左侧核心控制面板 -->
+        <div class="player-left grid-side-panel">
+          <button class="back-link" id="btn-back-grid-player">← Back to Dashboard</button>
+          
+          <div class="card project-header-card">
+            <h2 id="grid-player-title">Grid Knitting Project</h2>
+            <div class="project-meta" style="flex-wrap: wrap; gap: 0.5rem 0.75rem;">
+              <span id="grid-meta-type" class="badge">Pixel Chart</span>
+              <span id="grid-meta-knit" class="badge">Flat</span>
+              <span class="badge time" style="display: inline-flex; align-items: center; gap: 4px; padding: 0.35rem 0.75rem;">
+                ⏱️ <span id="grid-meta-time">00:00:00</span>
+                <button id="btn-grid-timer-toggle" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0 2px; font-size: 0.8rem; line-height: 1; display: inline-flex; align-items: center;" title="Pause / Resume Timer">⏸️</button>
+              </span>
+              <span id="grid-meta-cumulative-time" class="badge secondary" style="padding: 0.35rem 0.75rem;">Total Time: 0m</span>
+              <div id="grid-tutorial-link-area" class="tutorial-link-area"></div>
+            </div>
+            
+          </div>
+
+          <!-- 当前行指示卡片 -->
+          <div class="card active-row-card" id="grid-active-row-card">
+            <div class="row-info-header">
+              <span class="row-label">当前编织行 / Active Row</span>
+
+              <!-- 移动后的 Knitting Progress 进度条 -->
+              <div class="header-progress-inline">
+                <div class="progress-info-row">
+                  <span class="progress-title">编织进度 / Progress</span>
+                  <span id="grid-progress-percent" class="progress-pct">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="grid-progress-fill" class="progress-fill"></div>
+                </div>
+              </div>
+
+              <span class="row-total" id="grid-row-progress">1 / 20 Rows</span>
+            </div>
+            
+            <div class="huge-row-num" id="grid-huge-row-num">ROW 1</div>
+            
+            <div class="direction-indicator" id="grid-direction-indicator">
+              看图解方向：从右向左 → / Right to Left
+            </div>
+
+            <div class="active-row-stitch-preview" id="grid-row-stitch-preview">
+              <!-- 动态解析出当前行的针目序列简写 -->
+            </div>
+            
+            <div class="player-controls">
+              <button id="btn-grid-prev" class="btn round-btn secondary" title="上一行 / Previous Row (Backspace)">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+              </button>
+              
+              <button id="btn-grid-next" class="btn round-btn primary huge-btn" title="下一行 / Next Row (Spacebar)">
+                <span class="btn-text">下一行 / Next</span>
+                <span class="btn-subtext">空格键 Spacebar</span>
+              </button>
+            </div>
+
+            <div class="mini-controls">
+              <button id="btn-grid-reset" class="btn text-btn">重置进度 / Reset</button>
+              <button id="btn-save-as-template-grid" class="btn text-btn" title="保存当前网格图解为复用模板">存为模板 / Template</button>
+              <button id="btn-grid-export-png" class="btn text-btn">导出图片 / Export PNG</button>
+              <button id="btn-grid-print" class="btn text-btn">打印图解 / Print Sheet</button>
+            </div>
+          </div>
+
+          <!-- 针目符号与色彩画笔选择区 -->
+          <div class="card paint-palette-card" id="paint-palette">
+            <h3 style="margin-bottom: 0.75rem; font-size: 1.05rem; font-weight: 600;">Stitch Symbol & Color Palette / 针法符号与色彩画笔</h3>
+            <div class="palette-grid" id="palette-colors" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem;">
+              <!-- 动态渲染针法与颜色 -->
+            </div>
+            
+            <div class="custom-yarn-builder" style="margin-top: 1rem; border-top: 1px solid var(--card-border); padding-top: 0.75rem;">
+              <div style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem;">Add Custom Yarn Color / 自定义颜料与不透明度</div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <select id="input-custom-yarn-symbol" style="flex: 1; font-size: 0.85rem; padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main);">
+                  <option value="plain">Color Block (No Symbol) / 纯色无符号</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; width: 100%;">
+                <span style="font-size: 0.78rem; color: var(--text-muted); flex-shrink: 0;">透明度 / Opacity:</span>
+                <input type="range" id="input-custom-yarn-opacity" min="10" max="100" value="60" style="flex: 1; cursor: pointer;">
+                <span id="text-custom-yarn-opacity-val" style="font-size: 0.78rem; font-weight: 600; width: 36px; text-align: right; color: var(--text-main);">60%</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <input type="color" id="input-custom-yarn-color" value="#D18E97" style="width: 38px; height: 32px; border: 1px solid var(--card-border); border-radius: 4px; cursor: pointer; padding: 2px; background: transparent;">
+                <input type="text" id="input-custom-yarn-name" placeholder="Yarn Name" style="flex: 1; min-width: 100px; font-size: 0.85rem; padding: 0.35rem 0.6rem; border-radius: 4px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main);">
+                <button id="btn-add-custom-yarn" class="btn text-btn" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; border: 1px solid var(--primary); color: var(--primary);">+ Add</button>
+              </div>
+            </div>
+
+            <div class="helper-text margin-top-sm" style="margin-top: 0.75rem; font-size: 0.8rem; opacity: 0.8;">💡 Tip: Click any symbol/color swatch above, then click or drag on grid cells to paint!</div>
+          </div>
+
+          <!-- 图例展示 (支持点击标题折叠/展开) -->
+          <div class="card legend-card" id="legend-display">
+            <div id="btn-toggle-legend" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; padding: 0.2rem 0; gap: 0.5rem;" title="点击折叠或展开针法图例表">
+              <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; line-height: 1.35;">
+                📖 Stitch Symbol Legend / 针法图例表
+              </h3>
+              <span id="legend-toggle-arrow" style="font-size: 0.78rem; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 0.25rem 0.65rem; border-radius: 12px; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;">▼ 折叠</span>
+            </div>
+            <div class="legend-list" id="stitch-legend-list" style="margin-top: 0.85rem; transition: all 0.3s ease;">
+              <!-- 动态渲染 -->
+            </div>
+          </div>
+
+          <!-- 教程与针法卡片 -->
+          <div class="card tutorials-card" id="grid-tutorials-card" style="margin-top: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Reference Tutorials & Links</h3>
+            <div class="tutorials-list" id="grid-tutorials-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- 动态填充 -->
+            </div>
+            <div class="tutorials-actions" style="margin-top: 0.5rem; display: flex; justify-content: flex-end;">
+              <button id="btn-grid-add-tutorial" class="btn text-btn" style="padding: 4px 8px; font-size: 0.85rem;">➕ Add Tutorial / Link</button>
+            </div>
+          </div>
+
+          <!-- 项目备注与编织参数卡片 -->
+          <div class="card project-notes-card" id="grid-notes-card" style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                📌 项目备注与编织参数 / Notes & Specs
+              </h3>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">自动保存 / Auto-saved</span>
+            </div>
+
+            <!-- 3大核心快速参数纵向全宽大框 (解决任意长文字显示与自动换行问题) -->
+            <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.85rem;">
+              <!-- 针号 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">🪡 针号 / Needle</label>
+                <textarea id="grid-notes-needle" class="input-project-needle" rows="1" placeholder="例如：4.5mm 环针" style="width: 100%; border: none; background: transparent; font-size: 0.85rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0; resize: vertical; min-height: 24px; font-family: inherit; line-height: 1.45; box-sizing: border-box;"></textarea>
+              </div>
+              <!-- 线材 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">🧶 线材 / Yarn</label>
+                <textarea id="grid-notes-yarn" class="input-project-yarn" rows="1" placeholder="例如：美丽诺羊毛 150g" style="width: 100%; border: none; background: transparent; font-size: 0.85rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0; resize: vertical; min-height: 24px; font-family: inherit; line-height: 1.45; box-sizing: border-box;"></textarea>
+              </div>
+              <!-- 密度小样 -->
+              <div style="background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.75rem;">
+                <label style="font-size: 0.78rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">📏 密度小样 / Gauge</label>
+                <textarea id="grid-notes-gauge" class="input-project-gauge" rows="1" placeholder="例如：10cm=22针×30行" style="width: 100%; border: none; background: transparent; font-size: 0.85rem; color: var(--text-main); font-weight: 600; outline: none; padding: 0; resize: vertical; min-height: 24px; font-family: inherit; line-height: 1.45; box-sizing: border-box;"></textarea>
+              </div>
+            </div>
+
+            <!-- 自由文本备注区域 -->
+            <div>
+              <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">自由备注 / Notes:</label>
+              <textarea id="grid-notes-memo" class="textarea-project-memo" rows="3" placeholder="在此记录任何细节..." style="width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.82rem; color: var(--text-main); background: var(--bg-color); resize: vertical; box-sizing: border-box; line-height: 1.45; outline: none; font-family: inherit;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧像素网格画布 -->
+        <div class="player-right grid-canvas-panel">
+          <div class="card grid-container-card">
+            <div class="grid-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div class="toolbar-left" style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="tool-title" style="font-weight: 600;">Chart Canvas</span>
+                <button id="btn-grid-toggle-mode" class="btn" style="background: linear-gradient(135deg, #D18E97, #C06C76) !important; color: #ffffff !important; padding: 0.5rem 1rem !important; border-radius: 20px !important; font-weight: 700 !important; font-size: 0.88rem !important; cursor: pointer; border: none !important; box-shadow: 0 4px 14px rgba(209, 142, 151, 0.45) !important;">🎨 编辑网格图解与颜料 / Edit Grid</button>
+              </div>
+              <div class="toolbar-right" style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                <!-- 动态扩展网格尺寸按钮 -->
+                <div class="grid-dim-actions" style="display: flex; gap: 2px; border: 1px solid var(--card-border); border-radius: 4px; padding: 2px; background: var(--bg-color);">
+                  <button id="btn-grid-add-row" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="底部增加一行">＋Row</button>
+                  <button id="btn-grid-remove-row" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="减少一行">－Row</button>
+                  <button id="btn-grid-add-col" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="右侧增加一列">＋Col</button>
+                  <button id="btn-grid-remove-col" class="btn text-btn" style="padding: 2px 6px; font-size: 0.75rem;" title="减少一列">－Col</button>
+                </div>
+                <button id="btn-grid-zoom-in" class="btn icon-only-btn" title="Zoom In">＋</button>
+                <button id="btn-grid-zoom-out" class="btn icon-only-btn" title="Zoom Out">－</button>
+                <button id="btn-grid-toggle-bindoff" class="btn text-btn" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--card-border); border-radius: 4px; font-weight: 600; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 3px;" title="点击切换顶部收针指示点显隐">
+                  <span id="bindoff-dots-status">⚫ 收针点: 显</span>
+                </button>
+                <!-- 复制/粘贴行花样按钮 (仅在编辑图解模式下显现) -->
+                <button id="btn-grid-copy-modal" class="btn text-btn hidden" style="padding: 2px 10px; font-size: 0.78rem; border: 1.5px solid #839958; border-radius: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; display: none; align-items: center; gap: 4px; background: #FFFDF7; color: #5a7032; transition: all 0.2s ease;" title="复制粘贴工具：快速将单行或多行花样复制覆盖到其它行">
+                  <span>📋 复制/粘贴行</span>
+                </button>
+                <!-- 橡皮擦工具按钮 (仅在编辑图解模式下显现) -->
+                <button id="btn-grid-eraser" class="btn text-btn hidden" style="padding: 2px 10px; font-size: 0.78rem; border: 1.5px solid #D18E97; border-radius: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; display: none; align-items: center; gap: 4px; background: #FFFDF7; color: var(--primary); transition: all 0.2s ease;" title="橡皮擦工具：开启后在网格上涂抹即可擦除画错的针法与颜色">
+                  <span id="eraser-btn-text">🧹 橡皮擦 / Eraser</span>
+                </button>
+
+                <button id="btn-edit-clear" class="btn text-btn danger-text hidden" style="display: none;">Clear Canvas</button>
+
+
+
+              </div>
+            </div>
+            
+            <div class="grid-scroll-wrapper">
+              <div class="grid-canvas-container" id="grid-canvas-container">
+                <!-- SVG 或 HTML 动态渲染的网格 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- 独立花样/针法对照批量与多行编辑器弹窗 (不透明极简高对比卡片) -->
+  <div id="motif-modal" class="modal-overlay hidden">
+    <div class="modal-card card" style="max-width: 580px; width: 92%; background: #FAF6F0; border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 20px 50px rgba(0,0,0,0.3); border-radius: var(--radius-lg); padding: 1.5rem; opacity: 1;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 0.75rem;">
+        <h3 style="margin: 0; font-size: 1.1rem; font-family: var(--font-serif); color: #111111; font-weight: 700;">独立花样/针法对照编辑器 (Sub-Patterns)</h3>
+        <button id="btn-close-motif-modal" class="btn text-btn" style="font-size: 1.2rem; line-height: 1; padding: 2px 6px; color: #333333;">✕</button>
+      </div>
+
+      <!-- 模式切换标签卡 -->
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 0.5rem;">
+        <button id="tab-btn-motif-batch" class="btn text-btn" style="font-weight: 700; border-bottom: 2px solid #111111; border-radius: 0; color: #111111;">⚡ 批量一次全写 (Batch Input)</button>
+        <button id="tab-btn-motif-single" class="btn text-btn" style="font-weight: 500; opacity: 0.75; color: #444444;">📝 单个花样多行编辑 (Single Item)</button>
+      </div>
+
+      <!-- Tab 1: 批量写输入 -->
+      <div id="motif-tab-batch">
+        <div class="helper-text" style="margin-bottom: 0.5rem; font-size: 0.82rem; color: #444444; line-height: 1.4;">
+          💡 <strong style="color: #111111;">支持直接复制粘贴所有的花样与分行说明！</strong>格式如 <code>[F16]</code>（或 <code>[花样A]</code>），紧接着写各行的编织针法。
+        </div>
+        <textarea id="motif-batch-input" rows="11" style="width: 100%; font-size: 0.88rem; font-family: var(--font-sans); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(0,0,0,0.2); background: #FFFFFF; color: #111111; line-height: 1.45; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" placeholder="示例格式：
+
+[小野花]
+F1 [4上, 1下, 空加针, 1下, 空加针, 1下, 4上]
+F2 [4下, 7上, 4下]
+F3 [3上, k2tog, 2下, 空加针, 1下, 3上]
+F4 [3下, 3上, 1扭下, 1上, 1扭下, 3下]
+
+[麻花A]
+R1: 1下, 空加针, 1扭上, 31下
+R2: 1上, 1扭下, 31上"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button id="btn-cancel-motif-batch" class="btn text-btn" style="color: #444444;">取消</button>
+          <button id="btn-save-motif-batch" class="btn primary" style="background: #111111; color: #FFFFFF; font-weight: 700;">一键导入所有独立花样</button>
+        </div>
+      </div>
+
+      <!-- Tab 2: 单个写编辑 -->
+      <div id="motif-tab-single" class="hidden">
+        <input type="hidden" id="motif-single-index" value="-1">
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #111111;">花样/图解代号 (Code/Tag)</label>
+          <input type="text" id="motif-single-code" placeholder="例如 [F16] 或 [Cable A]" style="font-size: 0.85rem; padding: 0.5rem 0.6rem; background: #FFFFFF; color: #111111; border: 1px solid rgba(0,0,0,0.2); border-radius: 6px;">
+        </div>
+        <div class="form-group">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #111111;">分行针法解说 (Multi-line Pattern Text)</label>
+          <textarea id="motif-single-desc" rows="7" placeholder="支持多行书写，示例：
+R1: 1下, 1扭上, 1下
+R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height: 1.4; background: #FFFFFF; color: #111111; border: 1px solid rgba(0,0,0,0.2); border-radius: 6px;"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button id="btn-cancel-motif-single" class="btn text-btn" style="color: #444444;">取消</button>
+          <button id="btn-save-motif-single" class="btn primary" style="background: #111111; color: #FFFFFF; font-weight: 700;">保存花样</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：用户登录与注册 -->
+  <div id="auth-modal" class="modal-backdrop hidden">
+    <div class="modal-card auth-modal-card" style="max-width: 380px; padding: 1.5rem; position: relative;">
+      <button class="modal-close-btn" id="btn-close-auth-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      
+      <div class="auth-header" style="text-align: center; margin-bottom: 1.2rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">✨ 欢迎使用 KnitFlow</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">登录个人账号，保存属于你的项目与图解库</p>
+      </div>
+
+      <div class="auth-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px dashed var(--card-border); padding-bottom: 0.5rem;">
+        <button id="auth-tab-login" class="btn text-btn auth-tab-btn active" style="flex: 1; padding: 0.4rem 0; font-weight: 700; border-bottom: 2px solid var(--primary); border-radius: 0;">登录 / Login</button>
+        <button id="auth-tab-register" class="btn text-btn auth-tab-btn" style="flex: 1; padding: 0.4rem 0; font-weight: 600; opacity: 0.7; border-radius: 0;">注册 / Register</button>
+      </div>
+
+      <!-- 登录表单 -->
+      <form id="form-login" class="auth-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="login-account" style="font-size: 0.8rem; font-weight: 500;">邮箱 / 手机号 / 用户名</label>
+          <input type="text" id="login-account" placeholder="Email, phone or username" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label for="login-password" style="font-size: 0.8rem; font-weight: 500;">密码 / Password</label>
+            <button type="button" id="btn-open-forgot-pwd" style="background: none; border: none; font-size: 0.76rem; color: var(--primary); cursor: pointer; text-decoration: underline; padding: 0;">忘记密码？</button>
+          </div>
+          <input type="password" id="login-password" placeholder="输入你的登录密码" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">登录账号 / Log In</button>
+      </form>
+
+      <!-- 注册表单 -->
+      <form id="form-register" class="auth-form hidden" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-username" style="font-size: 0.8rem; font-weight: 500;">用户名 / Username</label>
+          <input type="text" id="reg-username" placeholder="设置你的昵称 (如：小毛球)" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-account" style="font-size: 0.8rem; font-weight: 500;">邮箱或手机号 / Email or Phone</label>
+          <input type="text" id="reg-account" placeholder="name@example.com 或 138..." required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="reg-password" style="font-size: 0.8rem; font-weight: 500;">设置密码 / Password</label>
+          <input type="password" id="reg-password" placeholder="至少 6 位密码" minlength="6" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">注册并开始使用 / Sign Up</button>
+      </form>
+
+      <div style="margin-top: 1.2rem; padding-top: 0.8rem; border-top: 1px dashed var(--card-border); text-align: center;">
+        <button type="button" id="btn-force-cloud-sync" class="btn tertiary" style="font-size: 0.78rem; padding: 0.4rem 0.8rem; font-weight: 600; width: 100%; border-radius: var(--radius-sm); color: var(--primary);">
+          ☁️ 一键同步电脑与平板账号 / Sync PC & Tablet Accounts
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：忘记密码/邮箱重置密码 -->
+  <div id="forgot-pwd-modal" class="modal-backdrop hidden">
+    <div class="modal-card auth-modal-card" style="max-width: 400px; padding: 1.5rem; position: relative;">
+      <button class="modal-close-btn" id="btn-close-forgot-pwd-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      
+      <div class="auth-header" style="text-align: center; margin-bottom: 1.2rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">📧 找回密码 / Reset Password</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">通过绑定的注册邮箱或手机号重置密码</p>
+      </div>
+
+      <form id="form-forgot-pwd" class="auth-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="forgot-account" style="font-size: 0.8rem; font-weight: 500;">注册邮箱或手机号 / Registered Email or Phone</label>
+          <input type="text" id="forgot-account" placeholder="输入注册时的邮箱或手机号" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="forgot-code" style="font-size: 0.8rem; font-weight: 500;">邮箱验证码 / Verification Code</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="forgot-code" placeholder="6 位验证码" required maxlength="6" style="flex: 1; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+            <button type="button" id="btn-send-forgot-code" class="btn secondary" style="padding: 0.45rem 0.75rem; font-size: 0.78rem; font-weight: 600; flex-shrink: 0; white-space: nowrap;">获取验证码</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="forgot-new-pwd" style="font-size: 0.8rem; font-weight: 500;">设置新密码 / New Password</label>
+          <input type="password" id="forgot-new-pwd" placeholder="至少 6 位新密码" minlength="6" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+
+        <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">重置密码并继续登录 / Reset Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 模态框：修改密码 -->
+  <div id="change-pwd-modal" class="modal-backdrop hidden">
+    <div class="modal-card auth-modal-card" style="max-width: 380px; padding: 1.5rem; position: relative;">
+      <button class="modal-close-btn" id="btn-close-pwd-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      
+      <div class="auth-header" style="text-align: center; margin-bottom: 1.2rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">🔑 修改密码 / Change Password</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;" id="pwd-user-hint">为您当前的账号修改密码</p>
+      </div>
+
+      <form id="form-change-pwd" class="auth-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="pwd-old" style="font-size: 0.8rem; font-weight: 500;">原密码 / Current Password</label>
+          <input type="password" id="pwd-old" placeholder="输入当前原密码" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="pwd-new" style="font-size: 0.8rem; font-weight: 500;">新密码 / New Password</label>
+          <input type="password" id="pwd-new" placeholder="至少 6 位新密码" minlength="6" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="pwd-confirm" style="font-size: 0.8rem; font-weight: 500;">确认新密码 / Confirm New Password</label>
+          <input type="password" id="pwd-confirm" placeholder="再次输入新密码" minlength="6" required style="width: 100%; font-size: 0.88rem; padding: 0.45rem 0.65rem;">
+        </div>
+        <button type="submit" class="btn primary full-width" style="margin-top: 0.5rem; padding: 0.55rem 0; font-weight: 700; font-size: 0.9rem;">确认修改密码 / Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 模态框：设置个人头像 -->
+  <div id="avatar-modal" class="modal-backdrop hidden">
+    <div class="modal-card auth-modal-card" style="max-width: 400px; padding: 1.5rem; position: relative;">
+      <button class="modal-close-btn" id="btn-close-avatar-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      
+      <div class="auth-header" style="text-align: center; margin-bottom: 1rem;">
+        <h3 style="margin-bottom: 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">🖼️ 设置个人头像 / Set Profile Avatar</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">选择可爱预设头像或上传自定义图片</p>
+      </div>
+
+      <!-- 头像当前预览区 -->
+      <div style="display: flex; justify-content: center; margin-bottom: 1.2rem;">
+        <div id="avatar-current-preview" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--primary); background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.12); padding: 4px;">
+          <img src="avatar_preset_1.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Avatar Preview">
+        </div>
+      </div>
+
+      <!-- 预设图标选择区 (去除“可爱”二字，置换为4款极简星芒印记) -->
+      <div style="margin-bottom: 1.2rem;">
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; display: block;">预设图案 / Preset Icons:</label>
+        <div id="avatar-preset-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
+          <button type="button" class="avatar-preset-item active" data-avatar="avatar_preset_1.png" style="height: 52px; border-radius: 50%; border: 2px solid var(--primary); background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="紫红星芒 / Dark Pink Star"><img src="avatar_preset_1.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 1"></button>
+          <button type="button" class="avatar-preset-item" data-avatar="avatar_preset_2.png" style="height: 52px; border-radius: 50%; border: 2px solid transparent; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="浅粉星芒 / Light Pink Star"><img src="avatar_preset_2.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 2"></button>
+          <button type="button" class="avatar-preset-item" data-avatar="avatar_preset_3.png" style="height: 52px; border-radius: 50%; border: 2px solid transparent; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="芥绿星芒 / Yellow-Green Star"><img src="avatar_preset_3.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 3"></button>
+          <button type="button" class="avatar-preset-item" data-avatar="avatar_preset_4.png" style="height: 52px; border-radius: 50%; border: 2px solid transparent; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;" title="暖橙星芒 / Orange Star"><img src="avatar_preset_4.png" style="width: 100%; height: 100%; object-fit: contain;" alt="Preset 4"></button>
+        </div>
+      </div>
+
+      <!-- 自定义本地文件上传 -->
+      <div style="margin-bottom: 1.2rem;">
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block;">自定义本地图片上传 / Upload Local Image:</label>
+        <input type="file" id="input-avatar-file" accept="image/*" style="font-size: 0.8rem; width: 100%;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button type="button" id="btn-cancel-avatar" class="btn text-btn">取消</button>
+        <button type="button" id="btn-save-avatar" class="btn primary" style="padding: 0.45rem 1.2rem; font-weight: 700;">保存头像 / Save Avatar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 复制/粘贴行花样弹窗 Modal -->
+  <div id="grid-copy-modal" class="modal-overlay hidden">
+    <div class="modal-card card" style="max-width: 480px; width: 92%; background: #FAF6F0; border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 20px 50px rgba(0,0,0,0.3); border-radius: var(--radius-lg); padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 0.75rem;">
+        <h3 style="margin: 0; font-size: 1.1rem; font-family: var(--font-serif); color: #111111; font-weight: 700;">📋 复制与粘贴行花样 (Copy & Paste Rows)</h3>
+        <button id="btn-close-copy-modal" class="btn text-btn" style="padding: 0.2rem 0.5rem; font-size: 1.2rem; cursor: pointer; color: #666; border: none; background: none;">×</button>
+      </div>
+
+      <!-- 快捷单行复制操作区 -->
+      <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="font-weight: 700; font-size: 0.9rem; color: var(--primary); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 4px;">
+          <span>🎯 方式 1：单行快速复制覆盖</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-size: 0.85rem; color: #3c3530;">
+          <span>将第</span>
+          <input type="number" id="input-copy-single-from" min="1" style="width: 55px; padding: 0.3rem; border: 1px solid var(--card-border); border-radius: 6px; font-weight: 700; text-align: center; font-size: 0.9rem;" placeholder="源行">
+          <span>行 复制覆盖到第</span>
+          <input type="number" id="input-copy-single-to" min="1" style="width: 55px; padding: 0.3rem; border: 1px solid var(--card-border); border-radius: 6px; font-weight: 700; text-align: center; font-size: 0.9rem;" placeholder="目标行">
+          <span>行</span>
+          <button id="btn-exec-copy-single" class="btn text-btn" style="background: #839958; color: #fff; border: none; padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; margin-left: auto;">执行复制</button>
+        </div>
+      </div>
+
+      <!-- 连续多行/循环花样批量复制区 -->
+      <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px; padding: 1rem;">
+        <div style="font-weight: 700; font-size: 0.9rem; color: var(--primary); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 4px;">
+          <span>🔁 方式 2：多行循环花样批量复制</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem; color: #3c3530;">
+          <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+            <span>复制行范围：从第</span>
+            <input type="number" id="input-copy-range-start" min="1" style="width: 55px; padding: 0.3rem; border: 1px solid var(--card-border); border-radius: 6px; font-weight: 700; text-align: center; font-size: 0.9rem;" placeholder="始">
+            <span>行 到第</span>
+            <input type="number" id="input-copy-range-end" min="1" style="width: 55px; padding: 0.3rem; border: 1px solid var(--card-border); border-radius: 6px; font-weight: 700; text-align: center; font-size: 0.9rem;" placeholder="终">
+            <span>行</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+            <span>粘贴起始行：从第</span>
+            <input type="number" id="input-copy-target-start" min="1" style="width: 55px; padding: 0.3rem; border: 1px solid var(--card-border); border-radius: 6px; font-weight: 700; text-align: center; font-size: 0.9rem;" placeholder="目标">
+            <span>行 开始粘贴</span>
+            <button id="btn-exec-copy-range" class="btn text-btn" style="background: var(--primary); color: #fff; border: none; padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; margin-left: auto;">批量粘贴</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 提示弹窗 (Toast) -->
+  <div id="toast" class="toast hidden"></div>
+
+
+  <!-- 引入逻辑脚本 (添加超级版本序列，强制刷新消除浏览器本地与 CDN 历史缓存) -->
+  <script src="speech.js?v=20260723_300"></script>
+  <script src="parser.js?v=20260723_300"></script>
+  <script src="grid.js?v=20260723_300"></script>
+  <script src="app.js?v=20260723_300"></script>
+</body>
+</html>

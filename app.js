@@ -28,10 +28,8 @@ const App = {
     if (this.registeredUsers && this.registeredUsers.length > 0) {
       this.pushCloudUsers();
     }
-    // 清理历史强缓存
-    if (typeof window !== 'undefined' && 'caches' in window) {
-      try { caches.keys().then(names => names.forEach(n => caches.delete(n))); } catch (e) {}
-    }
+    // 确保固定为莫兰迪浅色原色大理石主题
+    document.body.classList.remove('dark-mode');
 
     this.loadProjects();
     this.loadCustomTemplates();
@@ -3354,10 +3352,6 @@ const App = {
       el.addEventListener('input', () => syncNotes());
     });
 
-    // 主题切换
-    addClick('btn-toggle-theme', () => {
-      document.body.classList.toggle('dark-mode');
-    });
 
     // 表单提交事件
     addClick('btn-save-grid-project', (e) => this.createGridProject(e));
