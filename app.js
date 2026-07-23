@@ -2247,8 +2247,12 @@ const App = {
       }
 
       // 编辑绘制模式
-      const selectedKey = Grid.selectedStitch;
-      if (Grid.multiCellConfig && Grid.multiCellConfig[selectedKey]) {
+      let selectedKey = Grid.selectedStitch;
+      if (Grid.isEraserActive) {
+        selectedKey = 'k'; // 橡皮擦模式下擦除恢复为基础下针
+      }
+
+      if (!Grid.isEraserActive && Grid.multiCellConfig && Grid.multiCellConfig[selectedKey]) {
         const span = Grid.multiCellConfig[selectedKey].span;
         for (let offset = 0; offset < span; offset++) {
           if (colIndex + offset < Grid.width) {
@@ -2260,8 +2264,34 @@ const App = {
       }
       this.saveProjects();
       this.renderGridCanvas();
+
     });
   },
+
+  toggleEraserMode() {
+    Grid.isEraserActive = !Grid.isEraserActive;
+    this.updateEraserUI();
+    this.renderStitchPalette();
+  },
+
+  updateEraserUI() {
+    const eraserBtn = document.getElementById('btn-grid-eraser');
+    if (eraserBtn) {
+      if (Grid.isEraserActive) {
+        eraserBtn.style.background = '#D18E97';
+        eraserBtn.style.color = '#ffffff';
+        eraserBtn.style.borderColor = '#D18E97';
+        eraserBtn.style.boxShadow = '0 2px 10px rgba(209, 142, 151, 0.45)';
+        this.showToast('🧹 已开启橡皮擦模式！在网格上按住涂抹即可擦除画错的格');
+      } else {
+        eraserBtn.style.background = '#FFFDF7';
+        eraserBtn.style.color = 'var(--primary)';
+        eraserBtn.style.borderColor = '#D18E97';
+        eraserBtn.style.boxShadow = 'none';
+      }
+    }
+  },
+
 
   renderColorSelect() {
     const select = document.getElementById('input-custom-yarn-symbol');
@@ -2596,13 +2626,35 @@ const App = {
       
       item.addEventListener('click', () => {
         Grid.selectedStitch = key;
+        Grid.isEraserActive = false;
+        this.updateEraserUI();
         document.querySelectorAll('.palette-item').forEach(el => el.classList.remove('active'));
         item.classList.add('active');
       });
-      
+
       container.appendChild(item);
     });
+
+    // 专属橡皮擦画笔块 (Eraser Tile)
+    const eraserTile = document.createElement('div');
+    eraserTile.className = `palette-item ${Grid.isEraserActive ? 'active' : ''}`;
+    eraserTile.title = '橡皮擦工具：选中后涂抹网格即可擦除画错的图案';
+    eraserTile.style.cursor = 'pointer';
+    eraserTile.innerHTML = `
+      <div class="stitch-icon-box" style="background-color: ${Grid.isEraserActive ? '#D18E97' : '#FFFDF7'}; border: 1.5px solid #D18E97; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: ${Grid.isEraserActive ? '#ffffff' : '#D18E97'};">
+        🧹
+      </div>
+      <span style="font-weight: 700; color: ${Grid.isEraserActive ? '#D18E97' : 'inherit'};">橡皮擦</span>
+    `;
+
+    eraserTile.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleEraserMode();
+    });
+
+    container.appendChild(eraserTile);
   },
+
 
   renderStitchLegend() {
     const container = document.getElementById('stitch-legend-list');
@@ -3264,6 +3316,11 @@ const App = {
       this.saveProjects();
     });
 
+    // 绑定橡皮擦按钮
+    addClick('btn-grid-eraser', () => {
+      this.toggleEraserMode();
+    });
+
     // 清空网格画布
     addClick('btn-edit-clear', () => {
       if (confirm('Are you sure you want to clear all painted stitches on the grid canvas?')) {
@@ -3271,11 +3328,14 @@ const App = {
         if (!p) return;
         Grid.initBlank(p.data[0].length, p.data.length, p.knitType);
         p.data = Grid.data;
+        Grid.isEraserActive = false;
+        this.updateEraserUI();
         this.saveProjects();
         this.renderGridCanvas();
         this.showToast('Canvas cleared');
       }
     });
+
     const opacityInput = document.getElementById('input-custom-yarn-opacity');
     const opacityValText = document.getElementById('text-custom-yarn-opacity-val');
     if (opacityInput && opacityValText) {
