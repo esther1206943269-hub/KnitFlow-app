@@ -2095,3 +2095,30 @@ body.dark-mode .auth-modal-card {
 .active-motif-pulse {
   animation: motifPulseGlow 1.8s infinite ease-in-out !important;
 }
+
+/* 在线状态绿点闪烁动画 */
+@keyframes onlineDotPulse {
+  0% {
+    transform: scale(0.92);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
+  }
+  100% {
+    transform: scale(0.92);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #4CAF50;
+  display: inline-block;
+  flex-shrink: 0;
+  animation: onlineDotPulse 2s infinite;
+}
+

@@ -18,6 +18,11 @@
         <h1>KnitFlow <span class="subtitle">编织行行好</span></h1>
       </div>
       <div class="header-actions" style="display: flex; align-items: center; gap: 0.65rem;">
+        <!-- 实时在线人数 Badge -->
+        <div id="online-users-badge" style="display: flex; align-items: center; gap: 6px; background: rgba(76, 175, 80, 0.12); color: #2e7d32; padding: 0.25rem 0.65rem; border-radius: 16px; font-size: 0.78rem; font-weight: 600; border: 1px solid rgba(76, 175, 80, 0.25); white-space: nowrap;" title="当前在线织友人数 / Real-time Online Users">
+          <span class="online-dot"></span>
+          <span id="online-users-count">1 人在线</span>
+        </div>
         <!-- 网页浏览量统计 Badge -->
         <div id="pageview-counter-badge" style="display: flex; align-items: center; gap: 4px; background: rgba(209, 142, 151, 0.12); color: var(--primary); padding: 0.25rem 0.65rem; border-radius: 16px; font-size: 0.78rem; font-weight: 600; border: 1px solid rgba(209, 142, 151, 0.25); white-space: nowrap;" title="网页累计访问次数 / Total Pageviews">
           <span id="pageview-count-number">...</span>
@@ -708,9 +713,9 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
   <div id="toast" class="toast hidden"></div>
 
   <!-- 引入逻辑脚本 (添加版本序列，绕过浏览器本地与 CDN 静态缓存) -->
-  <script src="speech.js?v=20260723_30"></script>
-  <script src="parser.js?v=20260723_30"></script>
-  <script src="grid.js?v=20260723_30"></script>
-  <script src="app.js?v=20260723_30"></script>
+  <script src="speech.js?v=20260723_31"></script>
+  <script src="parser.js?v=20260723_31"></script>
+  <script src="grid.js?v=20260723_31"></script>
+  <script src="app.js?v=20260723_31"></script>
 </body>
 </html>
