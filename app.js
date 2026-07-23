@@ -3667,27 +3667,11 @@ const App = {
 
     this.customTemplates.unshift(newTpl);
     this.saveCustomTemplates();
-
-    // 同步在【我的项目】区域中生成对应的新项目
-    const newProj = {
-      id: 'proj-custom-tpl-' + Date.now(),
-      name: cleanName,
-      type: isText ? 'text' : 'grid',
-      currentLoc: 1,
-      knitType: knitType,
-      totalTime: 0,
-      referenceLinks: [],
-      updatedAt: new Date().toISOString(),
-      data: JSON.parse(JSON.stringify(tplData))
-    };
-
-    this.projects.unshift(newProj);
-    this.saveProjects();
-    this.renderProjectList();
     this.renderPresetTemplates();
 
-    this.showToast(`⭐ 已成功保存模板 “${cleanName}” 并同步放置到【我的项目】！`);
+    this.showToast(`⭐ 新模板 “${cleanName}” 已成功保存至【图解库】！`);
   },
+
 
   // 导出 PNG 图解图片
   exportGridPNG() {
