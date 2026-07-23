@@ -28,6 +28,10 @@ const App = {
     if (this.registeredUsers && this.registeredUsers.length > 0) {
       this.pushCloudUsers();
     }
+    // 清理历史强缓存
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      try { caches.keys().then(names => names.forEach(n => caches.delete(n))); } catch (e) {}
+    }
 
     this.loadProjects();
     this.loadCustomTemplates();
