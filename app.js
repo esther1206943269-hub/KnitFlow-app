@@ -235,11 +235,12 @@ const App = {
       }
 
       container.innerHTML = `
-        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.4rem; background: var(--primary-light); padding: 0.2rem 0.65rem 0.2rem 0.3rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
+        <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.35rem; background: var(--primary-light); padding: 0.2rem 0.65rem 0.2rem 0.3rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--card-border);" title="已登录为 ${this.currentUser.username} (${this.currentUser.account})">
           <div id="btn-avatar-circle" style="display: flex; align-items: center; cursor: pointer; position: relative;" title="点击更换/设置头像">
             ${avatarContent}
           </div>
-          <span id="btn-username-text" style="color: var(--text-main); font-weight: 600; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="点击更换/设置头像">${this.currentUser.username}</span>
+          <span id="btn-username-text" style="color: var(--text-main); font-weight: 600; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="点击修改用户名/昵称">${this.currentUser.username}</span>
+          <button id="btn-edit-username" style="background: none; border: none; font-size: 0.72rem; color: var(--primary); cursor: pointer; padding: 0 1px; line-height: 1;" title="修改用户名/昵称">✏️</button>
           <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="修改密码">🔑 改密</button>
           <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px;" title="退出登录">退出</button>
         </div>
@@ -257,9 +258,18 @@ const App = {
       if (usernameText) {
         usernameText.onclick = (e) => {
           e.stopPropagation();
-          this.openAvatarModal();
+          this.changeUsername();
         };
       }
+
+      const editNameBtn = container.querySelector('#btn-edit-username');
+      if (editNameBtn) {
+        editNameBtn.onclick = (e) => {
+          e.stopPropagation();
+          this.changeUsername();
+        };
+      }
+
 
       const pwdBtn = container.querySelector('#btn-open-pwd-modal');
       if (pwdBtn) {
@@ -341,6 +351,52 @@ const App = {
     this.closeAvatarModal();
     this.showToast('🎉 头像设置成功！');
   },
+
+  changeUsername() {
+    if (!this.currentUser) return;
+
+    const oldName = this.currentUser.username || '';
+    const input = prompt('✏️ 请输入新的用户名 / 昵称：', oldName);
+    if (input === null) return;
+    const cleanName = input.trim();
+
+    if (!cleanName) {
+      alert('用户名不能为空！');
+      return;
+    }
+
+    if (cleanName === oldName) return;
+
+    // 检查新的用户名是否与现有其他账号重复
+    const isTaken = this.registeredUsers.some(u => 
+      u && u.id !== this.currentUser.id && 
+      ((u.username || '').toLowerCase() === cleanName.toLowerCase() || (u.account || '').toLowerCase() === cleanName.toLowerCase())
+    );
+
+    if (isTaken) {
+      alert(`用户名 “${cleanName}” 已被其他账号使用，请换一个名称！`);
+      return;
+    }
+
+    // 更新当前登录用户 currentUser
+    this.currentUser.username = cleanName;
+    localStorage.setItem('knitflow_current_user', JSON.stringify(this.currentUser));
+
+    // 更新注册账号列表中对应的记录
+    const userInList = this.registeredUsers.find(u => u && u.id === this.currentUser.id);
+    if (userInList) {
+      userInList.username = cleanName;
+      localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
+    }
+
+    // 云端多端同步推动
+    this.pushCloudUsers();
+
+    // 重新渲染 UI
+    this.renderUserAuthUI();
+    this.showToast(`🎉 用户名已成功修改为 “${cleanName}”！`);
+  },
+
 
   openAuthModal() {
     const modal = document.getElementById('auth-modal');
