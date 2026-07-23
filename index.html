@@ -477,11 +477,12 @@
                 <button id="btn-grid-toggle-bindoff" class="btn text-btn" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--card-border); border-radius: 4px; font-weight: 600; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 3px;" title="点击切换顶部收针指示点显隐">
                   <span id="bindoff-dots-status">⚫ 收针点: 显</span>
                 </button>
-                <!-- 橡皮擦工具按钮 -->
-                <button id="btn-grid-eraser" class="btn text-btn" style="padding: 2px 10px; font-size: 0.78rem; border: 1.5px solid #D18E97; border-radius: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; background: #FFFDF7; color: var(--primary); transition: all 0.2s ease;" title="橡皮擦工具：开启后在网格上涂抹即可擦除画错的针法与颜色">
+                <!-- 橡皮擦工具按钮 (仅在编辑图解模式下显现) -->
+                <button id="btn-grid-eraser" class="btn text-btn hidden" style="padding: 2px 10px; font-size: 0.78rem; border: 1.5px solid #D18E97; border-radius: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; background: #FFFDF7; color: var(--primary); transition: all 0.2s ease;" title="橡皮擦工具：开启后在网格上涂抹即可擦除画错的针法与颜色">
                   <span id="eraser-btn-text">🧹 橡皮擦 / Eraser</span>
                 </button>
-                <button id="btn-edit-clear" class="btn text-btn danger-text">Clear Canvas</button>
+                <button id="btn-edit-clear" class="btn text-btn danger-text hidden">Clear Canvas</button>
+
 
               </div>
             </div>
@@ -718,9 +719,9 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
   <div id="toast" class="toast hidden"></div>
 
   <!-- 引入逻辑脚本 (添加版本序列，绕过浏览器本地与 CDN 静态缓存) -->
-  <script src="speech.js?v=20260723_41"></script>
-  <script src="parser.js?v=20260723_41"></script>
-  <script src="grid.js?v=20260723_41"></script>
-  <script src="app.js?v=20260723_41"></script>
+  <script src="speech.js?v=20260723_42"></script>
+  <script src="parser.js?v=20260723_42"></script>
+  <script src="grid.js?v=20260723_42"></script>
+  <script src="app.js?v=20260723_42"></script>
 </body>
 </html>

@@ -2120,6 +2120,7 @@ const App = {
     const palette = document.getElementById('paint-palette');
     const legend = document.getElementById('legend-display');
     const clearBtn = document.getElementById('btn-edit-clear');
+    const eraserBtn = document.getElementById('btn-grid-eraser');
     const editIndicator = document.getElementById('edit-indicator');
     const dimActions = document.querySelector('.grid-dim-actions');
     const activeRowCard = document.getElementById('grid-active-row-card');
@@ -2133,6 +2134,7 @@ const App = {
       if (palette) palette.classList.remove('hidden');
       if (legend) legend.classList.remove('hidden');
       if (clearBtn) clearBtn.classList.remove('hidden');
+      if (eraserBtn) eraserBtn.classList.remove('hidden');
       if (dimActions) dimActions.classList.remove('hidden');
       if (activeRowCard) activeRowCard.classList.add('hidden');
       if (editIndicator) {
@@ -2140,6 +2142,10 @@ const App = {
         editIndicator.classList.remove('hidden');
       }
     } else {
+      // 退出编辑模式时重置橡皮擦
+      Grid.isEraserActive = false;
+      this.updateEraserUI();
+
       if (toggleBtn) {
         toggleBtn.textContent = '🎨 编辑网格图解与颜料 / Edit Grid';
         toggleBtn.classList.remove('editing-active');
@@ -2148,6 +2154,7 @@ const App = {
       if (palette) palette.classList.add('hidden');
       if (legend) legend.classList.add('hidden');
       if (clearBtn) clearBtn.classList.add('hidden');
+      if (eraserBtn) eraserBtn.classList.add('hidden');
       if (dimActions) dimActions.classList.add('hidden');
       if (activeRowCard) activeRowCard.classList.remove('hidden');
       if (editIndicator) {
@@ -2156,6 +2163,7 @@ const App = {
       }
     }
   },
+
 
   updateGridPlayerUI() {
     const p = this.currentProject;
