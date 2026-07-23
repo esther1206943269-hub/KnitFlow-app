@@ -874,8 +874,12 @@ const App = {
       const typeLabel = p.type === 'text' ? 'Written' : 'Grid';
       const specsLabel = p.type === 'text' ? `${totalRows} Rows` : `Size ${colCount}×${totalRows}`;
 
-      // 默认统一使用图二编织插画，除非用户通过“更换封面”手动上传了专属图片
-      const coverSrc = (p.isCustomUserUploadedCover && p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'knitting_cover.png';
+      // 判断是否为用户自定义上传的封面图片
+      const isCustomCover = (p.isCustomUserUploadedCover && p.thumbnail && p.thumbnail.trim());
+      const coverSrc = isCustomCover ? p.thumbnail : 'knitting_cover.png';
+      const coverStyle = isCustomCover 
+        ? 'width: 100%; height: 100%; object-fit: cover; opacity: 0.6; padding: 0; box-sizing: border-box;' 
+        : 'width: 100%; height: 100%; object-fit: contain; padding: 3px; opacity: 1; box-sizing: border-box;';
 
       item.innerHTML = `
         <!-- 左上角完成标记勾选按钮 -->
@@ -885,8 +889,9 @@ const App = {
 
         <div class="project-info" title="点击开始编织此项目">
           <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff; position: relative;">
-            <img src="${coverSrc}" style="width: 100%; height: 100%; object-fit: contain; padding: 3px; box-sizing: border-box;" alt="${p.name} Cover" onerror="this.src='knitting_cover.png'">
+            <img src="${coverSrc}" style="${coverStyle}" alt="${p.name} Cover" onerror="this.src='knitting_cover.png'">
           </div>
+
           <div class="project-name" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
             <span>${p.name}</span>
             ${p.isCompleted ? '<span style="font-size: 0.65rem; font-weight: 700; color: #839958; background: rgba(131,153,88,0.18); padding: 1px 5px; border-radius: 4px; display: inline-flex; align-items: center;">✓ 已完成</span>' : ''}
@@ -1109,6 +1114,27 @@ const App = {
     const p = this.projects.find(proj => proj.id === id);
     if (!p) return;
 
+    if (p.isCustomUserUploadedCover) {
+      const choice = prompt(
+        `项目 “${p.name}” 当前使用的是自定义封面图片。\n\n` +
+        `请选择操作：\n` +
+        `输入 1 ：上传新图片更换封面\n` +
+        `输入 2 ：🔄 恢复为初始编织插画封面`,
+        '1'
+      );
+
+      if (choice === null) return;
+      const cleanChoice = choice.trim();
+      if (cleanChoice === '2') {
+        p.isCustomUserUploadedCover = false;
+        delete p.thumbnail;
+        this.saveProjects();
+        this.renderProjectList();
+        this.showToast(`✅ 已成功恢复项目 “${p.name}” 的初始编织封面！`);
+        return;
+      }
+    }
+
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
@@ -1125,13 +1151,14 @@ const App = {
           p.isCustomUserUploadedCover = true;
           this.saveProjects();
           this.renderProjectList();
-          this.showToast(`🖼️ 已成功更新项目“${p.name}”的封面缩略图！`);
+          this.showToast(`🖼️ 已成功更换项目封面！自适应裁剪铺满并提供 60% 柔和透明度。`);
         };
         reader.readAsDataURL(file);
       }
     };
     fileInput.click();
   },
+
 
   duplicateProject(id) {
     const project = this.projects.find(p => p.id === id);
