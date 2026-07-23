@@ -697,8 +697,77 @@ const App = {
     this.customTemplates[toIndex] = temp;
     this.saveCustomTemplates();
     this.renderPresetTemplates();
+    // 播放灵动清脆的“咻咻”互换音效
+    this.playWhooshSound();
     this.showToast('⇄ 模板图解位置已成功互换！');
   },
+
+  // Web Audio API 动态实时合成清脆“咻咻”风声/滑过音效 (Whoosh Sound Effect)
+  playWhooshSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!this.audioCtx) {
+        this.audioCtx = new AudioCtx();
+      }
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+
+      const now = this.audioCtx.currentTime;
+
+      // 1. 产生轻柔风声白噪声
+      const bufferSize = Math.floor(this.audioCtx.sampleRate * 0.16); // 0.16 秒
+      const buffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      const whiteNoise = this.audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      // 2. 带通滤镜 Sweep，产生高频到中低频快速下滑的“咻”空气破空声
+      const filter = this.audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.Q.setValueAtTime(3.5, now);
+      filter.frequency.setValueAtTime(1400, now);
+      filter.frequency.exponentialRampToValueAtTime(350, now + 0.14);
+
+      // 3. 同时叠加一个轻盈的滑音正弦波 (Sine Sweep)
+      const osc = this.audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.14);
+
+      const oscGain = this.audioCtx.createGain();
+      oscGain.gain.setValueAtTime(0.01, now);
+      oscGain.gain.linearRampToValueAtTime(0.08, now + 0.03);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+      // 4. 主增益包络 (Volume Envelope)
+      const noiseGain = this.audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.01, now);
+      noiseGain.gain.linearRampToValueAtTime(0.3, now + 0.03);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+      whiteNoise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(this.audioCtx.destination);
+
+      osc.connect(oscGain);
+      oscGain.connect(this.audioCtx.destination);
+
+      whiteNoise.start(now);
+      whiteNoise.stop(now + 0.16);
+
+      osc.start(now);
+      osc.stop(now + 0.16);
+    } catch (e) {
+      console.warn('播放咻咻音效跳过：', e);
+    }
+  },
+
 
 
   loadDeletedPresets() {
