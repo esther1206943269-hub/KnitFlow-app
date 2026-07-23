@@ -690,6 +690,17 @@ const App = {
     }
   },
 
+  swapCustomTemplates(fromIndex, toIndex) {
+    if (!this.customTemplates || fromIndex < 0 || fromIndex >= this.customTemplates.length || toIndex < 0 || toIndex >= this.customTemplates.length) return;
+    const temp = this.customTemplates[fromIndex];
+    this.customTemplates[fromIndex] = this.customTemplates[toIndex];
+    this.customTemplates[toIndex] = temp;
+    this.saveCustomTemplates();
+    this.renderPresetTemplates();
+    this.showToast('⇄ 模板图解位置已成功互换！');
+  },
+
+
   loadDeletedPresets() {
     try {
       const stored = localStorage.getItem('knitflow_deleted_preset_templates');
@@ -3072,7 +3083,6 @@ const App = {
         }
       }
     });
-
     // 网格编辑模式切换
     addClick('btn-grid-toggle-mode', () => {
       Grid.isEditMode = !Grid.isEditMode;
@@ -3249,18 +3259,31 @@ const App = {
 
     // 2. 渲染用户自定义保存的图解模板
     if (this.customTemplates && this.customTemplates.length > 0) {
-      this.customTemplates.forEach(tpl => {
+      this.customTemplates.forEach((tpl, index) => {
         renderedCount++;
         const typeLabel = tpl.type === 'grid' ? 'Grid' : 'Written';
         const wrapper = document.createElement('div');
         wrapper.className = 'template-card-item';
-        wrapper.style.cssText = 'display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; border-radius: var(--radius-lg); min-height: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box;';
+        wrapper.setAttribute('draggable', 'true');
+        wrapper.dataset.index = index;
+        wrapper.style.cssText = 'display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; border-radius: var(--radius-lg); min-height: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); box-sizing: border-box; cursor: grab; transition: transform 0.2s ease, box-shadow 0.2s ease;';
+
+        const isFirst = index === 0;
+        const isLast = index === this.customTemplates.length - 1;
 
         wrapper.innerHTML = `
-          <!-- 顶部：类型 Badge 标牌与重命名/删除按钮 -->
+          <!-- 顶部：类型 Badge 标牌与位置互换/重命名/删除按钮 -->
           <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <span class="chip-badge" style="background: var(--primary-light); color: var(--primary); font-weight: 700; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; text-transform: uppercase;">CUSTOM (${typeLabel})</span>
             <div style="display: flex; gap: 4px; align-items: center;">
+              <!-- 向上/左互换按钮 -->
+              <button class="btn icon-btn primary-text btn-move-left-custom-tpl" data-custom-id="${tpl.id}" title="与左侧模板互换位置" aria-label="Move Left" style="padding: 4px; border-radius: 50%; cursor: ${isFirst ? 'not-allowed' : 'pointer'}; opacity: ${isFirst ? '0.3' : '0.85'}; color: var(--primary);" ${isFirst ? 'disabled' : ''}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <!-- 向下/右互换按钮 -->
+              <button class="btn icon-btn primary-text btn-move-right-custom-tpl" data-custom-id="${tpl.id}" title="与右侧模板互换位置" aria-label="Move Right" style="padding: 4px; border-radius: 50%; cursor: ${isLast ? 'not-allowed' : 'pointer'}; opacity: ${isLast ? '0.3' : '0.85'}; color: var(--primary);" ${isLast ? 'disabled' : ''}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
               <button class="btn icon-btn primary-text btn-rename-custom-tpl" data-custom-id="${tpl.id}" title="重命名模板" aria-label="Rename template" style="padding: 4px; border-radius: 50%; opacity: 0.75; cursor: pointer; color: var(--primary);">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
               </button>
@@ -3271,7 +3294,7 @@ const App = {
           </div>
 
           <!-- 中间主体：点击直接开启编织 -->
-          <div class="tpl-card-body" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0.7rem 0; cursor: pointer; text-align: center;" title="点击使用此模板开始编织">
+          <div class="tpl-card-body" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0.7rem 0; cursor: pointer; text-align: center;" title="点击使用此模板开始编织（支持按住卡片拖拽互换位置）">
             ${unifiedIconSvg}
             <h4 style="margin: 0.4rem 0 0 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main); line-height: 1.35; word-break: break-word;">${tpl.name}</h4>
           </div>
@@ -3281,6 +3304,61 @@ const App = {
             ➕ 导入我的项目/My Projects
           </button>
         `;
+
+        // 绑定拖拽 Drag & Drop 交换顺序事件
+        wrapper.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', index.toString());
+          wrapper.style.opacity = '0.4';
+          wrapper.style.transform = 'scale(0.96)';
+        });
+
+        wrapper.addEventListener('dragend', () => {
+          wrapper.style.opacity = '1';
+          wrapper.style.transform = 'none';
+          container.querySelectorAll('.template-card-item').forEach(el => {
+            el.style.border = '';
+            el.style.boxShadow = '';
+          });
+        });
+
+        wrapper.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          wrapper.style.border = '2px dashed var(--primary)';
+          wrapper.style.boxShadow = '0 8px 20px rgba(209, 142, 151, 0.25)';
+        });
+
+        wrapper.addEventListener('dragleave', () => {
+          wrapper.style.border = '';
+          wrapper.style.boxShadow = '';
+        });
+
+        wrapper.addEventListener('drop', (e) => {
+          e.preventDefault();
+          wrapper.style.border = '';
+          wrapper.style.boxShadow = '';
+          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+          const toIndex = index;
+          if (!isNaN(fromIndex) && fromIndex !== toIndex) {
+            this.swapCustomTemplates(fromIndex, toIndex);
+          }
+        });
+
+        // 绑定左/右互换按键事件
+        const moveLeftBtn = wrapper.querySelector('.btn-move-left-custom-tpl');
+        if (moveLeftBtn && !isFirst) {
+          moveLeftBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.swapCustomTemplates(index, index - 1);
+          });
+        }
+
+        const moveRightBtn = wrapper.querySelector('.btn-move-right-custom-tpl');
+        if (moveRightBtn && !isLast) {
+          moveRightBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.swapCustomTemplates(index, index + 1);
+          });
+        }
 
         wrapper.querySelector('.tpl-card-body').addEventListener('click', () => {
           this.loadCustomTemplate(tpl.id, true);
@@ -3300,6 +3378,7 @@ const App = {
           e.stopPropagation();
           this.deleteCustomTemplate(tpl.id);
         });
+
 
         container.appendChild(wrapper);
       });
