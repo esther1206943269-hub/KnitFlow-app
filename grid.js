@@ -447,12 +447,13 @@ const Grid = {
           color: '#D18E97',
           directionText: '【从右向左 ←】'
         };
-    const baseCellSize = 30; // 每个格子的基础像素尺寸
+    const cellWidth = 30;  // 网格列宽
+    const cellHeight = 21; // 网格行高 (稍微扁一些的扁长方形格子，符合棒针实际织片比例)
     const axisSize = this.showBindOffDots ? 36 : 25; // 边框坐标轴大小 (若开启收针点，顶部留出更高空间)
     const textMargin = 5;
 
-    const baseSvgWidth = this.width * baseCellSize + axisSize * 2;
-    const baseSvgHeight = this.height * baseCellSize + axisSize * 2;
+    const baseSvgWidth = this.width * cellWidth + axisSize * 2;
+    const baseSvgHeight = this.height * cellHeight + axisSize * 2;
 
     const zoomFactor = this.zoom || 1.0;
     const scaledWidth = Math.round(baseSvgWidth * zoomFactor);
@@ -460,7 +461,6 @@ const Grid = {
 
     const svgWidth = baseSvgWidth;
     const svgHeight = baseSvgHeight;
-    const cellSize = baseCellSize;
 
     // 创建 SVG 节点并应用真实 Layout 布局尺寸与 viewBox
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -474,11 +474,11 @@ const Grid = {
     // 行号 (左右两侧均绘制: 单数行粉红 / 双数行草绿)
     for (let r = 0; r < this.height; r++) {
       const rowNum = r + 1; // 编织是从下往上，r=0 代表最底部 Row 1
-      const y = svgHeight - axisSize - (r * cellSize) - (cellSize / 2) + 5; // y 轴方向需要倒转
+      const y = svgHeight - axisSize - (r * cellHeight) - (cellHeight / 2) + 4; // y 轴方向倒转
       const isOdd = rowNum % 2 !== 0;
       const rowColor = isOdd ? '#D18E97' : '#839958';
       const rowWeight = rowNum === activeRow ? '900' : '700';
-      const fontSize = rowNum === activeRow ? '12px' : '10px';
+      const fontSize = rowNum === activeRow ? '11px' : '10px';
       
       // 左侧行号
       const textL = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -503,13 +503,11 @@ const Grid = {
       svg.appendChild(textR);
     }
 
-
-
     // 针目序号 (上下两侧均绘制) 与最顶端收针点 (Bind-off Dots)
     // 编织习惯：从右往左数针目！右下角是第一针！
     for (let c = 0; c < this.width; c++) {
       const colNum = c + 1;
-      const x = svgWidth - axisSize - (c * cellSize) - (cellSize / 2); // 同样反转 x 轴，使右边为第 1 针
+      const x = svgWidth - axisSize - (c * cellWidth) - (cellWidth / 2); // 同样反转 x 轴，使右边为第 1 针
       
       // 底部针目号
       const textB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -547,7 +545,7 @@ const Grid = {
       }
     }
 
-    // 2. 绘制单元格网格 (分为背景层 cellsGroup 与 符号图层 iconsGroup，彻底解决跨格符号被后排单元格背景覆盖遮挡问题)
+    // 2. 绘制单元格网格 (分为背景层 cellsGroup 与 符号图层 iconsGroup)
     const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     const iconsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     svg.appendChild(cellsGroup);
@@ -564,18 +562,16 @@ const Grid = {
         const stitch = this.stitches[stitchKey] || this.stitches['k'];
         const multiCfg = this.getMultiCellConfig(stitchKey);
 
-        // 计算格子坐标
-        // x轴：左侧轴宽度 + (colIndex * cellSize)
-        // y轴：svgHeight - 右侧底轴宽度 - ( (rowIndex+1) * cellSize )
-        const x = axisSize + colIndex * cellSize;
-        const y = svgHeight - axisSize - (rowIndex + 1) * cellSize;
+        // 计算长方形格子坐标
+        const x = axisSize + colIndex * cellWidth;
+        const y = svgHeight - axisSize - (rowIndex + 1) * cellHeight;
 
         // 格子矩形 (放入背景图层 cellsGroup)
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('x', x);
         rect.setAttribute('y', y);
-        rect.setAttribute('width', cellSize);
-        rect.setAttribute('height', cellSize);
+        rect.setAttribute('width', cellWidth);
+        rect.setAttribute('height', cellHeight);
         rect.setAttribute('fill', stitch.color);
         rect.setAttribute('class', 'grid-cell');
         if (rowNum === activeRow) {
@@ -591,13 +587,12 @@ const Grid = {
 
         rect.addEventListener('mousedown', (e) => {
           if (e.button !== 0) return; // 仅左键响应
-          e.preventDefault(); // 防止 Edge 等浏览器触发默认原生拖拽导致 mouseup 事件丢失
+          e.preventDefault();
           this.isDrawing = true;
           handleInteraction(e);
         });
 
         rect.addEventListener('mouseenter', (e) => {
-          // 双重保险：检查当前按键状态，如果鼠标左键已被松开，强制结束绘图
           if (e.buttons === 0) {
             this.isDrawing = false;
             return;
@@ -611,11 +606,9 @@ const Grid = {
 
         // 绘制针法 SVG 矢量符号 (放入顶部符号图层 iconsGroup)
         if (multiCfg) {
-          // 如果当前列尚处于上一个跨格 Motif 的伸展绘制范围内，跳过避免重复覆盖
           if (colIndex < skipUntilCol) {
             // 已由起点的 Motif 统一拉伸绘制
           } else {
-            // 这是新的跨格 Motif 的起始列！计算它实际连续占用的格子数 (最大为 multiCfg.span)
             let spanCount = 1;
             for (let offset = 1; offset < multiCfg.span; offset++) {
               if (colIndex + offset < this.width && this.data[rowIndex][colIndex + offset] === stitchKey) {
@@ -625,13 +618,12 @@ const Grid = {
               }
             }
 
-            // 标记后续连续被此 Motif 占用的单元格列
             skipUntilCol = colIndex + spanCount;
 
             const strokeColor = this.getStrokeColor(stitch.color);
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            const targetWidth = cellSize * spanCount;
-            const targetHeight = cellSize;
+            const targetWidth = cellWidth * spanCount;
+            const targetHeight = cellHeight;
             const scaleX = targetWidth / multiCfg.vbW;
             const scaleY = targetHeight / multiCfg.vbH;
             
@@ -646,10 +638,11 @@ const Grid = {
             const strokeColor = this.getStrokeColor(stitch.color);
 
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            const iconSize = 20;
-            const offsetX = x + (cellSize - iconSize) / 2;
-            const offsetY = y + (cellSize - iconSize) / 2;
-            group.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${iconSize / 24})`);
+            const iconWidth = 16;
+            const iconHeight = 16;
+            const offsetX = x + (cellWidth - iconWidth) / 2;
+            const offsetY = y + (cellHeight - iconHeight) / 2;
+            group.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${iconWidth / 24})`);
             group.setAttribute('style', `color: ${strokeColor}; pointer-events: none;`);
             group.innerHTML = svgPaths;
             iconsGroup.appendChild(group);
@@ -672,10 +665,10 @@ const Grid = {
     // 3. 绘制活跃行高亮框及阅读方向指示箭头
     const activeRowIndex = activeRow - 1;
     if (activeRowIndex >= 0 && activeRowIndex < this.height) {
-      const highlightY = svgHeight - axisSize - activeRow * cellSize;
+      const highlightY = svgHeight - axisSize - activeRow * cellHeight;
       const highlightX = axisSize;
-      const highlightW = this.width * cellSize;
-      const highlightH = cellSize;
+      const highlightW = this.width * cellWidth;
+      const highlightH = cellHeight;
 
       // 活跃行半透明遮罩
       const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -688,7 +681,7 @@ const Grid = {
       overlay.setAttribute('class', 'active-row-overlay');
       svg.appendChild(overlay);
 
-      // 活跃行外框 (必须显式设置 fill="none"，防止 SVG 导出或独立渲染时默认填充纯黑色)
+      // 活跃行外框
       const mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       mask.setAttribute('x', highlightX);
       mask.setAttribute('y', highlightY);
@@ -702,22 +695,19 @@ const Grid = {
       svg.appendChild(mask);
 
       // 绘制带箭头的线表示读图解方向
-      // Flat (片织) 偶数行从左往右，其他从右往左
       const isFlat = this.knitType === 'flat';
       const isEvenRow = activeRow % 2 === 0;
       const goesLeftToRight = (isFlat && isEvenRow);
 
       const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      const arrowY = highlightY + cellSize / 2;
+      const arrowY = highlightY + cellHeight / 2;
       
       let d = '';
       if (goesLeftToRight) {
-        // 从左往右箭头 (从 x=0 到 x=width)
         const startX = highlightX + 5;
         const endX = highlightX + highlightW - 5;
         d = `M ${startX} ${arrowY} L ${endX} ${arrowY} M ${endX - 6} ${arrowY - 4} L ${endX} ${arrowY} L ${endX - 6} ${arrowY + 4}`;
       } else {
-        // 从右往左箭头 (从 x=width 到 x=0)
         const startX = highlightX + highlightW - 5;
         const endX = highlightX + 5;
         d = `M ${startX} ${arrowY} L ${endX} ${arrowY} M ${endX + 6} ${arrowY - 4} L ${endX} ${arrowY} L ${endX + 6} ${arrowY + 4}`;
@@ -725,7 +715,7 @@ const Grid = {
       
       arrowPath.setAttribute('d', d);
       arrowPath.setAttribute('class', 'direction-arrow-path');
-      arrowPath.setAttribute('stroke-dasharray', '2 2'); // 使其呈虚线避免遮挡
+      arrowPath.setAttribute('stroke-dasharray', '2 2');
       arrowPath.setAttribute('opacity', '0.6');
       svg.appendChild(arrowPath);
     }
@@ -734,9 +724,11 @@ const Grid = {
   }
 };
 
+
 // 导出或挂载到 window
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = Grid;
 } else {
   window.Grid = Grid;
 }
+
