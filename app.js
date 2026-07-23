@@ -2133,8 +2133,14 @@ const App = {
       }
       if (palette) palette.classList.remove('hidden');
       if (legend) legend.classList.remove('hidden');
-      if (clearBtn) clearBtn.classList.remove('hidden');
-      if (eraserBtn) eraserBtn.classList.remove('hidden');
+      if (clearBtn) {
+        clearBtn.classList.remove('hidden');
+        clearBtn.style.display = 'inline-block';
+      }
+      if (eraserBtn) {
+        eraserBtn.classList.remove('hidden');
+        eraserBtn.style.display = 'inline-flex';
+      }
       if (dimActions) dimActions.classList.remove('hidden');
       if (activeRowCard) activeRowCard.classList.add('hidden');
       if (editIndicator) {
@@ -2142,7 +2148,7 @@ const App = {
         editIndicator.classList.remove('hidden');
       }
     } else {
-      // 退出编辑模式时重置橡皮擦
+      // 退出编辑模式时重置橡皮擦状态
       Grid.isEraserActive = false;
       this.updateEraserUI();
 
@@ -2153,8 +2159,14 @@ const App = {
       }
       if (palette) palette.classList.add('hidden');
       if (legend) legend.classList.add('hidden');
-      if (clearBtn) clearBtn.classList.add('hidden');
-      if (eraserBtn) eraserBtn.classList.add('hidden');
+      if (clearBtn) {
+        clearBtn.classList.add('hidden');
+        clearBtn.style.display = 'none';
+      }
+      if (eraserBtn) {
+        eraserBtn.classList.add('hidden');
+        eraserBtn.style.display = 'none';
+      }
       if (dimActions) dimActions.classList.add('hidden');
       if (activeRowCard) activeRowCard.classList.remove('hidden');
       if (editIndicator) {
@@ -2163,6 +2175,7 @@ const App = {
       }
     }
   },
+
 
 
   updateGridPlayerUI() {
