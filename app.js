@@ -882,10 +882,11 @@ const App = {
         : 'width: 100%; height: 100%; object-fit: contain; padding: 3px; opacity: 1; box-sizing: border-box;';
 
       item.innerHTML = `
-        <!-- 左上角完成标记勾选按钮 -->
-        <button class="btn icon-btn btn-toggle-complete-project ${p.isCompleted ? 'completed' : ''}" data-id="${p.id}" title="${p.isCompleted ? '取消完成标记' : '标记项目为已完成'}" style="position: absolute; top: 10px; left: 10px; z-index: 10; width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid ${p.isCompleted ? '#839958' : 'rgba(0,0,0,0.18)'}; background: ${p.isCompleted ? '#839958' : 'rgba(255,255,255,0.85)'}; color: ${p.isCompleted ? '#ffffff' : 'var(--text-muted)'}; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-          ${p.isCompleted ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '<div style="width: 13px; height: 13px; border: 1.5px solid rgba(0,0,0,0.25); border-radius: 3px;"></div>'}
+        <!-- 左上角完成标记勾选按钮（淡淡的温暖鹅黄色调） -->
+        <button class="btn icon-btn btn-toggle-complete-project ${p.isCompleted ? 'completed' : ''}" data-id="${p.id}" title="${p.isCompleted ? '取消完成标记' : '标记项目为已完成'}" style="position: absolute; top: 10px; left: 10px; z-index: 10; width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid ${p.isCompleted ? '#E5BA5A' : '#E8D4B8'}; background: ${p.isCompleted ? '#F3CA68' : '#FFFDF7'}; color: ${p.isCompleted ? '#ffffff' : '#C7A26B'}; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; transition: all 0.2s ease; box-shadow: ${p.isCompleted ? '0 2px 8px rgba(235, 185, 90, 0.45)' : '0 2px 6px rgba(220, 190, 140, 0.2)'};">
+          ${p.isCompleted ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '<div style="width: 13px; height: 13px; border: 1.5px solid #D6B685; border-radius: 3px; background: #FEF9EB;"></div>'}
         </button>
+
 
         <div class="project-info" title="点击开始编织此项目">
           <div class="project-thumbnail-wrapper" style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.06); flex-shrink: 0; background: #fff; position: relative;">
