@@ -740,7 +740,8 @@ const App = {
       const typeLabel = p.type === 'text' ? 'Written' : 'Grid';
       const specsLabel = p.type === 'text' ? `${totalRows} Rows` : `Size ${colCount}×${totalRows}`;
 
-      const coverSrc = (p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'knitting_cover.png';
+      // 默认统一使用图二编织插画，除非用户通过“更换封面”手动上传了专属图片
+      const coverSrc = (p.isCustomUserUploadedCover && p.thumbnail && p.thumbnail.trim()) ? p.thumbnail : 'knitting_cover.png';
 
       item.innerHTML = `
         <!-- 左上角完成标记勾选按钮 -->
@@ -987,6 +988,7 @@ const App = {
         const reader = new FileReader();
         reader.onload = (evt) => {
           p.thumbnail = evt.target.result;
+          p.isCustomUserUploadedCover = true;
           this.saveProjects();
           this.renderProjectList();
           this.showToast(`🖼️ 已成功更新项目“${p.name}”的封面缩略图！`);
