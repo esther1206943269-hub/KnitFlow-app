@@ -2271,8 +2271,8 @@ const App = {
   toggleEraserMode() {
     Grid.isEraserActive = !Grid.isEraserActive;
     this.updateEraserUI();
-    this.renderStitchPalette();
   },
+
 
   updateEraserUI() {
     const eraserBtn = document.getElementById('btn-grid-eraser');
@@ -2634,26 +2634,8 @@ const App = {
 
       container.appendChild(item);
     });
-
-    // 专属橡皮擦画笔块 (Eraser Tile)
-    const eraserTile = document.createElement('div');
-    eraserTile.className = `palette-item ${Grid.isEraserActive ? 'active' : ''}`;
-    eraserTile.title = '橡皮擦工具：选中后涂抹网格即可擦除画错的图案';
-    eraserTile.style.cursor = 'pointer';
-    eraserTile.innerHTML = `
-      <div class="stitch-icon-box" style="background-color: ${Grid.isEraserActive ? '#D18E97' : '#FFFDF7'}; border: 1.5px solid #D18E97; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: ${Grid.isEraserActive ? '#ffffff' : '#D18E97'};">
-        🧹
-      </div>
-      <span style="font-weight: 700; color: ${Grid.isEraserActive ? '#D18E97' : 'inherit'};">橡皮擦</span>
-    `;
-
-    eraserTile.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleEraserMode();
-    });
-
-    container.appendChild(eraserTile);
   },
+
 
 
   renderStitchLegend() {
