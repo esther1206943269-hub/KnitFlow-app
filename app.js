@@ -240,8 +240,7 @@ const App = {
             ${avatarContent}
           </div>
           <span id="btn-username-text" style="color: var(--text-main); font-weight: 600; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="点击修改用户名/昵称">${this.currentUser.username}</span>
-          <button id="btn-edit-username" style="background: none; border: none; font-size: 0.72rem; color: var(--primary); cursor: pointer; padding: 0 1px; line-height: 1;" title="修改用户名/昵称">✏️</button>
-          <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="修改密码">🔑 修改密码</button>
+          <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="修改密码">修改密码</button>
           <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px;" title="退出登录">退出</button>
         </div>
       `;
@@ -262,13 +261,6 @@ const App = {
         };
       }
 
-      const editNameBtn = container.querySelector('#btn-edit-username');
-      if (editNameBtn) {
-        editNameBtn.onclick = (e) => {
-          e.stopPropagation();
-          this.changeUsername();
-        };
-      }
 
 
       const pwdBtn = container.querySelector('#btn-open-pwd-modal');
