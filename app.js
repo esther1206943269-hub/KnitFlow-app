@@ -2117,6 +2117,7 @@ const App = {
     const legend = document.getElementById('legend-display');
     const clearBtn = document.getElementById('btn-edit-clear');
     const eraserBtn = document.getElementById('btn-grid-eraser');
+    const copyBtn = document.getElementById('btn-grid-copy-modal');
     const editIndicator = document.getElementById('edit-indicator');
     const dimActions = document.querySelector('.grid-dim-actions');
     const activeRowCard = document.getElementById('grid-active-row-card');
@@ -2136,6 +2137,10 @@ const App = {
       if (eraserBtn) {
         eraserBtn.classList.remove('hidden');
         eraserBtn.style.display = 'inline-flex';
+      }
+      if (copyBtn) {
+        copyBtn.classList.remove('hidden');
+        copyBtn.style.display = 'inline-flex';
       }
       if (dimActions) dimActions.classList.remove('hidden');
       if (activeRowCard) activeRowCard.classList.add('hidden');
@@ -2163,6 +2168,10 @@ const App = {
         eraserBtn.classList.add('hidden');
         eraserBtn.style.display = 'none';
       }
+      if (copyBtn) {
+        copyBtn.classList.add('hidden');
+        copyBtn.style.display = 'none';
+      }
       if (dimActions) dimActions.classList.add('hidden');
       if (activeRowCard) activeRowCard.classList.remove('hidden');
       if (editIndicator) {
@@ -2170,6 +2179,7 @@ const App = {
         editIndicator.classList.add('hidden');
       }
     }
+
   },
 
 
@@ -2308,6 +2318,119 @@ const App = {
       }
     }
   },
+
+  openGridCopyModal() {
+    const p = this.currentProject;
+    if (!p) return;
+
+    const modal = document.getElementById('grid-copy-modal');
+    if (!modal) return;
+
+    const activeRow = p.currentLoc || 1;
+    const maxRow = p.data.length;
+
+    // 设置智能默认推荐输入值
+    const inputSingleFrom = document.getElementById('input-copy-single-from');
+    const inputSingleTo = document.getElementById('input-copy-single-to');
+    if (inputSingleFrom) {
+      inputSingleFrom.value = activeRow;
+      inputSingleFrom.max = maxRow;
+    }
+    if (inputSingleTo) {
+      inputSingleTo.value = Math.min(activeRow + 1, maxRow);
+      inputSingleTo.max = maxRow;
+    }
+
+    const inputRangeStart = document.getElementById('input-copy-range-start');
+    const inputRangeEnd = document.getElementById('input-copy-range-end');
+    const inputTargetStart = document.getElementById('input-copy-target-start');
+
+    if (inputRangeStart) { inputRangeStart.value = 1; inputRangeStart.max = maxRow; }
+    if (inputRangeEnd) { inputRangeEnd.value = Math.min(10, maxRow); inputRangeEnd.max = maxRow; }
+    if (inputTargetStart) { inputTargetStart.value = Math.min(11, maxRow); inputTargetStart.max = maxRow; }
+
+    modal.classList.remove('hidden');
+  },
+
+  closeGridCopyModal() {
+    const modal = document.getElementById('grid-copy-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  executeSingleRowCopy() {
+    const p = this.currentProject;
+    if (!p) return;
+
+    const fromVal = parseInt(document.getElementById('input-copy-single-from').value, 10);
+    const toVal = parseInt(document.getElementById('input-copy-single-to').value, 10);
+
+    const maxRow = p.data.length;
+    if (isNaN(fromVal) || fromVal < 1 || fromVal > maxRow) {
+      alert(`请输入有效的源行号（1 ~ ${maxRow}）`);
+      return;
+    }
+    if (isNaN(toVal) || toVal < 1 || toVal > maxRow) {
+      alert(`请输入有效的目标行号（1 ~ ${maxRow}）`);
+      return;
+    }
+    if (fromVal === toVal) {
+      alert('源行与目标行相同，无需复制！');
+      return;
+    }
+
+    // 复制数据 (编织行是 1-indexed 底层向上，在 p.data 数组里索引为 rowNum - 1)
+    const fromIndex = fromVal - 1;
+    const toIndex = toVal - 1;
+
+    p.data[toIndex] = JSON.parse(JSON.stringify(p.data[fromIndex]));
+    this.saveProjects();
+    this.renderGridCanvas();
+    this.closeGridCopyModal();
+    this.showToast(`🎉 已成功将 Row ${fromVal} 复制覆盖至 Row ${toVal}！`);
+  },
+
+  executeRangeRowsCopy() {
+    const p = this.currentProject;
+    if (!p) return;
+
+    const startVal = parseInt(document.getElementById('input-copy-range-start').value, 10);
+    const endVal = parseInt(document.getElementById('input-copy-range-end').value, 10);
+    const targetStartVal = parseInt(document.getElementById('input-copy-target-start').value, 10);
+
+    const maxRow = p.data.length;
+    if (isNaN(startVal) || startVal < 1 || startVal > maxRow) {
+      alert(`请输入有效的复制起始行（1 ~ ${maxRow}）`);
+      return;
+    }
+    if (isNaN(endVal) || endVal < startVal || endVal > maxRow) {
+      alert(`请输入有效的复制结束行（需大于等于起始行且 ≤ ${maxRow}）`);
+      return;
+    }
+    if (isNaN(targetStartVal) || targetStartVal < 1 || targetStartVal > maxRow) {
+      alert(`请输入有效的目标粘贴起始行（1 ~ ${maxRow}）`);
+      return;
+    }
+
+    const rangeCount = endVal - startVal + 1;
+    let pasteSuccessCount = 0;
+
+    for (let i = 0; i < rangeCount; i++) {
+      const srcRow = startVal + i;
+      const destRow = targetStartVal + i;
+      if (destRow > maxRow) break; // 超出网格总行数截断
+
+      const srcIndex = srcRow - 1;
+      const destIndex = destRow - 1;
+      p.data[destIndex] = JSON.parse(JSON.stringify(p.data[srcIndex]));
+      pasteSuccessCount++;
+    }
+
+    this.saveProjects();
+    this.renderGridCanvas();
+    this.closeGridCopyModal();
+    this.showToast(`🎉 已成功将 Row ${startVal}~${startVal + pasteSuccessCount - 1} 批量复制粘贴至 Row ${targetStartVal}~${targetStartVal + pasteSuccessCount - 1}！`);
+  },
+
 
 
   renderColorSelect() {
@@ -3315,10 +3438,17 @@ const App = {
       this.saveProjects();
     });
 
+    // 绑定复制/粘贴行花样弹窗按钮
+    addClick('btn-grid-copy-modal', () => this.openGridCopyModal());
+    addClick('btn-close-copy-modal', () => this.closeGridCopyModal());
+    addClick('btn-exec-copy-single', () => this.executeSingleRowCopy());
+    addClick('btn-exec-copy-range', () => this.executeRangeRowsCopy());
+
     // 绑定橡皮擦按钮
     addClick('btn-grid-eraser', () => {
       this.toggleEraserMode();
     });
+
 
     // 清空网格画布
     addClick('btn-edit-clear', () => {
