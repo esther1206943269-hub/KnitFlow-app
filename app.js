@@ -1107,7 +1107,13 @@ const App = {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
-      const ctx = new AudioCtx();
+      if (!this.audioCtx) {
+        this.audioCtx = new AudioCtx();
+      }
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+      const ctx = this.audioCtx;
       const now = ctx.currentTime;
 
       // 第一声“咔” (High Crisp Snap)
@@ -1263,6 +1269,7 @@ const App = {
   // ==========================================================================
   openProject(id) {
     try {
+      this.playClickClackSound();
       console.log('Attempting to open project:', id);
       const project = this.projects.find(p => p && (String(p.id) === String(id) || p.name === id));
       if (!project) {
