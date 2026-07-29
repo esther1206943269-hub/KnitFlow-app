@@ -230,86 +230,119 @@ const App = {
   // ==========================================================================
   getUserProjectKey() {
     if (!this.currentUser) return 'guest';
-    // 以注册输入的邮箱或手机号 account 标准化做 Key（保证各端均保持绝对统一）
     if (this.currentUser.account && this.currentUser.account.trim()) {
       return 'acc_' + this.currentUser.account.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
     }
     if (this.currentUser.id) {
-      return String(this.currentUser.id);
+      return 'u_' + String(this.currentUser.id);
     }
     return 'guest';
   },
 
   async syncCloudProjects() {
     try {
+      const userKey = this.getUserProjectKey();
+      console.log(`[CloudSync] 开始同步账号 [${userKey}] 的编织项目...`);
+
       const res = await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
         headers: { 'Accept': 'application/json' }
       });
+      
       if (res.ok) {
         const json = await res.json();
         const userProjectsMap = (json && json.userProjectsMap) ? json.userProjectsMap : {};
         
-        const mergedMap = new Map();
+        // 提取仅属于当前账号的云端项目
+        const candidateKeys = [userKey];
+        if (this.currentUser && this.currentUser.id) {
+          candidateKeys.push('u_' + String(this.currentUser.id));
+        }
 
-        // 1. 将本地已有有效项目优先放入 mergedMap
-        this.projects.forEach(localP => {
-          if (localP && localP.id && localP.id !== 'test-proj-1' && localP.name !== '全量同步测试项目') {
-            mergedMap.set(String(localP.id), localP);
-          }
-        });
-
-        // 2. 扫远端 JsonBlob 下所有 key 的真实项目，彻底剔除测试数据
-        Object.keys(userProjectsMap).forEach(k => {
+        const remoteMap = new Map();
+        candidateKeys.forEach(k => {
           const list = userProjectsMap[k];
           if (Array.isArray(list)) {
             list.forEach(p => {
-              if (p && p.id && p.id !== 'sample-text' && p.id !== 'sample-grid' && p.id !== 'test-proj-1' && p.name !== '全量同步测试项目') {
+              if (p && p.id && p.id !== 'test-proj-1' && p.name !== '全量同步测试项目') {
                 const pId = String(p.id);
-                if (mergedMap.has(pId)) {
-                  const existingP = mergedMap.get(pId);
+                if (remoteMap.has(pId)) {
+                  const existingP = remoteMap.get(pId);
                   const existingTime = new Date(existingP.updatedAt || 0).getTime();
                   const pTime = new Date(p.updatedAt || 0).getTime();
                   if (pTime > existingTime) {
-                    mergedMap.set(pId, p);
+                    remoteMap.set(pId, p);
                   }
                 } else {
-                  mergedMap.set(pId, p);
+                  remoteMap.set(pId, p);
                 }
               }
             });
           }
         });
 
+        // 将本地当前账号的项目与云端同账号项目进行双向增量合并
+        const mergedMap = new Map();
+        
+        // 1) 放入本地项目
+        (this.projects || []).forEach(localP => {
+          if (localP && localP.id && localP.id !== 'test-proj-1' && localP.name !== '全量同步测试项目') {
+            mergedMap.set(String(localP.id), localP);
+          }
+        });
+
+        // 2) 比较云端项目（最新修改时间优先，缺漏自动补全）
+        remoteMap.forEach((remoteP, pId) => {
+          if (mergedMap.has(pId)) {
+            const localP = mergedMap.get(pId);
+            const localTime = new Date(localP.updatedAt || 0).getTime();
+            const remoteTime = new Date(remoteP.updatedAt || 0).getTime();
+            if (remoteTime > localTime) {
+              mergedMap.set(pId, remoteP);
+            }
+          } else {
+            mergedMap.set(pId, remoteP);
+          }
+        });
+
         this.projects = Array.from(mergedMap.values()).filter(p => p && p.id !== 'test-proj-1' && p.name !== '全量同步测试项目');
         
-        // 保存至本地主缓存
+        // 更新保存到当前账号的本地缓存
         const storageKey = this.getProjectsStorageKey();
         localStorage.setItem(storageKey, JSON.stringify(this.projects));
 
         // 重新渲染项目列表
         this.renderProjectList();
+
+        // 静默把合并后的全量最新项目数据回推到云端当前账号槽中
+        await this.pushCloudProjects();
         return true;
       }
     } catch (e) {
-      console.warn('云端编织项目双向同步跳过：', e);
+      console.warn(`[CloudSync] 账号 [${this.getUserProjectKey()}] 项目同步跳过：`, e);
     }
     return false;
   },
 
   async pushCloudProjects() {
     try {
-      const cleanProjects = this.projects.filter(p => p && p.id !== 'test-proj-1' && p.name !== '全量同步测试项目');
-      const primaryKey = this.getUserProjectKey();
+      const userKey = this.getUserProjectKey();
+      const cleanProjects = (this.projects || []).filter(p => p && p.id && p.id !== 'test-proj-1' && p.name !== '全量同步测试项目');
       
-      const userProjectsMap = {
-        'global_sync_slot': cleanProjects,
-        'latest_backup': cleanProjects,
-        'guest': cleanProjects,
-        [primaryKey]: cleanProjects
-      };
+      const res = await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      let userProjectsMap = {};
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.userProjectsMap) {
+          userProjectsMap = json.userProjectsMap;
+        }
+      }
 
-      if (this.currentUser && this.currentUser.id && String(this.currentUser.id) !== primaryKey) {
-        userProjectsMap[String(this.currentUser.id)] = cleanProjects;
+      // 严格仅更新当前账号在云端的项目列表 (实现完全账号隔离与多设备同步)
+      userProjectsMap[userKey] = cleanProjects;
+      if (this.currentUser && this.currentUser.id) {
+        userProjectsMap['u_' + String(this.currentUser.id)] = cleanProjects;
       }
 
       await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
@@ -317,7 +350,7 @@ const App = {
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ userProjectsMap })
       });
-      console.log(`[CloudSync] 成功向 JsonBlob 云端推送 ${cleanProjects.length} 个真实编织项目！`);
+      console.log(`[CloudSync] 成功推送 ${cleanProjects.length} 个项目至账号 [${userKey}] 云端空间！`);
       return true;
     } catch (e) {
       console.warn('推送云端项目失败：', e);
@@ -327,7 +360,8 @@ const App = {
 
   async doInstantCloudSync() {
     this.playClickClackSound();
-    this.showToast('☁️ 正在为您双向同步平板与电脑编织项目...');
+    const accountName = this.currentUser ? (this.currentUser.username || this.currentUser.account) : '游客';
+    this.showToast(`☁️ 正在为您双向同步账号 [${accountName}] 的编织项目...`);
     
     // 视觉旋转动画
     const syncBtn = document.getElementById('btn-sync-projects-inline');
@@ -338,15 +372,14 @@ const App = {
 
     try {
       this.saveProjects();
-      await this.pushCloudProjects();
       await this.syncCloudProjects();
       
       if (syncBtn) {
         syncBtn.style.transform = 'none';
       }
 
-      this.showToast(`🎉 同步完成！当前已保持 ${this.projects.length} 个项目完全同步`);
-      alert(`🎉 编织项目多端云同步完成！\n\n当前包含 ${this.projects.length} 个编织项目，已全部成功推送并与平板端同步！`);
+      this.showToast(`🎉 账号 [${accountName}] 编织项目同步完成！`);
+      alert(`🎉 账号 [${accountName}] 编织项目多端云同步完成！\n\n当前包含 ${this.projects.length} 个编织项目，已成功与平板端同步！`);
     } catch (err) {
       console.error('Instant sync error:', err);
       this.showToast('✨ 同步完成');
@@ -839,65 +872,60 @@ const App = {
   },
 
   getProjectsStorageKey() {
-    return this.currentUser ? `knitflow_projects_user_${this.currentUser.id}` : 'knitflow_projects_guest';
+    return `knitflow_projects_${this.getUserProjectKey()}`;
   },
 
   getCustomTemplatesStorageKey() {
-    return this.currentUser ? `knitflow_custom_templates_user_${this.currentUser.id}` : 'knitflow_custom_templates_guest';
+    return `knitflow_custom_templates_${this.getUserProjectKey()}`;
   },
 
   // ==========================================================================
-  // 本地/云端账户项目存储管理
+  // 本地/云端账户项目存储管理 (严格多账号隔离 & 多设备精准同步)
   // ==========================================================================
   loadProjects() {
     try {
-      const allFoundProjects = [];
-      const seenIds = new Set();
+      const storageKey = this.getProjectsStorageKey();
+      let stored = localStorage.getItem(storageKey);
+      let list = stored ? JSON.parse(stored) : null;
 
-      // 1. 全量扫描当前浏览器 localStorage 所有的历史 key (全盘抓取真正的项目)
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('knitflow_projects') || key.includes('projects'))) {
-          try {
-            const item = localStorage.getItem(key);
-            if (item) {
-              const list = JSON.parse(item);
-              if (Array.isArray(list)) {
-                list.forEach(p => {
-                  if (p && p.id && p.name && p.id !== 'sample-text' && p.id !== 'sample-grid' && p.id !== 'test-proj-1') {
-                    const pId = String(p.id);
-                    if (!seenIds.has(pId)) {
-                      seenIds.add(pId);
-                      allFoundProjects.push(p);
-                    }
-                  }
-                });
+      // 迁移容错：若当前账号在专属 key 下尚无项目，检索该账号的兼容旧 Key
+      if ((!list || !Array.isArray(list) || list.length === 0) && this.currentUser) {
+        const fallbacks = [
+          `knitflow_projects_user_${this.currentUser.id}`,
+          `knitflow_projects_${this.currentUser.account}`,
+          'knitflow_projects'
+        ];
+        for (const fb of fallbacks) {
+          if (fb === storageKey) continue;
+          const fbItem = localStorage.getItem(fb);
+          if (fbItem) {
+            try {
+              const parsed = JSON.parse(fbItem);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                list = parsed;
+                console.log(`[LoadProjects] 从兼容 Key [${fb}] 成功迁移 ${list.length} 个项目`);
+                break;
               }
-            }
-          } catch(e) {}
+            } catch(e) {}
+          }
         }
       }
 
-      // 2. 保底机制：若未检索到“Fiona Cappa”、“麻花针花样”、“横渡提花练习”，自动注入补全
-      const defaultPresets = [
-        { id: 'proj_fiona_cappa', name: 'Fiona Cappa', type: 'grid', rows: 24, cols: 20, updatedAt: new Date().toISOString() },
-        { id: 'proj_cable_pattern', name: '麻花针花样', type: 'grid', rows: 20, cols: 18, updatedAt: new Date().toISOString() },
-        { id: 'proj_stranded_jacquard', name: '横渡提花练习', type: 'grid', rows: 22, cols: 20, updatedAt: new Date().toISOString() }
-      ];
+      // 若依旧完全为空，注入初始图解
+      if (!list || !Array.isArray(list) || list.length === 0) {
+        const makeGridData = (rows, cols) => Array.from({ length: rows }, () => Array(cols).fill('k'));
+        list = [
+          { id: 'proj_fiona_cappa', name: 'Fiona Cappa', type: 'grid', rows: 24, cols: 20, data: makeGridData(24, 20), updatedAt: new Date().toISOString() },
+          { id: 'proj_cable_pattern', name: '麻花针花样', type: 'grid', rows: 20, cols: 18, data: makeGridData(20, 18), updatedAt: new Date().toISOString() },
+          { id: 'proj_stranded_jacquard', name: '横渡提花练习', type: 'grid', rows: 22, cols: 20, data: makeGridData(22, 20), updatedAt: new Date().toISOString() }
+        ];
+      }
 
-      defaultPresets.forEach(dp => {
-        if (!seenIds.has(dp.id) && !allFoundProjects.some(p => p.name === dp.name)) {
-          seenIds.add(dp.id);
-          allFoundProjects.push(dp);
-        }
-      });
-
-      this.projects = allFoundProjects;
-      console.log(`[LoadProjects] 成功加载 ${this.projects.length} 个编织项目！`, this.projects.map(p=>p.name));
-
-      // 写入当前设备主缓存 key
-      const mainKey = this.getProjectsStorageKey();
-      localStorage.setItem(mainKey, JSON.stringify(this.projects));
+      this.projects = list.filter(p => p && p.id && p.id !== 'test-proj-1' && p.name !== '全量同步测试项目');
+      console.log(`[LoadProjects] 当前账号 [${this.getUserProjectKey()}] 已成功加载 ${this.projects.length} 个编织项目`);
+      
+      // 保存至本地当前账号 Key
+      localStorage.setItem(storageKey, JSON.stringify(this.projects));
     } catch (e) {
       console.error('加载项目失败：', e);
       this.projects = [];
