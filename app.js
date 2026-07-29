@@ -3811,6 +3811,166 @@ const App = {
     addClick('btn-grid-print', () => window.print());
     addClick('btn-text-copy', () => this.copyTextPattern());
     addClick('btn-grid-export-png', () => this.exportGridPNG());
+    addClick('btn-share-project-text', () => this.shareCurrentProject());
+    addClick('btn-share-project-grid', () => this.shareCurrentProject());
+
+    // 绑定口令提取与文件备份导入导出
+    addClick('btn-fetch-sync-code', () => this.fetchAndImportByShareCode());
+    addClick('btn-export-projects-file', () => this.exportBackupFile());
+
+    const fileInput = document.getElementById('input-import-projects-file');
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => this.importBackupFile(e));
+    }
+  },
+
+  async fetchAndImportByShareCode() {
+    const input = document.getElementById('input-sync-code');
+    const code = input ? input.value.trim().toUpperCase() : '';
+    if (!code) {
+      alert('请输入 6 位提取口令！');
+      return;
+    }
+
+    this.playClickClackSound();
+    this.showToast(`⌛ 正在云端检索口令 [${code}] 的图解...`);
+
+    try {
+      const res = await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        const mainJson = await res.json();
+        const shareCodeMap = mainJson.shareCodeMap || {};
+        const userProjectsMap = mainJson.userProjectsMap || {};
+
+        let targetP = shareCodeMap[code];
+        if (!targetP && userProjectsMap[code]) {
+          targetP = userProjectsMap[code];
+        }
+
+        if (targetP) {
+          const newP = JSON.parse(JSON.stringify(Array.isArray(targetP) ? targetP[0] : targetP));
+          newP.id = 'proj_' + Date.now();
+          newP.updatedAt = new Date().toISOString();
+
+          this.projects.unshift(newP);
+          this.saveProjects();
+          this.renderProjectList();
+
+          const closeBtn = document.getElementById('btn-close-sync-modal');
+          if (closeBtn) closeBtn.click();
+
+          this.showToast(`🎉 成功导入图解 “${newP.name}”！`);
+          alert(`🎉 恭喜！成功通过口令提取并导入了编织图解：“${newP.name}”！\n已自动置顶到您的项目列表中。`);
+          return;
+        }
+      }
+      alert(`⚠️ 未能检索到口令 [${code}] 对应的图解，请核对口令是否正确！`);
+    } catch (e) {
+      console.error('Fetch sync code error:', e);
+      alert('网络检索失败，请稍后重试。');
+    }
+  },
+
+  exportBackupFile() {
+    try {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.projects, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `KnitFlow_Projects_Backup_${new Date().toISOString().slice(0,10)}.knitflow`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      this.showToast('💾 项目备份文件已成功导出！');
+    } catch (e) {
+      alert('导出备份文件失败：' + e.message);
+    }
+  },
+
+  importBackupFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        const list = Array.isArray(imported) ? imported : [imported];
+        let count = 0;
+        list.forEach(p => {
+          if (p && p.name) {
+            p.id = 'proj_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+            this.projects.unshift(p);
+            count++;
+          }
+        });
+        this.saveProjects();
+        this.renderProjectList();
+        this.showToast(`📂 成功导入 ${count} 个编织图解！`);
+        alert(`🎉 成功导入 ${count} 个编织图解项目！已加入您的项目列表中。`);
+      } catch (err) {
+        alert('文件格式解析失败，请确保上传有效的 .knitflow 或 .json 备份文件！');
+      }
+    };
+    reader.readAsText(file);
+  },
+
+  async shareCurrentProject() {
+    const p = this.getActiveProject();
+    if (!p) {
+      alert('未找到当前活跃项目！');
+      return;
+    }
+
+    this.playClickClackSound();
+    this.showToast('⌛ 正在为您生成云端 6 位分享口令...');
+
+    // 生成 6 位大写字母数字组合口令
+    const randomCode = 'KF' + Math.floor(1000 + Math.random() * 9000);
+    
+    try {
+      const shareData = JSON.parse(JSON.stringify(p));
+
+      // 保存至云端 JsonBlob 的 shareCodeMap 中
+      const res = await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      let mainJson = {};
+      if (res.ok) {
+        mainJson = await res.json();
+      }
+      if (!mainJson.shareCodeMap) {
+        mainJson.shareCodeMap = {};
+      }
+      mainJson.shareCodeMap[randomCode] = shareData;
+
+      await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(mainJson)
+      });
+
+      // 拼接贴吧/小红书分享文本
+      const shareText = `🧶【KnitFlow 编织图解分享】\n📌 图解名称：${p.name}\n🔑 6位云端提取口令：${randomCode}\n\n👉 使用方法：在 KnitFlow 编织小助手首页点击“云端同步 / 提取口令”，输入口令 [${randomCode}] 即可一键加载并开始编织！`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareText);
+      }
+
+      this.showToast(`🎉 云端分享口令 [${randomCode}] 已生成并已复制到剪贴板！`);
+      alert(`🎉 恭喜！已为您成功生成贴吧/小红书【6位分享口令】：\n\n🔑 口令：${randomCode}\n\n📋 分享文案已自动复制到您的剪贴板！您可以直接粘贴发布到贴吧、小红书或微信群中。其他织友输入该口令即可一键导入编织！`);
+
+    } catch (e) {
+      console.error('Share project error:', e);
+      const jsonStr = JSON.stringify(p, null, 2);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(jsonStr);
+        alert(`🎉 图解完整数据已复制到剪贴板！可以直接发送给织友进行导入！`);
+      } else {
+        alert('生成口令失败，请检查网络后再试。');
+      }
+    }
   },
 
   // ==========================================================================
