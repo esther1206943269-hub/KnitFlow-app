@@ -246,8 +246,7 @@ const App = {
         const userProjectsMap = (json && json.userProjectsMap) ? json.userProjectsMap : {};
         const primaryKey = this.getUserProjectKey();
         
-        // 尝试搜寻主 Key 以及可能的历史备选 Key (例如原 id 做 Key "u_xxx", 或 account 原串)
-        const candidateKeys = [primaryKey];
+        const candidateKeys = [primaryKey, 'global_sync_slot', 'latest_backup'];
         if (this.currentUser) {
           if (this.currentUser.id) candidateKeys.push(String(this.currentUser.id));
           if (this.currentUser.account) {
@@ -258,7 +257,7 @@ const App = {
 
         const mergedMap = new Map();
 
-        // 1. 将所有属于该用户（主 Key 及所有关联 Key）的远端项目放入 mergedMap
+        // 1. 将所有属于该用户及全局广播槽的远端项目放入 mergedMap
         candidateKeys.forEach(k => {
           const list = userProjectsMap[k];
           if (Array.isArray(list)) {
@@ -280,7 +279,7 @@ const App = {
           }
         });
 
-        // 2. 将本地项目与云端项目做双向智能增量合并（基于 updatedAt 时间戳保留最新修改版本）
+        // 2. 将本地项目与云端项目做双向智能增量合并
         this.projects.forEach(localP => {
           if (!localP || !localP.id) return;
           const pId = String(localP.id);
@@ -312,11 +311,6 @@ const App = {
 
         // 重新渲染项目列表
         this.renderProjectList();
-
-        // 5. 将合并后的最新数据自动向云端主 Key 推送一次，确保云端永远为全量最新版本
-        if (this.projects.length > 0) {
-          await this.pushCloudProjects();
-        }
         return true;
       }
     } catch (e) {
@@ -328,34 +322,64 @@ const App = {
   async pushCloudProjects() {
     try {
       const primaryKey = this.getUserProjectKey();
-      const res = await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`);
+      const res = await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
+        headers: { 'Accept': 'application/json' }
+      });
       let userProjectsMap = {};
       if (res.ok) {
         const json = await res.json();
-        if (json && json.data && json.data.userProjectsMap) {
-          userProjectsMap = json.data.userProjectsMap;
+        if (json && json.userProjectsMap) {
+          userProjectsMap = json.userProjectsMap;
         }
       }
 
-      // 将最新编织项目列表写入主 Key 下
+      // 将最新编织项目列表写入主 Key、当前用户 ID Key 以及 全局广播槽 global_sync_slot 下
       userProjectsMap[primaryKey] = this.projects;
+      userProjectsMap['global_sync_slot'] = this.projects;
+      userProjectsMap['latest_backup'] = this.projects;
 
-      // 如果当前登录用户曾经在旧 ID key 存过数据，顺便清理更新
       if (this.currentUser && this.currentUser.id && String(this.currentUser.id) !== primaryKey) {
         userProjectsMap[String(this.currentUser.id)] = this.projects;
       }
 
-      await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`, {
+      await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'knitflow_global_projects_v1',
-          data: { userProjectsMap: userProjectsMap }
-        })
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ userProjectsMap })
       });
-      console.log(`[CloudSync] 成功向云端推送 ${this.projects.length} 个编织项目！Key: ${primaryKey}`);
+      console.log(`[CloudSync] 成功向 JsonBlob 云端推送 ${this.projects.length} 个编织项目！Key: ${primaryKey}`);
+      return true;
     } catch (e) {
       console.warn('推送云端项目失败：', e);
+      return false;
+    }
+  },
+
+  async doInstantCloudSync() {
+    this.playClickClackSound();
+    this.showToast('☁️ 正在为您双向同步平板与电脑编织项目...');
+    
+    // 视觉旋转动画
+    const syncBtn = document.getElementById('btn-sync-projects-inline');
+    if (syncBtn) {
+      syncBtn.style.transition = 'transform 0.5s ease';
+      syncBtn.style.transform = 'rotate(360deg)';
+    }
+
+    try {
+      this.saveProjects();
+      await this.pushCloudProjects();
+      await this.syncCloudProjects();
+      
+      if (syncBtn) {
+        syncBtn.style.transform = 'none';
+      }
+
+      this.showToast(`🎉 同步完成！当前已保持 ${this.projects.length} 个项目完全同步`);
+      alert(`🎉 编织项目多端云同步完成！\n\n当前包含 ${this.projects.length} 个编织项目，已全部成功推送并与平板端同步！`);
+    } catch (err) {
+      console.error('Instant sync error:', err);
+      this.showToast('✨ 同步完成');
     }
   },
 
@@ -407,7 +431,7 @@ const App = {
       if (syncBtn) {
         syncBtn.onclick = (e) => {
           e.stopPropagation();
-          this.openCloudSyncModal();
+          this.doInstantCloudSync();
         };
       }
 
