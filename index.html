@@ -25482,6 +25482,55 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
         </div>
       </div>
 
+  <!-- 云端多端同步与项目全量备份 Modal -->
+  <div id="cloud-sync-modal" class="modal-overlay hidden">
+    <div class="modal-card card" style="max-width: 520px; width: 92%; background: #FAF6F0; border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 20px 50px rgba(0,0,0,0.3); border-radius: var(--radius-lg); padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 0.75rem;">
+        <h3 style="margin: 0; font-size: 1.15rem; font-family: var(--font-serif); color: #111111; font-weight: 700;">☁️ 多端同步与项目全量备份</h3>
+        <button id="btn-close-sync-modal" class="btn text-btn" style="padding: 0.2rem 0.5rem; font-size: 1.2rem; cursor: pointer; color: #666; border: none; background: none;">×</button>
+      </div>
+
+      <!-- 模块 1：账号全自动双向同步 -->
+      <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="font-weight: 700; font-size: 0.92rem; color: var(--primary); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>🔄 方式 1：账号全自动同步 (推荐)</span>
+          <span id="sync-account-status-badge" style="font-size: 0.75rem; color: #839958; background: #EEF3E5; padding: 2px 8px; border-radius: 12px; font-weight: 600;">当前账号</span>
+        </div>
+        <p style="font-size: 0.8rem; color: #666; margin: 0 0 0.75rem 0;">电脑上传 -> 平板拉取。登录同一账号点击下方按钮完成同步。</p>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="btn-modal-push-cloud" class="btn primary" style="flex: 1; padding: 0.45rem; font-size: 0.82rem; font-weight: 700;">📤 将电脑项目推送至云端</button>
+          <button id="btn-modal-pull-cloud" class="btn text-btn" style="flex: 1; padding: 0.45rem; font-size: 0.82rem; font-weight: 700; background: #839958; color: #fff;">📥 从云端拉取项目到平板</button>
+        </div>
+      </div>
+
+      <!-- 模块 2：6位数字闪传口令码 (零门槛跨设备秒传) -->
+      <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="font-weight: 700; font-size: 0.92rem; color: var(--primary); margin-bottom: 0.4rem;">
+          🔑 方式 2：6位闪传提取码 (无需相同设备设置)
+        </div>
+        <p style="font-size: 0.8rem; color: #666; margin: 0 0 0.6rem 0;">电脑端一键生成 6 位提取码，平板端输入即可直接导入！</p>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <button id="btn-gen-sync-code" class="btn text-btn" style="background: var(--primary-light); color: var(--text-main); font-weight: 700; font-size: 0.8rem; padding: 0.4rem 0.75rem; border: 1px solid var(--card-border);">生成当前提取码</button>
+          <div id="display-sync-code" style="font-family: monospace; font-size: 1.1rem; font-weight: 800; color: #D87488; letter-spacing: 2px;">------</div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="input-sync-code" maxlength="6" style="flex: 1; padding: 0.4rem 0.6rem; border: 1px solid var(--card-border); border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-align: center; letter-spacing: 2px;" placeholder="输入6位提取码">
+          <button id="btn-fetch-sync-code" class="btn primary" style="padding: 0.4rem 1rem; font-size: 0.82rem; font-weight: 700;">提取并合并</button>
+        </div>
+      </div>
+
+      <!-- 模块 3：离线项目文件导出/导入 (AirDrop/微信/QQ直接传输) -->
+      <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px; padding: 1rem;">
+        <div style="font-weight: 700; font-size: 0.92rem; color: var(--primary); margin-bottom: 0.4rem;">
+          📁 方式 3：离线文件导入 / 导出 (.knitflow 备份包)
+        </div>
+        <p style="font-size: 0.8rem; color: #666; margin: 0 0 0.6rem 0;">电脑上导出备份文件，发到平板或微信选择打开即可。</p>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button id="btn-export-projects-file" class="btn text-btn" style="flex: 1; background: #FAF6F0; border: 1px solid var(--card-border); color: #3c3530; font-weight: 700; font-size: 0.8rem; padding: 0.45rem;">💾 导出当前项目备份</button>
+          <label for="input-import-projects-file" class="btn text-btn" style="flex: 1; background: #FAF6F0; border: 1px solid var(--card-border); color: #3c3530; font-weight: 700; font-size: 0.8rem; padding: 0.45rem; text-align: center; cursor: pointer; margin: 0;">📂 选择备份文件导入</label>
+          <input type="file" id="input-import-projects-file" accept=".json,.knitflow" style="display: none;">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -25490,9 +25539,9 @@ R2: 1上, 1扭下, 1上" style="font-size: 0.85rem; padding: 0.5rem; line-height
 
 
   <!-- 引入逻辑脚本 (添加超级版本序列，强制刷新消除浏览器本地与 CDN 历史缓存) -->
-  <script src="speech.js?v=20260729_2000"></script>
-  <script src="parser.js?v=20260729_2000"></script>
-  <script src="grid.js?v=20260729_2000"></script>
-  <script src="app.js?v=20260729_2000"></script>
+  <script src="speech.js?v=20260729_3000"></script>
+  <script src="parser.js?v=20260729_3000"></script>
+  <script src="grid.js?v=20260729_3000"></script>
+  <script src="app.js?v=20260729_3000"></script>
 </body>
 </html>

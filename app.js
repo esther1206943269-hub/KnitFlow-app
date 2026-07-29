@@ -405,17 +405,9 @@ const App = {
 
       const syncBtn = container.querySelector('#btn-sync-projects-inline');
       if (syncBtn) {
-        syncBtn.onclick = async (e) => {
+        syncBtn.onclick = (e) => {
           e.stopPropagation();
-          this.showToast('☁️ 正在为您双向同步平板与电脑编织项目...');
-          this.saveProjects();
-          await this.pushCloudProjects();
-          const success = await this.syncCloudProjects();
-          if (success) {
-            this.showToast(`🎉 同步完成！当前共有 ${this.projects.length} 个编织项目`);
-          } else {
-            this.showToast(`✨ 同步完成！已更新 ${this.projects.length} 个编织项目`);
-          }
+          this.openCloudSyncModal();
         };
       }
 
