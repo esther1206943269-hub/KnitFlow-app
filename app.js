@@ -18,6 +18,7 @@ const App = {
 
   // 页面加载入口
   CLOUD_USERS_BIN_ID: 'ff8081819f7e10ae019f893c3adf1162',
+  CLOUD_PROJECTS_BIN_ID: 'ff8081819f7e10ae019fad3c49424274',
   CLOUD_API_BASE: 'https://api.restful-api.dev/objects',
 
   async init() {
@@ -32,6 +33,9 @@ const App = {
     document.body.classList.remove('dark-mode');
 
     this.loadProjects();
+    // 从云端双向同步属于该账号的编织项目数据 (支持电脑与平板实时同步)
+    this.syncCloudProjects();
+
     this.loadCustomTemplates();
     this.loadDeletedPresets();
     this.bindEvents();
@@ -220,6 +224,98 @@ const App = {
     }
   },
 
+  // ==========================================================================
+  // 多设备云端项目实时双向同步逻辑 (支持电脑、平板与手机无缝同步)
+  // ==========================================================================
+  getUserProjectKey() {
+    return this.currentUser ? (this.currentUser.id || (this.currentUser.account ? this.currentUser.account.toLowerCase() : 'user')) : 'guest';
+  },
+
+  async syncCloudProjects() {
+    try {
+      const res = await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`);
+      if (res.ok) {
+        const json = await res.json();
+        const userProjectsMap = (json && json.data && json.data.userProjectsMap) ? json.data.userProjectsMap : {};
+        const userKey = this.getUserProjectKey();
+        const remoteProjects = userProjectsMap[userKey];
+
+        if (Array.isArray(remoteProjects)) {
+          const mergedMap = new Map();
+
+          // 1. 将远端项目写入 map
+          remoteProjects.forEach(p => {
+            if (p && p.id) {
+              mergedMap.set(String(p.id), p);
+            }
+          });
+
+          // 2. 将本地项目智能增量合并（比较 updatedAt 时间戳，保留最新修改版本）
+          this.projects.forEach(localP => {
+            if (!localP || !localP.id) return;
+            const pId = String(localP.id);
+            if (mergedMap.has(pId)) {
+              const remoteP = mergedMap.get(pId);
+              const localTime = new Date(localP.updatedAt || 0).getTime();
+              const remoteTime = new Date(remoteP.updatedAt || 0).getTime();
+              if (localTime >= remoteTime) {
+                mergedMap.set(pId, localP);
+              }
+            } else {
+              mergedMap.set(pId, localP);
+            }
+          });
+
+          this.projects = Array.from(mergedMap.values());
+          
+          // 更新本地缓存
+          const storageKey = this.getProjectsStorageKey();
+          localStorage.setItem(storageKey, JSON.stringify(this.projects));
+
+          // 若在播放或编辑界面中，同步引用
+          if (this.currentProject) {
+            const updatedCurrent = this.projects.find(p => String(p.id) === String(this.currentProject.id));
+            if (updatedCurrent) {
+              this.currentProject = updatedCurrent;
+            }
+          }
+
+          // 重新渲染项目列表
+          this.renderProjectList();
+        }
+      }
+    } catch (e) {
+      console.warn('云端编织项目双向同步跳过：', e);
+    }
+  },
+
+  async pushCloudProjects() {
+    try {
+      const userKey = this.getUserProjectKey();
+      const res = await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`);
+      let userProjectsMap = {};
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.data && json.data.userProjectsMap) {
+          userProjectsMap = json.data.userProjectsMap;
+        }
+      }
+
+      userProjectsMap[userKey] = this.projects;
+
+      await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'knitflow_global_projects_v1',
+          data: { userProjectsMap: userProjectsMap }
+        })
+      });
+    } catch (e) {
+      console.warn('推送云端项目失败：', e);
+    }
+  },
+
   renderUserAuthUI() {
     const container = document.getElementById('user-auth-entry');
     if (!container) return;
@@ -242,6 +338,7 @@ const App = {
             ${avatarContent}
           </div>
           <span id="btn-username-text" style="color: var(--text-main); font-weight: 600; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="点击修改用户名/昵称">${this.currentUser.username}</span>
+          <button id="btn-sync-projects-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="同步平板与电脑编织项目">☁️ 同步</button>
           <button id="btn-open-pwd-modal" style="background: none; border: none; font-size: 0.75rem; color: var(--primary); cursor: pointer; padding: 0 2px; margin-left: 2px;" title="修改密码">修改密码</button>
           <button id="btn-logout-inline" style="background: none; border: none; font-size: 0.75rem; color: var(--danger); cursor: pointer; padding: 0 2px;" title="退出登录">退出</button>
         </div>
@@ -260,6 +357,17 @@ const App = {
         usernameText.onclick = (e) => {
           e.stopPropagation();
           this.changeUsername();
+        };
+      }
+
+      const syncBtn = container.querySelector('#btn-sync-projects-inline');
+      if (syncBtn) {
+        syncBtn.onclick = async (e) => {
+          e.stopPropagation();
+          this.showToast('☁️ 正在为您同步平板与电脑编织项目...');
+          await this.syncCloudProjects();
+          await this.pushCloudProjects();
+          this.showToast('🎉 项目多端同步已成功更新至最新！');
         };
       }
 
@@ -403,11 +511,13 @@ const App = {
   },
 
   async forceCloudSync() {
-    this.showToast('☁️ 正在为您同步电脑与平板端账号...');
+    this.showToast('☁️ 正在为您同步电脑与平板端账号与编织项目...');
     await this.pushCloudUsers();
     await this.syncCloudUsers();
-    alert(`🎉 账号云端同步完成！\n\n已为您同步包含 ${this.registeredUsers.length} 个账号\n平板电脑与手机端现已可无缝登录！`);
-    this.showToast('🎉 云端账号同步完成！');
+    await this.syncCloudProjects();
+    await this.pushCloudProjects();
+    alert(`🎉 多端云端同步完成！\n\n已为您同步包含 ${this.registeredUsers.length} 个账号及全量编织项目\n电脑、平板电脑与手机端项目现已 100% 保持同步！`);
+    this.showToast('🎉 云端账号与项目多端同步完成！');
   },
 
   async openForgotPwdModal() {
@@ -649,7 +759,7 @@ const App = {
     this.showToast(`🎉 欢迎回来，${user.username}！多端同步已开启。`);
   },
 
-  loginUserObject(userObj, isNewReg = false) {
+  async loginUserObject(userObj, isNewReg = false) {
     // 保留用户所有资料字段（含 avatar），避免重新登录后头像丢失
     this.currentUser = {
       id: userObj.id,
@@ -666,6 +776,10 @@ const App = {
     this.loadCustomTemplates();
     this.renderProjectList();
     this.renderPresetTemplates();
+
+    // 登录后瞬间从云端同步该账号下的所有编织项目
+    await this.syncCloudProjects();
+    this.pushCloudProjects();
   },
 
   logoutUser() {
@@ -734,6 +848,12 @@ const App = {
     try {
       const key = this.getProjectsStorageKey();
       localStorage.setItem(key, JSON.stringify(this.projects));
+
+      // 实时防抖向云端推数据，确保平板、手机与电脑端数据全量同步
+      if (this.pushProjectTimer) clearTimeout(this.pushProjectTimer);
+      this.pushProjectTimer = setTimeout(() => {
+        this.pushCloudProjects();
+      }, 1000);
     } catch (e) {
       console.error('保存项目失败：', e);
     }
