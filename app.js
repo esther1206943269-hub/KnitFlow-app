@@ -157,11 +157,13 @@ const App = {
 
   async syncCloudUsers() {
     try {
-      const res = await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_USERS_BIN_ID}`);
+      const res = await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_USERS_BLOB_ID}`, {
+        headers: { 'Accept': 'application/json' }
+      });
       if (res.ok) {
         const json = await res.json();
-        if (json && json.data && Array.isArray(json.data.users)) {
-          const remoteUsers = json.data.users;
+        const remoteUsers = (json && Array.isArray(json.users)) ? json.users : (Array.isArray(json) ? json : []);
+        if (remoteUsers.length > 0) {
           const mergedMap = new Map();
 
           // 先将远端写入 map
@@ -173,16 +175,12 @@ const App = {
           });
 
           // 再用本地数据做字段级智能合并：
-          // 对于每个用户，以本地版本为基准（本地密码最新），
-          // 但如果本地缺少某个资料字段（如 avatar），则保留远端的值。
           this.registeredUsers.forEach(u => {
             if (u && (u.account || u.username)) {
               const key = (u.account || u.username).toLowerCase();
               if (mergedMap.has(key)) {
                 const remote = mergedMap.get(key);
-                // 字段级合并：本地优先，但缺失的字段从远端补充
                 const merged = Object.assign({}, remote, u);
-                // 特别处理：若本地 avatar 为空而远端有值，用远端的
                 if (!merged.avatar && remote.avatar) merged.avatar = remote.avatar;
                 mergedMap.set(key, merged);
               } else {
@@ -194,9 +192,8 @@ const App = {
           this.registeredUsers = Array.from(mergedMap.values());
           localStorage.setItem('knitflow_registered_users', JSON.stringify(this.registeredUsers));
 
-          // 如果当前已登录用户在合并后的列表里有 avatar，同步回 currentUser
           if (this.currentUser) {
-            const updated = this.registeredUsers.find(u => u.id === this.currentUser.id);
+            const updated = this.registeredUsers.find(u => u.id === this.currentUser.id || u.account === this.currentUser.account);
             if (updated && updated.avatar && !this.currentUser.avatar) {
               this.currentUser.avatar = updated.avatar;
               localStorage.setItem('knitflow_current_user', JSON.stringify(this.currentUser));
@@ -211,13 +208,13 @@ const App = {
 
   async pushCloudUsers() {
     try {
-      await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_USERS_BIN_ID}`, {
+      await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_USERS_BLOB_ID}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'knitflow_global_users_v1',
-          data: { users: this.registeredUsers }
-        })
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ users: this.registeredUsers })
       });
     } catch (e) {
       console.warn('推送云端用户库失败：', e);
@@ -241,10 +238,12 @@ const App = {
 
   async syncCloudProjects() {
     try {
-      const res = await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`);
+      const res = await fetch(`${this.CLOUD_JSONBLOB_BASE}/${this.CLOUD_PROJECTS_BLOB_ID}`, {
+        headers: { 'Accept': 'application/json' }
+      });
       if (res.ok) {
         const json = await res.json();
-        const userProjectsMap = (json && json.data && json.data.userProjectsMap) ? json.data.userProjectsMap : {};
+        const userProjectsMap = (json && json.userProjectsMap) ? json.userProjectsMap : {};
         const primaryKey = this.getUserProjectKey();
         
         // 尝试搜寻主 Key 以及可能的历史备选 Key (例如原 id 做 Key "u_xxx", 或 account 原串)
@@ -316,12 +315,14 @@ const App = {
 
         // 5. 将合并后的最新数据自动向云端主 Key 推送一次，确保云端永远为全量最新版本
         if (this.projects.length > 0) {
-          this.pushCloudProjects();
+          await this.pushCloudProjects();
         }
+        return true;
       }
     } catch (e) {
       console.warn('云端编织项目双向同步跳过：', e);
     }
+    return false;
   },
 
   async pushCloudProjects() {
@@ -406,10 +407,15 @@ const App = {
       if (syncBtn) {
         syncBtn.onclick = async (e) => {
           e.stopPropagation();
-          this.showToast('☁️ 正在为您同步平板与电脑编织项目...');
-          await this.syncCloudProjects();
+          this.showToast('☁️ 正在为您双向同步平板与电脑编织项目...');
+          this.saveProjects();
           await this.pushCloudProjects();
-          this.showToast('🎉 项目多端同步已成功更新至最新！');
+          const success = await this.syncCloudProjects();
+          if (success) {
+            this.showToast(`🎉 同步完成！当前共有 ${this.projects.length} 个编织项目`);
+          } else {
+            this.showToast(`✨ 同步完成！已更新 ${this.projects.length} 个编织项目`);
+          }
         };
       }
 
