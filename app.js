@@ -430,13 +430,22 @@ const App = {
       }
     } else {
       container.innerHTML = `
-        <button id="btn-open-auth-modal" class="btn text-btn" style="padding: 0.3rem 0.75rem; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--primary); border-radius: 18px; color: var(--primary); display: flex; align-items: center; gap: 4px; cursor: pointer;">
-          <span>👤 登录 / 注册</span>
-        </button>
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <button id="btn-sync-guest-trigger" class="btn text-btn btn-trigger-cloud-sync" style="padding: 0.3rem 0.65rem; font-size: 0.8rem; font-weight: 600; background: var(--primary-light); border: 1px solid var(--card-border); border-radius: 18px; color: var(--primary); display: flex; align-items: center; gap: 4px; cursor: pointer;" title="打开多端同步与全量备份">
+            <span>☁️ 多端同步</span>
+          </button>
+          <button id="btn-open-auth-modal" class="btn text-btn" style="padding: 0.3rem 0.75rem; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--primary); border-radius: 18px; color: var(--primary); display: flex; align-items: center; gap: 4px; cursor: pointer;">
+            <span>👤 登录 / 注册</span>
+          </button>
+        </div>
       `;
       const loginBtn = container.querySelector('#btn-open-auth-modal');
       if (loginBtn) {
         loginBtn.onclick = () => this.openAuthModal();
+      }
+      const syncGuestBtn = container.querySelector('#btn-sync-guest-trigger');
+      if (syncGuestBtn) {
+        syncGuestBtn.onclick = () => this.openCloudSyncModal();
       }
     }
   },
@@ -3388,6 +3397,23 @@ const App = {
   // 事件交互绑定 (全防御性包装，避免任一元素缺失影响页面功能)
   // ==========================================================================
   bindEvents() {
+    // 强制全局捕获：保障页面上任何地方（无论是顶部卡片、侧栏还是登录弹窗）点击【同步】相关按钮均 100% 打开多端同步与备份中心
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('#btn-sync-projects-inline, #btn-force-cloud-sync, .btn-trigger-cloud-sync');
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.openCloudSyncModal();
+        return;
+      }
+
+      const rawBtn = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
+      if (rawBtn && rawBtn.innerText && (rawBtn.innerText.includes('同步') || rawBtn.innerText.includes('Sync')) && !rawBtn.closest('#cloud-sync-modal')) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.openCloudSyncModal();
+      }
+    });
     this.bindMotifModalEvents();
 
     const addClick = (id, fn) => {
