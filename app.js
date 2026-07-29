@@ -228,7 +228,15 @@ const App = {
   // 多设备云端项目实时双向同步逻辑 (支持电脑、平板与手机无缝同步)
   // ==========================================================================
   getUserProjectKey() {
-    return this.currentUser ? (this.currentUser.id || (this.currentUser.account ? this.currentUser.account.toLowerCase() : 'user')) : 'guest';
+    if (!this.currentUser) return 'guest';
+    // 以注册输入的邮箱或手机号 account 标准化做 Key（保证各端均保持绝对统一）
+    if (this.currentUser.account && this.currentUser.account.trim()) {
+      return 'acc_' + this.currentUser.account.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+    }
+    if (this.currentUser.id) {
+      return String(this.currentUser.id);
+    }
+    return 'guest';
   },
 
   async syncCloudProjects() {
@@ -237,51 +245,78 @@ const App = {
       if (res.ok) {
         const json = await res.json();
         const userProjectsMap = (json && json.data && json.data.userProjectsMap) ? json.data.userProjectsMap : {};
-        const userKey = this.getUserProjectKey();
-        const remoteProjects = userProjectsMap[userKey];
+        const primaryKey = this.getUserProjectKey();
+        
+        // 尝试搜寻主 Key 以及可能的历史备选 Key (例如原 id 做 Key "u_xxx", 或 account 原串)
+        const candidateKeys = [primaryKey];
+        if (this.currentUser) {
+          if (this.currentUser.id) candidateKeys.push(String(this.currentUser.id));
+          if (this.currentUser.account) {
+            candidateKeys.push(this.currentUser.account.toLowerCase());
+            candidateKeys.push('acc_' + this.currentUser.account.trim().toLowerCase().replace(/[^a-z0-9]/g, '_'));
+          }
+        }
 
-        if (Array.isArray(remoteProjects)) {
-          const mergedMap = new Map();
+        const mergedMap = new Map();
 
-          // 1. 将远端项目写入 map
-          remoteProjects.forEach(p => {
-            if (p && p.id) {
-              mergedMap.set(String(p.id), p);
-            }
-          });
-
-          // 2. 将本地项目智能增量合并（比较 updatedAt 时间戳，保留最新修改版本）
-          this.projects.forEach(localP => {
-            if (!localP || !localP.id) return;
-            const pId = String(localP.id);
-            if (mergedMap.has(pId)) {
-              const remoteP = mergedMap.get(pId);
-              const localTime = new Date(localP.updatedAt || 0).getTime();
-              const remoteTime = new Date(remoteP.updatedAt || 0).getTime();
-              if (localTime >= remoteTime) {
-                mergedMap.set(pId, localP);
+        // 1. 将所有属于该用户（主 Key 及所有关联 Key）的远端项目放入 mergedMap
+        candidateKeys.forEach(k => {
+          const list = userProjectsMap[k];
+          if (Array.isArray(list)) {
+            list.forEach(p => {
+              if (p && p.id) {
+                const pId = String(p.id);
+                if (mergedMap.has(pId)) {
+                  const existingP = mergedMap.get(pId);
+                  const existingTime = new Date(existingP.updatedAt || 0).getTime();
+                  const pTime = new Date(p.updatedAt || 0).getTime();
+                  if (pTime > existingTime) {
+                    mergedMap.set(pId, p);
+                  }
+                } else {
+                  mergedMap.set(pId, p);
+                }
               }
-            } else {
+            });
+          }
+        });
+
+        // 2. 将本地项目与云端项目做双向智能增量合并（基于 updatedAt 时间戳保留最新修改版本）
+        this.projects.forEach(localP => {
+          if (!localP || !localP.id) return;
+          const pId = String(localP.id);
+          if (mergedMap.has(pId)) {
+            const remoteP = mergedMap.get(pId);
+            const localTime = new Date(localP.updatedAt || 0).getTime();
+            const remoteTime = new Date(remoteP.updatedAt || 0).getTime();
+            if (localTime >= remoteTime) {
               mergedMap.set(pId, localP);
             }
-          });
-
-          this.projects = Array.from(mergedMap.values());
-          
-          // 更新本地缓存
-          const storageKey = this.getProjectsStorageKey();
-          localStorage.setItem(storageKey, JSON.stringify(this.projects));
-
-          // 若在播放或编辑界面中，同步引用
-          if (this.currentProject) {
-            const updatedCurrent = this.projects.find(p => String(p.id) === String(this.currentProject.id));
-            if (updatedCurrent) {
-              this.currentProject = updatedCurrent;
-            }
+          } else {
+            mergedMap.set(pId, localP);
           }
+        });
 
-          // 重新渲染项目列表
-          this.renderProjectList();
+        this.projects = Array.from(mergedMap.values());
+        
+        // 3. 将合并后的最新全量项目保存到本地缓存
+        const storageKey = this.getProjectsStorageKey();
+        localStorage.setItem(storageKey, JSON.stringify(this.projects));
+
+        // 4. 若在播放或编辑界面中，同步当前项目引用
+        if (this.currentProject) {
+          const updatedCurrent = this.projects.find(p => String(p.id) === String(this.currentProject.id));
+          if (updatedCurrent) {
+            this.currentProject = updatedCurrent;
+          }
+        }
+
+        // 重新渲染项目列表
+        this.renderProjectList();
+
+        // 5. 将合并后的最新数据自动向云端主 Key 推送一次，确保云端永远为全量最新版本
+        if (this.projects.length > 0) {
+          this.pushCloudProjects();
         }
       }
     } catch (e) {
@@ -291,7 +326,7 @@ const App = {
 
   async pushCloudProjects() {
     try {
-      const userKey = this.getUserProjectKey();
+      const primaryKey = this.getUserProjectKey();
       const res = await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`);
       let userProjectsMap = {};
       if (res.ok) {
@@ -301,7 +336,13 @@ const App = {
         }
       }
 
-      userProjectsMap[userKey] = this.projects;
+      // 将最新编织项目列表写入主 Key 下
+      userProjectsMap[primaryKey] = this.projects;
+
+      // 如果当前登录用户曾经在旧 ID key 存过数据，顺便清理更新
+      if (this.currentUser && this.currentUser.id && String(this.currentUser.id) !== primaryKey) {
+        userProjectsMap[String(this.currentUser.id)] = this.projects;
+      }
 
       await fetch(`${this.CLOUD_API_BASE}/${this.CLOUD_PROJECTS_BIN_ID}`, {
         method: 'PUT',
@@ -311,6 +352,7 @@ const App = {
           data: { userProjectsMap: userProjectsMap }
         })
       });
+      console.log(`[CloudSync] 成功向云端推送 ${this.projects.length} 个编织项目！Key: ${primaryKey}`);
     } catch (e) {
       console.warn('推送云端项目失败：', e);
     }
@@ -809,8 +851,35 @@ const App = {
   loadProjects() {
     try {
       const key = this.getProjectsStorageKey();
-      const stored = localStorage.getItem(key);
-      const parsed = stored ? JSON.parse(stored) : null;
+      let stored = localStorage.getItem(key);
+      let parsed = stored ? JSON.parse(stored) : null;
+
+      // 容错迁移：如果当前账号 Key 下为空数组，且用户已登录，向下寻找历史或备选 Key (解决多设备间本地 key 前缀差异)
+      if ((!parsed || !Array.isArray(parsed) || parsed.length === 0) && this.currentUser) {
+        const primaryKey = this.getUserProjectKey();
+        const fallbackKeys = [
+          `knitflow_projects_user_${this.currentUser.id}`,
+          `knitflow_projects_user_${this.currentUser.account}`,
+          `knitflow_projects_user_${primaryKey}`,
+          'knitflow_projects_guest',
+          'knitflow_projects' // 原始历史全局 Key
+        ];
+
+        for (const fbKey of fallbackKeys) {
+          if (fbKey === key) continue;
+          const fbStored = localStorage.getItem(fbKey);
+          if (fbStored) {
+            try {
+              const fbParsed = JSON.parse(fbStored);
+              if (Array.isArray(fbParsed) && fbParsed.length > 0) {
+                console.log(`[CloudSync] 从备用 key ${fbKey} 迁移 ${fbParsed.length} 个编织项目`);
+                parsed = fbParsed;
+                break;
+              }
+            } catch(e){}
+          }
+        }
+      }
 
       const uniqueProjects = [];
       const seenSignatures = new Set();
@@ -819,7 +888,7 @@ const App = {
         parsed.forEach(p => {
           if (!p || p.id === 'sample-text' || p.id === 'sample-grid') return;
           // 根据 ID 或 (类型+名称+时间差) 防重
-          const sig = p.id ? p.id : `${p.type}_${p.name}`;
+          const sig = p.id ? String(p.id) : `${p.type}_${p.name}`;
           if (!seenSignatures.has(sig)) {
             seenSignatures.add(sig);
             if (!p.referenceLinks) {
@@ -834,9 +903,8 @@ const App = {
       }
 
       this.projects = uniqueProjects;
-      // 保存去重后的数据
-      if (parsed && parsed.length !== this.projects.length) {
-        this.saveProjects();
+      if (this.projects.length > 0) {
+        localStorage.setItem(key, JSON.stringify(this.projects));
       }
     } catch (e) {
       console.error('加载项目失败：', e);
