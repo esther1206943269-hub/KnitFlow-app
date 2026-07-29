@@ -1487,6 +1487,16 @@ const App = {
   // 1. 初始化文字模式 Player
   initTextPlayer() {
     const p = this.currentProject;
+    if (!p) return;
+
+    if (!p.data || !Array.isArray(p.data) || p.data.length === 0) {
+      p.data = [
+        { rowNum: 1, text: 'R1: 1下, 1上 (Repeat across)' },
+        { rowNum: 2, text: 'R2: 1上, 1下 (Repeat across)' }
+      ];
+      this.saveProjects();
+    }
+
     document.getElementById('text-player-title').textContent = p.name;
     this.updateTextPlayerUI();
     this.renderTextRowsList();
@@ -2199,15 +2209,23 @@ const App = {
     const p = this.currentProject;
     if (!p) return;
 
-    if (p.data && p.data.length > 0 && p.data[0]) {
-      Grid.width = p.data[0].length;
-      Grid.height = p.data.length;
-      Grid.data = p.data;
-      Grid.knitType = p.knitType || 'flat';
+    // 强力容错防护：若项目数据缺失 2D 二维网格矩阵 p.data，自动动态补全
+    if (!p.data || !Array.isArray(p.data) || p.data.length === 0 || !p.data[0]) {
+      const rows = p.rows || 24;
+      const cols = p.cols || 20;
+      p.data = Array.from({ length: rows }, () => Array(cols).fill('k'));
+      p.rows = rows;
+      p.cols = cols;
+      this.saveProjects();
     }
 
+    Grid.width = p.data[0].length;
+    Grid.height = p.data.length;
+    Grid.data = p.data;
+    Grid.knitType = p.knitType || 'flat';
+
     p.currentLoc = p.currentLoc || 1;
-    if (p.currentLoc > (p.data ? p.data.length : 1)) p.currentLoc = p.data ? p.data.length : 1;
+    if (p.currentLoc > p.data.length) p.currentLoc = p.data.length;
     if (p.currentLoc < 1) p.currentLoc = 1;
 
     const titleEl = document.getElementById('grid-player-title');
