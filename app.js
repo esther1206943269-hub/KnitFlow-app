@@ -17,24 +17,30 @@ const App = {
   registeredUsers: [],
 
   // 页面加载入口
-  CLOUD_USERS_BIN_ID: 'ff8081819f7e10ae019f893c3adf1162',
-  CLOUD_PROJECTS_BIN_ID: 'ff8081819f7e10ae019fad3c49424274',
-  CLOUD_API_BASE: 'https://api.restful-api.dev/objects',
+  CLOUD_JSONBLOB_BASE: 'https://jsonblob.com/api/jsonBlob',
+  CLOUD_PROJECTS_BLOB_ID: '019fad5d-d517-7a2e-865c-07ea483c07da',
+  CLOUD_USERS_BLOB_ID: '019fad5f-c967-73d7-a5c6-2c525b68dfc9',
 
   async init() {
+    console.log('[KnitFlow] Initializing App v20260729_PRO_SYNC...');
+    try {
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+    } catch (e) {}
+
     this.loadUserAuth();
-    
-    // 初始化时双向同步云端账号，将本地现有账号推上云端
     await this.syncCloudUsers();
     if (this.registeredUsers && this.registeredUsers.length > 0) {
       this.pushCloudUsers();
     }
-    // 确保固定为莫兰迪浅色原色大理石主题
     document.body.classList.remove('dark-mode');
 
     this.loadProjects();
-    // 从云端双向同步属于该账号的编织项目数据 (支持电脑与平板实时同步)
-    this.syncCloudProjects();
+    await this.syncCloudProjects();
+    await this.pushCloudProjects();
 
     this.loadCustomTemplates();
     this.loadDeletedPresets();
@@ -46,9 +52,7 @@ const App = {
     this.setupKeyboardShortcuts();
     this.initAudioUnlock();
 
-    // 全球访问量 / PV 浏览量统计
     this.trackPageview();
-    // 实时在线人数统计
     this.initOnlineTracker();
   },
 
@@ -244,25 +248,15 @@ const App = {
       if (res.ok) {
         const json = await res.json();
         const userProjectsMap = (json && json.userProjectsMap) ? json.userProjectsMap : {};
-        const primaryKey = this.getUserProjectKey();
         
-        const candidateKeys = [primaryKey, 'global_sync_slot', 'latest_backup'];
-        if (this.currentUser) {
-          if (this.currentUser.id) candidateKeys.push(String(this.currentUser.id));
-          if (this.currentUser.account) {
-            candidateKeys.push(this.currentUser.account.toLowerCase());
-            candidateKeys.push('acc_' + this.currentUser.account.trim().toLowerCase().replace(/[^a-z0-9]/g, '_'));
-          }
-        }
-
         const mergedMap = new Map();
 
-        // 1. 将所有属于该用户及全局广播槽的远端项目放入 mergedMap
-        candidateKeys.forEach(k => {
+        // 1. 全扫 userProjectsMap 下所有槽（包含所有用户账号、global_sync_slot、latest_backup、提取码等）
+        Object.keys(userProjectsMap).forEach(k => {
           const list = userProjectsMap[k];
           if (Array.isArray(list)) {
             list.forEach(p => {
-              if (p && p.id) {
+              if (p && p.id && p.id !== 'sample-text' && p.id !== 'sample-grid') {
                 const pId = String(p.id);
                 if (mergedMap.has(pId)) {
                   const existingP = mergedMap.get(pId);
@@ -279,7 +273,7 @@ const App = {
           }
         });
 
-        // 2. 将本地项目与云端项目做双向智能增量合并
+        // 2. 将本地项目与云端全量合并
         this.projects.forEach(localP => {
           if (!localP || !localP.id) return;
           const pId = String(localP.id);
@@ -297,7 +291,7 @@ const App = {
 
         this.projects = Array.from(mergedMap.values());
         
-        // 3. 将合并后的最新全量项目保存到本地缓存
+        // 3. 保存至本地缓存
         const storageKey = this.getProjectsStorageKey();
         localStorage.setItem(storageKey, JSON.stringify(this.projects));
 
